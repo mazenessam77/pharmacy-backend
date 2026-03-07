@@ -1,0 +1,82 @@
+### Pharmacy Backend API Tests
+### You can use the "REST Client" extension in VSCode to click and run these directly.
+
+@baseUrl = http://localhost:3001/api
+@adminToken = your_admin_jwt_token_here
+@patientToken = your_patient_jwt_token_here
+@pharmacyToken = your_pharmacy_jwt_token_here
+
+---
+### 1. Health Check
+GET http://localhost:3001/health
+
+---
+### 2. Swagger API Docs
+GET http://localhost:3001/api-docs
+
+---
+### 3. Auth Endpoints
+
+### Register a new Patient
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "password": "password123",
+  "role": "patient",
+  "phone": "1234567890"
+}
+
+###
+
+### Register a new Pharmacy
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Health Pharmacy",
+  "email": "pharmacy@example.com",
+  "password": "password123",
+  "role": "pharmacy",
+  "phone": "0987654321",
+  "pharmacyName": "Health Pharmacy Main",
+  "license": "LIC-12345",
+  "location": {
+    "lat": 40.7128,
+    "lng": -74.0060
+  },
+  "address": "123 Main St"
+}
+
+###
+
+### Login Patient
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com",
+  "password": "password123"
+}
+
+###
+
+### Get Current User Profile
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.token}}
+
+---
+### 4. Patient Orders
+
+### Get All Orders for logged-in user
+GET {{baseUrl}}/orders
+Authorization: Bearer {{login.response.body.token}}
+
+---
+### 5. Medicines
+
+### Get all medicines (public)
+GET {{baseUrl}}/medicines

@@ -1,0 +1,26 @@
+# ============================================================
+# terraform.tfvars.example
+# Copy this file to terraform.tfvars and fill in your values.
+# DO NOT commit terraform.tfvars to git — it contains secrets.
+# ============================================================
+
+aws_region   = "us-east-1"
+project_name = "pharma"
+environment  = "production"
+
+# Networking
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+availability_zone  = "us-east-1a"
+
+# Security — CHANGE THIS to your own IP: "203.0.113.5/32"
+ssh_allowed_cidr = "0.0.0.0/0"
+
+# Compute
+instance_type       = "t3.medium"
+key_pair_name       = "your-ec2-keypair-name"   # Must exist in AWS
+root_volume_size_gb = 30
+
+# App
+github_repo_url = "https://github.com/YOUR_USERNAME/pharmacy-backend.git"
+app_dir         = "/opt/pharma-app"
