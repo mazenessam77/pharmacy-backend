@@ -24,6 +24,10 @@ import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
+// Trust the Nginx reverse proxy (1 hop) so express-rate-limit
+// can correctly read the real client IP from X-Forwarded-For
+app.set('trust proxy', 1);
+
 // Global middleware
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
