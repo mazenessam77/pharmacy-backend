@@ -27,8 +27,8 @@ export const registerSchema = z.discriminatedUnion('role', [
     pharmacyName: z.string().min(2, 'Pharmacy name is required'),
     license: z.string().min(2, 'License number is required'),
     address: z.string().min(2, 'Address is required'),
-    lat: z.number({ required_error: 'Location is required' }),
-    lng: z.number({ required_error: 'Location is required' }),
+    lat: z.number({ message: 'Location is required' }),
+    lng: z.number({ message: 'Location is required' }),
     workingHoursOpen: z.string().min(1, 'Opening time is required'),
     workingHoursClose: z.string().min(1, 'Closing time is required'),
   }).refine((data) => data.password === data.confirmPassword, {

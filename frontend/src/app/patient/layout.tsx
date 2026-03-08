@@ -22,7 +22,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     connectSocket();
     fetchNotifications();
-    return () => disconnectSocket();
+    return () => { disconnectSocket(); };
   }, [fetchNotifications]);
 
   return (
