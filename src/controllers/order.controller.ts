@@ -125,7 +125,7 @@ export const getOrders = asyncHandler(async (req: Request, res: Response) => {
 
   const [orders, total] = await Promise.all([
     Order.find(filter)
-      .populate('acceptedPharmacy', 'pharmacyName rating')
+      .populate('acceptedPharmacy', 'pharmacyName rating userId')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit),
@@ -142,7 +142,7 @@ export const getOrders = asyncHandler(async (req: Request, res: Response) => {
 export const getOrderById = asyncHandler(async (req: Request, res: Response) => {
   const order = await Order.findById(req.params.id)
     .populate('patientId', 'name phone avatar')
-    .populate('acceptedPharmacy', 'pharmacyName rating location workingHours')
+    .populate('acceptedPharmacy', 'pharmacyName rating location workingHours userId')
     .populate('prescriptionId')
     .populate('acceptedResponse');
 
