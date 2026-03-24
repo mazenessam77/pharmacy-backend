@@ -24,6 +24,8 @@ services:
     ports: []
     environment:
       NODE_ENV: production
+      # Allow the browser frontend to call the API (CORS)
+      FRONTEND_URL: https://13.135.1.250
     volumes: []
     deploy:
       resources:
