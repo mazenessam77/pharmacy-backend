@@ -9,10 +9,12 @@ import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
@@ -23,11 +25,13 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setLoginError(null);
     try {
       await login(data);
       toast.success('Welcome back');
     } catch (err: any) {
-      toast.error(err.response?.data?.error?.message || 'Login failed');
+      const msg = err.response?.data?.error?.message || 'Invalid email or password.';
+      setLoginError(msg);
     }
   };
 
@@ -35,6 +39,14 @@ export default function LoginPage() {
     <div>
       <h2 className="text-[11px] uppercase tracking-widest text-neutral-500 mb-1">Welcome back</h2>
       <h3 className="text-[28px] font-light uppercase tracking-wide mb-10">Sign In</h3>
+
+      {/* Inline error banner */}
+      {loginError && (
+        <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-[13px] text-red-700">{loginError}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Input
@@ -56,9 +68,9 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-7 text-[11px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors"
+            className="absolute right-0 top-7 text-neutral-400 hover:text-black transition-colors"
           >
-            {showPassword ? 'Hide' : 'Show'}
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
 
