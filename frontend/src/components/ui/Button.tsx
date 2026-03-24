@@ -4,13 +4,16 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'outline' | 'ghost';
+  variant?: 'primary' | 'outline' | 'ghost' | 'indigo' | 'danger' | 'success';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
 
 const variants = {
   primary: 'bg-black text-white hover:bg-neutral-800',
+  indigo: 'bg-indigo-600 text-white hover:bg-indigo-700',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700',
   outline: 'border border-black text-black hover:bg-black hover:text-white',
   ghost: 'text-black hover:underline',
 };

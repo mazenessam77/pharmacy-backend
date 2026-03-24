@@ -8,9 +8,9 @@ interface BadgeProps {
 
 const variants = {
   default: 'bg-neutral-100 text-neutral-600',
-  success: 'bg-neutral-900 text-white',
-  warning: 'bg-neutral-200 text-neutral-800',
-  danger: 'bg-black text-white',
+  success: 'bg-emerald-100 text-emerald-700',
+  warning: 'bg-amber-100 text-amber-700',
+  danger: 'bg-red-100 text-red-700',
 };
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {

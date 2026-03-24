@@ -28,23 +28,46 @@ export default function PatientProfilePage() {
     }
   };
 
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    : 'P';
+
   return (
     <div className="max-w-lg">
-      <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Settings</p>
-      <h1 className="text-[28px] font-light uppercase tracking-wide mb-10">Profile</h1>
+      <div className="mb-8">
+        <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Account</p>
+        <h1 className="text-2xl font-semibold text-neutral-800">My Profile</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Input label="Email" value={user?.email || ''} disabled className="text-neutral-400" />
-        <Input label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+20xxxxxxxxxx" />
-        <Input label="Address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street, City" />
-
-        <div className="pt-4">
-          <Button type="submit" isLoading={saving} size="lg">
-            Save Changes
-          </Button>
+      {/* Avatar banner */}
+      <div className="bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl p-6 mb-6 text-white flex items-center gap-5 shadow-lg shadow-indigo-100">
+        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+          {initials}
         </div>
-      </form>
+        <div>
+          <p className="text-lg font-semibold">{user?.name || 'Patient'}</p>
+          <p className="text-indigo-200 text-[13px]">{user?.email}</p>
+          <span className="inline-block mt-1.5 px-2.5 py-0.5 bg-white/20 rounded-full text-[10px] uppercase tracking-widest">
+            Patient
+          </span>
+        </div>
+      </div>
+
+      {/* Form card */}
+      <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input label="Email" value={user?.email || ''} disabled className="text-neutral-400" />
+          <Input label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+20xxxxxxxxxx" />
+          <Input label="Address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street, City" />
+
+          <div className="pt-2">
+            <Button type="submit" variant="indigo" isLoading={saving} size="lg" className="w-full rounded-xl">
+              Save Changes
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

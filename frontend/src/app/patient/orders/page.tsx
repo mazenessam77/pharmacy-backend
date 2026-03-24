@@ -7,7 +7,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { ListSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
-import { Plus, ShoppingBag } from 'lucide-react';
+import { Plus, ShoppingBag, Pill, ChevronRight } from 'lucide-react';
 
 const STATUS_FILTERS = [
   { value: '', label: 'All' },
@@ -20,6 +20,16 @@ const STATUS_FILTERS = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+const statusBorderColor: Record<string, string> = {
+  pending: 'border-l-amber-400',
+  offered: 'border-l-blue-400',
+  confirmed: 'border-l-indigo-400',
+  preparing: 'border-l-purple-400',
+  out_for_delivery: 'border-l-cyan-400',
+  delivered: 'border-l-emerald-400',
+  cancelled: 'border-l-red-300',
+};
+
 export default function PatientOrdersPage() {
   const { orders, fetchOrders, isLoading, pagination } = useOrderStore();
   const [statusFilter, setStatusFilter] = useState('');
@@ -30,13 +40,14 @@ export default function PatientOrdersPage() {
 
   return (
     <div className="max-w-4xl">
-      <div className="flex items-start justify-between mb-8">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Orders</p>
-          <h1 className="text-[28px] font-light uppercase tracking-wide">My Orders</h1>
+          <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
+          <h1 className="text-2xl font-semibold text-neutral-800">My Orders</h1>
         </div>
         <Link href="/patient/orders/new">
-          <Button size="sm">
+          <Button variant="indigo" size="sm">
             <Plus className="w-3.5 h-3.5" />
             New Request
           </Button>
@@ -49,10 +60,10 @@ export default function PatientOrdersPage() {
           <button
             key={f.value}
             onClick={() => setStatusFilter(f.value)}
-            className={`px-4 py-2 text-[10px] uppercase tracking-widest border transition-colors duration-200 ${
+            className={`px-4 py-1.5 text-[11px] rounded-full font-medium transition-all duration-200 ${
               statusFilter === f.value
-                ? 'bg-black text-white border-black'
-                : 'bg-white text-neutral-500 border-neutral-200 hover:border-black'
+                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
+                : 'bg-white text-neutral-500 border border-neutral-200 hover:border-indigo-300 hover:text-indigo-600'
             }`}
           >
             {f.label}
@@ -64,11 +75,13 @@ export default function PatientOrdersPage() {
       {isLoading ? (
         <ListSkeleton count={5} />
       ) : orders.length === 0 ? (
-        <div className="border border-neutral-200 p-16 text-center">
-          <ShoppingBag className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
-          <p className="text-[12px] text-neutral-400 mb-4">No orders found</p>
+        <div className="bg-white rounded-2xl border border-neutral-200 py-16 text-center">
+          <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <ShoppingBag className="w-7 h-7 text-indigo-300" />
+          </div>
+          <p className="text-[13px] text-neutral-500 mb-4">No orders found</p>
           <Link href="/patient/orders/new">
-            <Button variant="outline" size="sm">Create Your First Order</Button>
+            <Button variant="indigo" size="sm">Create Your First Order</Button>
           </Link>
         </div>
       ) : (
@@ -77,25 +90,31 @@ export default function PatientOrdersPage() {
             <Link
               key={order._id}
               href={`/patient/orders/${order._id}`}
-              className="block border border-neutral-200 p-5 hover:border-black transition-colors duration-300"
+              className={`flex items-center gap-4 bg-white border border-neutral-200 border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-xl p-4 hover:shadow-md hover:shadow-neutral-100 transition-all duration-200 group`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] uppercase tracking-widest text-neutral-400">
-                  #{order._id.slice(-8)}
-                </p>
-                <Badge variant={statusVariant(order.status)}>
-                  {statusLabel(order.status)}
-                </Badge>
+              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
+                <Pill className="w-5 h-5 text-indigo-500" />
               </div>
-              <p className="text-[14px] mb-2">
-                {order.medicines.map((m) => `${m.name} x${m.quantity}`).join(', ')}
-              </p>
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] text-neutral-400">
-                  {order.deliveryType === 'delivery' ? 'Delivery' : 'Pickup'}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-[10px] text-neutral-400 uppercase tracking-widest">
+                    #{order._id.slice(-8)}
+                  </p>
+                  <Badge variant={statusVariant(order.status)}>
+                    {statusLabel(order.status)}
+                  </Badge>
+                </div>
+                <p className="text-[13px] font-medium text-neutral-800 truncate">
+                  {order.medicines.map((m) => `${m.name} ×${m.quantity}`).join(', ')}
                 </p>
-                <p className="text-[11px] text-neutral-400">{formatDate(order.createdAt)}</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-[11px] text-neutral-400">
+                    {order.deliveryType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
+                  </p>
+                  <p className="text-[11px] text-neutral-400">{formatDate(order.createdAt)}</p>
+                </div>
               </div>
+              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-indigo-400 shrink-0 transition-colors" />
             </Link>
           ))}
         </div>
@@ -108,10 +127,10 @@ export default function PatientOrdersPage() {
             <button
               key={i}
               onClick={() => fetchOrders({ page: i + 1, status: statusFilter || undefined })}
-              className={`w-8 h-8 text-[11px] border transition-colors ${
+              className={`w-9 h-9 text-[12px] rounded-lg font-medium transition-colors ${
                 pagination.page === i + 1
-                  ? 'bg-black text-white border-black'
-                  : 'border-neutral-200 hover:border-black'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'bg-white border border-neutral-200 text-neutral-600 hover:border-indigo-300'
               }`}
             >
               {i + 1}

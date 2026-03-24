@@ -27,10 +27,10 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
 
   return (
     <ProtectedRoute roles={['patient']}>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-slate-50">
         <Navbar />
         <div className="flex">
-          <Sidebar links={links} />
+          <Sidebar links={links} variant="indigo" />
           <main className="flex-1 p-8">{children}</main>
         </div>
       </div>
