@@ -115,7 +115,7 @@ export interface Order {
 export interface CreateOrderData {
   medicines: { name: string; quantity: number; medicineId?: string }[];
   prescriptionId?: string;
-  location: { lat: number; lng: number };
+  governorate: string;
   deliveryType: 'delivery' | 'pickup';
   notes?: string;
 }
