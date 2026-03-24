@@ -4,7 +4,7 @@ import { OrderResponse } from '../models/OrderResponse';
 import { Pharmacy } from '../models/Pharmacy';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
-import { calculateDistanceBetween } from '../services/geolocation.service';
+// geolocation service not needed in governorate-based system
 import { createNotification } from '../services/notification.service';
 import { sendOrderConfirmationEmail } from '../services/email.service';
 import { getIO } from '../socket';
@@ -21,9 +21,7 @@ export const submitResponse = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Pharmacy profile not found.', 404, ERROR_CODES.PHARMACY_NOT_FOUND);
   }
 
-  if (!pharmacy.isVerified) {
-    throw new AppError('Pharmacy is not verified.', 403, ERROR_CODES.PHARMACY_NOT_VERIFIED);
-  }
+  // isVerified check removed — all registered pharmacies can respond
 
   const order = await Order.findById(orderId);
   if (!order) {
@@ -43,13 +41,8 @@ export const submitResponse = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('You have already responded to this order.', 409, ERROR_CODES.ORDER_ALREADY_RESPONDED);
   }
 
-  // Calculate distance
-  const distanceKm = calculateDistanceBetween(
-    pharmacy.location.coordinates[0],
-    pharmacy.location.coordinates[1],
-    order.patientLocation.coordinates[0],
-    order.patientLocation.coordinates[1]
-  );
+  // Distance is 0 in governorate-based system
+  const distanceKm = 0;
 
   const orderResponse = await OrderResponse.create({
     orderId,
