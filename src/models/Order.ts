@@ -14,9 +14,10 @@ const orderSchema = new Schema<OrderDocument>(
       },
     ],
     prescriptionId: { type: Schema.Types.ObjectId, ref: 'Prescription' },
+    governorate: { type: String, required: true, default: 'Giza' },
     patientLocation: {
       type: { type: String, enum: ['Point'], default: 'Point' },
-      coordinates: { type: [Number], required: true },
+      coordinates: { type: [Number], default: [31.2357, 30.0444] },
     },
     status: {
       type: String,

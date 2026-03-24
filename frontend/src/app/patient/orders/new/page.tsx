@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import toast from 'react-hot-toast';
 import { Plus, Trash2, Upload } from 'lucide-react';
+import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 
 interface MedicineEntry {
   name: string;
@@ -20,6 +21,7 @@ export default function NewOrderPage() {
   const { createOrder, isLoading } = useOrderStore();
   const [medicines, setMedicines] = useState<MedicineEntry[]>([{ name: '', quantity: 1 }]);
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
+  const [governorate, setGovernorate] = useState('Giza');
   const [notes, setNotes] = useState('');
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
@@ -66,7 +68,7 @@ export default function NewOrderPage() {
         deliveryType,
         notes: notes || undefined,
         prescriptionId: prescriptionId || undefined,
-        location: { lat: 30.0444, lng: 31.2357 }, // Default Cairo — ideally from user profile/geolocation
+        governorate,
       });
       toast.success('Order created');
       router.push(`/patient/orders/${order._id}`);
@@ -152,6 +154,21 @@ export default function NewOrderPage() {
               <p className="mt-2 text-[11px] text-neutral-500">Uploaded successfully</p>
             )}
           </div>
+        </div>
+
+        {/* Governorate */}
+        <div>
+          <p className="text-[11px] uppercase tracking-widest mb-4">Governorate</p>
+          <select
+            value={governorate}
+            onChange={(e) => setGovernorate(e.target.value)}
+            className="w-full py-2.5 bg-transparent border-0 border-b border-neutral-300 text-[14px] focus:outline-none focus:border-black transition-colors duration-300"
+          >
+            {EGYPTIAN_GOVERNORATES.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+          <p className="text-[10px] text-neutral-400 mt-1">All pharmacies in this governorate will see your order</p>
         </div>
 
         {/* Delivery Type */}

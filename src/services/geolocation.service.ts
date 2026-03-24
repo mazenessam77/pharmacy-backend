@@ -14,30 +14,14 @@ interface NearbyPharmacyResult {
   distanceKm: number;
 }
 
-export const findNearbyPharmacies = async (
-  longitude: number,
-  latitude: number,
-  radiusKm: number = 5
+export const findPharmaciesByGovernorate = async (
+  governorate: string
 ): Promise<NearbyPharmacyResult[]> => {
   const pharmacies = await Pharmacy.aggregate([
     {
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: [longitude, latitude],
-        },
-        distanceField: 'distance',
-        maxDistance: radiusKm * 1000,
-        spherical: true,
-        query: {
-          isVerified: true,
-          isOpen: true,
-        },
-      },
-    },
-    {
-      $addFields: {
-        distanceKm: { $round: [{ $divide: ['$distance', 1000] }, 2] },
+      $match: {
+        governorate,
+        isOpen: true,
       },
     },
     {
@@ -51,6 +35,8 @@ export const findNearbyPharmacies = async (
     {
       $addFields: {
         userBanned: { $arrayElemAt: ['$user.isBanned', 0] },
+        distance: 0,
+        distanceKm: 0,
       },
     },
     {
@@ -64,11 +50,13 @@ export const findNearbyPharmacies = async (
         userBanned: 0,
       },
     },
-    { $sort: { distance: 1 } },
   ]);
 
   return pharmacies;
 };
+
+// Keep for backwards compatibility
+export const findNearbyPharmacies = findPharmaciesByGovernorate.bind(null, 'Giza') as any;
 
 export const calculateDistanceBetween = (
   lng1: number,

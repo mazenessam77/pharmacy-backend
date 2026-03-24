@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
+import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 
 export default function RegisterPage() {
   const { register: registerUser, isLoading } = useAuthStore();
@@ -43,7 +44,7 @@ export default function RegisterPage() {
         payload.pharmacyName = data.pharmacyName;
         payload.license = data.license;
         payload.address = data.address;
-        payload.location = { lat: data.lat, lng: data.lng };
+        payload.governorate = data.governorate;
         payload.workingHours = { open: data.workingHoursOpen, close: data.workingHoursClose };
       }
 
@@ -156,23 +157,20 @@ export default function RegisterPage() {
               {...register('address' as any)}
             />
 
-            <div className="grid grid-cols-2 gap-5">
-              <Input
-                label="Latitude"
-                type="number"
-                step="any"
-                placeholder="30.0444"
-                error={(errors as any).lat?.message}
-                {...register('lat' as any, { valueAsNumber: true })}
-              />
-              <Input
-                label="Longitude"
-                type="number"
-                step="any"
-                placeholder="31.2357"
-                error={(errors as any).lng?.message}
-                {...register('lng' as any, { valueAsNumber: true })}
-              />
+            <div>
+              <label className="block text-[11px] uppercase tracking-widest text-neutral-500 mb-2">Governorate</label>
+              <select
+                {...register('governorate' as any)}
+                className="w-full py-2.5 bg-transparent border-0 border-b border-neutral-300 text-[14px] focus:outline-none focus:border-black transition-colors duration-300"
+              >
+                <option value="">Select governorate</option>
+                {EGYPTIAN_GOVERNORATES.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+              {(errors as any).governorate && (
+                <p className="text-red-500 text-[11px] mt-1">{(errors as any).governorate.message}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-5">

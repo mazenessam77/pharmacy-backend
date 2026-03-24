@@ -4,7 +4,7 @@ import { Prescription } from '../models/Prescription';
 import { Pharmacy } from '../models/Pharmacy';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
-import { findNearbyPharmacies } from '../services/geolocation.service';
+import { findPharmaciesByGovernorate } from '../services/geolocation.service';
 import { createNotification } from '../services/notification.service';
 import { getIO } from '../socket';
 import { getPagination } from '../utils/helpers';
@@ -12,8 +12,12 @@ import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT
 import { sendOrderConfirmationEmail } from '../services/email.service';
 
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
-  const { medicines, prescriptionId, location, deliveryType, notes } = req.body;
+  const { medicines, prescriptionId, governorate, deliveryType, notes } = req.body;
   const patientId = req.user!._id;
+
+  if (!governorate) {
+    throw new AppError('Governorate is required.', 400, ERROR_CODES.VALIDATION_ERROR);
+  }
 
   // Verify prescription if provided
   if (prescriptionId) {
@@ -27,41 +31,34 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
     patientId,
     medicines,
     prescriptionId,
-    patientLocation: {
-      type: 'Point',
-      coordinates: [location.lng, location.lat],
-    },
+    governorate,
     deliveryType,
     notes,
   });
 
-  // Find nearby pharmacies
-  const searchRadius = req.user!.searchRadius || 5;
-  const nearbyPharmacies = await findNearbyPharmacies(location.lng, location.lat, searchRadius);
+  // Find all pharmacies in the same governorate
+  const governoratePharmacies = await findPharmaciesByGovernorate(governorate);
 
   const io = getIO();
 
-  // Notify each nearby pharmacy
-  for (const pharmacy of nearbyPharmacies) {
+  // Notify each pharmacy in the governorate
+  for (const pharmacy of governoratePharmacies) {
     if (io) {
-      io.to(`pharmacy:${pharmacy._id}`).emit('pharmacy:new-order', {
-        order,
-        distance: pharmacy.distanceKm,
-      });
+      io.to(`pharmacy:${pharmacy._id}`).emit('pharmacy:new-order', { order });
     }
 
     await createNotification({
       userId: pharmacy.userId,
       type: 'new_order',
-      title: 'New Order Nearby',
-      body: `A patient is requesting ${medicines.length} medicine(s) - ${pharmacy.distanceKm}km away`,
-      data: { orderId: order._id.toString(), distance: pharmacy.distanceKm },
+      title: 'New Order in Your Area',
+      body: `A patient in ${governorate} is requesting ${medicines.length} medicine(s)`,
+      data: { orderId: order._id.toString() },
     });
   }
 
   res.status(201).json({
     success: true,
-    data: { order, nearbyPharmaciesCount: nearbyPharmacies.length },
+    data: { order, pharmaciesNotified: governoratePharmacies.length },
   });
 });
 
@@ -83,34 +80,24 @@ export const getOrders = asyncHandler(async (req: Request, res: Response) => {
     }
 
     if (status === 'pending' || status === 'offered' || !status) {
-      // Return nearby orders that are pending or offered
-      const nearbyOrders = await Order.aggregate([
-        {
-          $geoNear: {
-            near: {
-              type: 'Point',
-              coordinates: pharmacy.location.coordinates as [number, number],
-            },
-            distanceField: 'distance',
-            maxDistance: 10000, // 10km
-            spherical: true,
-            query: {
-              status: { $in: ['pending', 'offered'] },
-            },
-          },
-        },
-        { $sort: { createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limit },
+      // Return orders in the same governorate that are pending or offered
+      const [governorateOrders, total] = await Promise.all([
+        Order.find({
+          governorate: pharmacy.governorate,
+          status: { $in: ['pending', 'offered'] },
+        })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+        Order.countDocuments({
+          governorate: pharmacy.governorate,
+          status: { $in: ['pending', 'offered'] },
+        }),
       ]);
-
-      const total = await Order.countDocuments({
-        status: { $in: ['pending', 'offered'] },
-      });
 
       return res.json({
         success: true,
-        data: nearbyOrders,
+        data: governorateOrders,
         pagination: getPagination(page, limit, total),
       });
     } else {
@@ -271,38 +258,30 @@ export const reorder = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
   }
 
-  const userLocation = req.user!.location?.coordinates || originalOrder.patientLocation.coordinates;
+  const governorate = originalOrder.governorate || 'Giza';
 
   const newOrder = await Order.create({
     patientId: req.user!._id,
     medicines: originalOrder.medicines,
-    patientLocation: {
-      type: 'Point',
-      coordinates: userLocation,
-    },
+    governorate,
     deliveryType: originalOrder.deliveryType,
     notes: originalOrder.notes,
   });
 
-  // Notify nearby pharmacies
-  const [lng, lat] = userLocation;
-  const searchRadius = req.user!.searchRadius || 5;
-  const nearbyPharmacies = await findNearbyPharmacies(lng, lat, searchRadius);
+  // Notify all pharmacies in the same governorate
+  const governoratePharmacies = await findPharmaciesByGovernorate(governorate);
 
   const io = getIO();
-  for (const pharmacy of nearbyPharmacies) {
+  for (const pharmacy of governoratePharmacies) {
     if (io) {
-      io.to(`pharmacy:${pharmacy._id}`).emit('pharmacy:new-order', {
-        order: newOrder,
-        distance: pharmacy.distanceKm,
-      });
+      io.to(`pharmacy:${pharmacy._id}`).emit('pharmacy:new-order', { order: newOrder });
     }
 
     await createNotification({
       userId: pharmacy.userId,
       type: 'new_order',
-      title: 'New Order Nearby',
-      body: `A patient is requesting ${newOrder.medicines.length} medicine(s)`,
+      title: 'New Order in Your Area',
+      body: `A patient in ${governorate} is requesting ${newOrder.medicines.length} medicine(s)`,
       data: { orderId: newOrder._id.toString() },
     });
   }

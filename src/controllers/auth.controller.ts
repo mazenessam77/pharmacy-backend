@@ -12,7 +12,7 @@ import { ERROR_CODES, BCRYPT_SALT_ROUNDS } from '../utils/constants';
 import { env } from '../config/env';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password, phone, role, pharmacyName, license, location, address, workingHours } = req.body;
+  const { name, email, password, phone, role, pharmacyName, license, governorate, address, workingHours } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -28,13 +28,6 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     address,
   };
 
-  if (location) {
-    userData.location = {
-      type: 'Point',
-      coordinates: [location.lng, location.lat],
-    };
-  }
-
   const user = await User.create(userData);
 
   // If pharmacy role, create pharmacy profile
@@ -43,10 +36,8 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       userId: user._id,
       pharmacyName,
       license,
-      location: {
-        type: 'Point',
-        coordinates: [location.lng, location.lat],
-      },
+      governorate: governorate || 'Giza',
+      location: { type: 'Point', coordinates: [31.2357, 30.0444] },
       workingHours: workingHours || {},
     });
   }

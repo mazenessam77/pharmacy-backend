@@ -19,6 +19,7 @@ const pharmacySchema = new Schema<PharmacyDocument>(
     },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     totalReviews: { type: Number, default: 0 },
+    governorate: { type: String, required: true, default: 'Giza' },
     isVerified: { type: Boolean, default: false },
     isOpen: { type: Boolean, default: true },
     verifiedAt: { type: Date },
