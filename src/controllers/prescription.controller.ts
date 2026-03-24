@@ -14,9 +14,16 @@ export const uploadPrescription = asyncHandler(async (req: Request, res: Respons
 
   const result = await uploadToCloudinary(req.file.buffer, 'pharmacy-app/prescriptions');
 
+  const prescription = await Prescription.create({
+    patientId: req.user!._id,
+    imageUrl: result.url,
+    extractedText: '',
+    extractedMeds: [],
+  });
+
   res.status(201).json({
     success: true,
-    data: { imageUrl: result.url },
+    data: { prescription },
   });
 });
 

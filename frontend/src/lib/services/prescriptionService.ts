@@ -3,7 +3,7 @@ import api from '@/lib/api';
 export const prescriptionService = {
   upload: (file: File) => {
     const formData = new FormData();
-    formData.append('prescription', file);
+    formData.append('image', file);        // must match upload.single('image') on the backend
     return api.post('/prescriptions/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -11,7 +11,7 @@ export const prescriptionService = {
 
   scan: (file: File) => {
     const formData = new FormData();
-    formData.append('prescription', file);
+    formData.append('image', file);        // must match upload.single('image') on the backend
     return api.post('/prescriptions/scan', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

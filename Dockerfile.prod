@@ -23,7 +23,7 @@ EXPOSE 5000
 
 # Run as non-root user
 RUN addgroup -g 1001 -S appuser && adduser -S appuser -u 1001 \
-    && mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+    && mkdir -p /app/logs /app/uploads && chown -R appuser:appuser /app/logs /app/uploads
 USER appuser
 
 CMD ["node", "dist/server.js"]
