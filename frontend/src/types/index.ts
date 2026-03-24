@@ -51,6 +51,7 @@ export interface Pharmacy {
   pharmacyName: string;
   license: string;
   licenseImage?: string;
+  governorate: string;
   location: { type: string; coordinates: [number, number] };
   workingHours: { open: string; close: string };
   rating: number;
