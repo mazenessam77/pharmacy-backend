@@ -11,9 +11,42 @@
   }
   body {
     @apply bg-white text-black antialiased;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue', sans-serif);
   }
   ::selection {
-    @apply bg-black text-white;
+    @apply bg-indigo-600 text-white;
+  }
+  /* Thin custom scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-neutral-200 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-neutral-300; }
+}
+
+@layer utilities {
+  /* Mesh gradient helper — used on the patient hero banner */
+  .mesh-gradient {
+    background:
+      radial-gradient(ellipse at 15% -10%, rgba(139, 92, 246, 0.75) 0px, transparent 52%),
+      radial-gradient(ellipse at 85%  0%,  rgba(59, 130, 246, 0.70) 0px, transparent 52%),
+      radial-gradient(ellipse at  0% 90%,  rgba(236, 72, 153, 0.25) 0px, transparent 40%),
+      radial-gradient(ellipse at 90% 85%,  rgba(16, 185, 129, 0.25) 0px, transparent 40%),
+      linear-gradient(135deg, #3730a3 0%, #1e40af 55%, #4338ca 100%);
+  }
+
+  /* Soft glass card */
+  .glass {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+  }
+
+  /* Floating card shadow */
+  .card-shadow {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  }
+  .card-shadow-lg {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   }
 }

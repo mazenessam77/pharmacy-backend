@@ -5,18 +5,49 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useOrderStore } from '@/store/orderStore';
 import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
-import { ShoppingBag, Plus, ArrowRight, Pill, Clock, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Plus, ArrowRight, Clock, CheckCircle2, Sparkles } from 'lucide-react';
 
+// ─── Medicine Avatar ──────────────────────────────────────────────────────────
+// Generates a deterministic pastel circle with the medicine's initials.
+// Replaces the generic pill icon so each medicine looks visually distinct.
+const AVATAR_PALETTES = [
+  { bg: '#e0e7ff', fg: '#4338ca' }, // indigo
+  { bg: '#d1fae5', fg: '#065f46' }, // emerald
+  { bg: '#fef3c7', fg: '#92400e' }, // amber
+  { bg: '#fce7f3', fg: '#9d174d' }, // pink
+  { bg: '#ede9fe', fg: '#5b21b6' }, // violet
+  { bg: '#e0f2fe', fg: '#075985' }, // sky
+  { bg: '#dcfce7', fg: '#15803d' }, // green
+  { bg: '#fff7ed', fg: '#9a3412' }, // orange
+];
+
+function MedicineAvatar({ name }: { name: string }) {
+  const code = Array.from(name).reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const { bg, fg } = AVATAR_PALETTES[code % AVATAR_PALETTES.length];
+  const initials = name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('');
+
+  return (
+    <div
+      className="w-11 h-11 rounded-2xl flex items-center justify-center text-[11px] font-bold shrink-0 select-none"
+      style={{ backgroundColor: bg, color: fg }}
+    >
+      {initials}
+    </div>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 export default function PatientDashboard() {
   const { user } = useAuthStore();
   const { orders, fetchOrders, isLoading } = useOrderStore();
 
-  useEffect(() => {
-    fetchOrders({ page: 1 });
-  }, [fetchOrders]);
+  useEffect(() => { fetchOrders({ page: 1 }); }, [fetchOrders]);
 
   const recentOrders = orders.slice(0, 5);
   const activeCount = orders.filter((o) =>
@@ -24,60 +55,122 @@ export default function PatientDashboard() {
   ).length;
   const deliveredCount = orders.filter((o) => o.status === 'delivered').length;
 
-  const stats = [
-    { label: 'Total Orders', value: orders.length, bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-100', icon: ShoppingBag },
-    { label: 'Active', value: activeCount, bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', icon: Clock },
-    { label: 'Delivered', value: deliveredCount, bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', icon: CheckCircle2 },
-  ];
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
 
   return (
-    <div className="max-w-4xl">
-      {/* Welcome Banner */}
-      <div className="rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 p-7 mb-8 text-white shadow-lg shadow-indigo-100">
-        <div className="flex items-center justify-between">
+    <div className="max-w-4xl relative">
+
+      {/* ── Mesh Gradient Hero ─────────────────────────────────────────── */}
+      <div
+        className="mesh-gradient rounded-3xl p-8 mb-7 text-white overflow-hidden relative"
+        style={{ boxShadow: '0 20px 40px -10px rgba(67, 56, 202, 0.40)' }}
+      >
+        {/* decorative blobs */}
+        <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-8 -left-8 w-36 h-36 bg-purple-400/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative flex items-start justify-between gap-4">
           <div>
-            <p className="text-indigo-200 text-[11px] uppercase tracking-widest mb-1">Patient Dashboard</p>
-            <h1 className="text-2xl font-semibold">
-              Hello, {user?.name?.split(' ')[0]} 👋
+            <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
+              <Sparkles className="w-3 h-3" />
+              Patient Portal
+            </div>
+            <h1 className="text-[28px] font-extrabold leading-tight">
+              {greeting()},{' '}
+              <span className="text-indigo-200">{user?.name?.split(' ')[0]}</span> 👋
             </h1>
-            <p className="text-indigo-100 mt-1.5 text-[13px]">
-              Get your medicines delivered fast across Egypt.
+            <p className="text-indigo-100/80 mt-1.5 text-[13px] font-medium">
+              Your health, delivered — across all of Egypt.
             </p>
           </div>
-          <div className="w-16 h-16 bg-white/15 rounded-2xl flex items-center justify-center shrink-0">
-            <Pill className="w-8 h-8 text-white" />
-          </div>
-        </div>
-        <div className="mt-5">
-          <Link href="/patient/orders/new">
-            <Button variant="ghost" size="sm" className="text-white hover:text-white hover:no-underline bg-white/20 hover:bg-white/30 px-5 rounded-lg">
-              <Plus className="w-4 h-4" />
-              New Medicine Request
-            </Button>
+
+          {/* High-contrast FAB inside hero */}
+          <Link
+            href="/patient/orders/new"
+            className="shrink-0 flex items-center gap-2 bg-white text-indigo-700 font-bold text-[13px] px-5 py-3 rounded-2xl hover:bg-indigo-50 active:scale-95 transition-all duration-200"
+            style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}
+          >
+            <Plus className="w-4 h-4" />
+            New Request
           </Link>
+        </div>
+
+        {/* Mini stats strip inside hero */}
+        <div className="relative mt-6 grid grid-cols-3 gap-3">
+          {[
+            { label: 'Total', value: orders.length },
+            { label: 'Active', value: activeCount },
+            { label: 'Delivered', value: deliveredCount },
+          ].map((s) => (
+            <div key={s.label} className="bg-white/15 rounded-2xl px-4 py-3 backdrop-blur-sm">
+              <p className="text-2xl font-extrabold">{s.value}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-200 mt-0.5">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        {stats.map((stat) => (
-          <div key={stat.label} className={`${stat.bg} border ${stat.border} rounded-xl p-5`}>
-            <stat.icon className={`w-5 h-5 ${stat.text} mb-3`} />
-            <p className={`text-3xl font-bold ${stat.text}`}>{stat.value}</p>
-            <p className="text-[11px] text-neutral-500 mt-1 uppercase tracking-wide">{stat.label}</p>
+      {/* ── Stat Cards ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-4 mb-7">
+        {[
+          {
+            label: 'Total Orders',
+            value: orders.length,
+            icon: ShoppingBag,
+            accent: '#e0e7ff',
+            iconColor: '#4338ca',
+            bar: 'bg-indigo-500',
+          },
+          {
+            label: 'In Progress',
+            value: activeCount,
+            icon: Clock,
+            accent: '#fef3c7',
+            iconColor: '#b45309',
+            bar: 'bg-amber-400',
+          },
+          {
+            label: 'Delivered',
+            value: deliveredCount,
+            icon: CheckCircle2,
+            accent: '#d1fae5',
+            iconColor: '#065f46',
+            bar: 'bg-emerald-500',
+          },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="glass rounded-2xl p-5 card-shadow hover:card-shadow-lg transition-shadow duration-300 overflow-hidden relative group"
+          >
+            {/* colored top bar */}
+            <div className={`absolute top-0 left-0 right-0 h-0.5 ${s.bar} opacity-60 group-hover:opacity-100 transition-opacity`} />
+
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center mb-4"
+              style={{ backgroundColor: s.accent }}
+            >
+              <s.icon className="w-4.5 h-4.5" style={{ color: s.iconColor, width: 18, height: 18 }} />
+            </div>
+            <p className="text-3xl font-extrabold text-slate-800">{s.value}</p>
+            <p className="text-[11px] font-semibold text-slate-400 mt-1 uppercase tracking-wide">{s.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Recent Orders */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+      {/* ── Recent Orders ──────────────────────────────────────────────── */}
+      <div className="glass rounded-3xl card-shadow p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-[13px] font-semibold text-neutral-800">Recent Orders</h2>
+          <h2 className="text-[15px] font-bold text-slate-800">Recent Orders</h2>
           <Link
             href="/patient/orders"
-            className="text-[11px] text-indigo-600 hover:text-indigo-800 transition-colors inline-flex items-center gap-1 font-medium"
+            className="text-[12px] text-indigo-600 font-semibold hover:text-indigo-800 transition-colors inline-flex items-center gap-1"
           >
-            View All <ArrowRight className="w-3 h-3" />
+            View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
@@ -86,16 +179,21 @@ export default function PatientDashboard() {
             {[1, 2, 3].map((i) => <CardSkeleton key={i} />)}
           </div>
         ) : recentOrders.length === 0 ? (
-          <div className="py-12 text-center">
-            <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <ShoppingBag className="w-7 h-7 text-indigo-300" />
+          <div className="py-14 text-center">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: '#e0e7ff' }}
+            >
+              <ShoppingBag className="w-7 h-7" style={{ color: '#4338ca' }} />
             </div>
-            <p className="text-[13px] text-neutral-500 mb-4">No orders yet. Start your first request!</p>
-            <Link href="/patient/orders/new">
-              <Button variant="indigo" size="sm">
-                <Plus className="w-3.5 h-3.5" />
-                New Request
-              </Button>
+            <p className="text-[13px] font-medium text-slate-500 mb-4">No orders yet — start your first request!</p>
+            <Link
+              href="/patient/orders/new"
+              className="inline-flex items-center gap-2 bg-indigo-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 active:scale-95 transition-all duration-200"
+              style={{ boxShadow: '0 4px 14px rgba(99,102,241,0.4)' }}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New Request
             </Link>
           </div>
         ) : (
@@ -104,30 +202,39 @@ export default function PatientDashboard() {
               <Link
                 key={order._id}
                 href={`/patient/orders/${order._id}`}
-                className="flex items-center justify-between p-4 rounded-xl hover:bg-indigo-50/50 transition-colors duration-200 group"
+                className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-indigo-50/60 active:scale-[0.99] transition-all duration-200 group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
-                    <Pill className="w-4 h-4 text-indigo-600" />
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-medium text-neutral-800 group-hover:text-indigo-700 transition-colors">
-                      {order.medicines.map((m) => m.name).join(', ')}
-                    </p>
-                    <p className="text-[11px] text-neutral-400 mt-0.5">{formatDate(order.createdAt)}</p>
-                  </div>
+                {/* Medicine avatar — unique per medicine name */}
+                <MedicineAvatar name={order.medicines[0]?.name ?? 'Medicine'} />
+
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">
+                    {order.medicines.map((m) => m.name).join(', ')}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{formatDate(order.createdAt)}</p>
                 </div>
-                <div className="flex items-center gap-3">
+
+                <div className="flex items-center gap-2.5 shrink-0">
                   <Badge variant={statusVariant(order.status)}>
                     {statusLabel(order.status)}
                   </Badge>
-                  <ArrowRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-indigo-400 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 transition-colors" />
                 </div>
               </Link>
             ))}
           </div>
         )}
       </div>
+
+      {/* ── Floating Action Button (outside main content) ──────────────── */}
+      <Link
+        href="/patient/orders/new"
+        aria-label="New medicine request"
+        className="fixed bottom-8 right-8 w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 active:scale-95 transition-all duration-200 z-50"
+        style={{ boxShadow: '0 8px 25px rgba(99,102,241,0.55)' }}
+      >
+        <Plus className="w-6 h-6" />
+      </Link>
     </div>
   );
 }
