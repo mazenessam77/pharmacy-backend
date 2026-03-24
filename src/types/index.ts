@@ -40,6 +40,7 @@ export interface IPharmacy {
   };
   rating: number;
   totalReviews: number;
+  governorate: string;
   isVerified: boolean;
   isOpen: boolean;
   verifiedAt?: Date;
@@ -56,7 +57,8 @@ export interface IOrder {
     medicineId?: Types.ObjectId;
   }[];
   prescriptionId?: Types.ObjectId;
-  patientLocation: {
+  governorate: string;
+  patientLocation?: {
     type: string;
     coordinates: number[];
   };
