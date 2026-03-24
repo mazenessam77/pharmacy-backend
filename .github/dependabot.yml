@@ -1,13 +1,15 @@
 version: 2
 updates:
+  # Backend npm packages
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     labels:
       - dependencies
+      - backend
     groups:
       dev-dependencies:
         dependency-type: development
@@ -19,6 +21,23 @@ updates:
         update-types:
           - patch
 
+  # Frontend npm packages
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - frontend
+    groups:
+      frontend-dependencies:
+        update-types:
+          - minor
+          - patch
+
+  # Docker base images
   - package-ecosystem: docker
     directory: /
     schedule:
@@ -27,6 +46,15 @@ updates:
       - docker
       - dependencies
 
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
+    labels:
+      - docker
+      - dependencies
+
+  # GitHub Actions versions
   - package-ecosystem: github-actions
     directory: /
     schedule:

@@ -7,11 +7,11 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  security-events: write
 
 jobs:
   # ─────────────────────────────────────────────
-  # 1. Run CI first (lint, test, security, docker)
+  # 1. Run full CI suite first
   # ─────────────────────────────────────────────
   ci:
     name: CI Checks
@@ -21,7 +21,7 @@ jobs:
       security-events: write
 
   # ─────────────────────────────────────────────
-  # 2. Deploy to EC2 (all services)
+  # 2. Deploy to EC2
   # ─────────────────────────────────────────────
   deploy:
     name: Deploy to Production (EC2)
@@ -32,33 +32,58 @@ jobs:
       url: https://${{ secrets.PRODUCTION_HOST }}
 
     steps:
-      - name: Deploy to EC2 via SSH
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
           script: |
+            set -e
             cd /opt/pharma-app
+
+            # Pull latest code
             git pull origin main
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+            # Rebuild only the app containers (not mongodb/redis/nginx which don't change)
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml build backend frontend
+
+            # Restart app containers
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d backend frontend
+
+            # Reload nginx so it picks up new container IPs (prevents 502 after restart)
+            docker exec pharma-nginx nginx -s reload
+
+            # Clean up dangling images
             docker image prune -f
 
+      # ─────────────────────────────────────────
+      # 3. Health check — verify deployment
+      # ─────────────────────────────────────────
       - name: Health check
         run: |
-          sleep 20
-          for i in {1..6}; do
-            status=$(curl -sk -o /dev/null -w "%{http_code}" https://${{ secrets.PRODUCTION_HOST }}/api/health || echo "000")
-            if [ "$status" = "200" ]; then
-              echo "Production is healthy"
+          echo "Waiting for containers to be ready..."
+          sleep 30
+
+          for i in {1..8}; do
+            STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
+              https://${{ secrets.PRODUCTION_HOST }}/api/health || echo "000")
+
+            if [ "$STATUS" = "200" ]; then
+              echo "✓ Production healthy (HTTP $STATUS)"
               exit 0
             fi
-            echo "Attempt $i/6: status=$status, retrying in 10s..."
-            sleep 10
+
+            echo "Attempt $i/8 — HTTP $STATUS, retrying in 15s..."
+            sleep 15
           done
-          echo "Health check failed after 6 attempts"
+
+          echo "::error::Health check failed after 8 attempts. Check logs:"
+          echo "::error::  ssh ubuntu@${{ secrets.PRODUCTION_HOST }} 'cd /opt/pharma-app && docker compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail=50'"
           exit 1
 
       - name: Notify on failure
         if: failure()
-        run: echo "::error::Production deployment failed! SSH into EC2 and check: docker compose logs"
+        run: |
+          echo "::error::Deployment failed. To roll back:"
+          echo "::error::  ssh ubuntu@${{ secrets.PRODUCTION_HOST }} 'cd /opt/pharma-app && git checkout HEAD~1 && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build backend frontend'"
