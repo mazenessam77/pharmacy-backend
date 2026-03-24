@@ -14,7 +14,7 @@ describe('App Endpoints', () => {
     describe('GET /api-docs', () => {
         it('should return API documentation', async () => {
             const response = await request(app).get('/api-docs');
-            expect(response.status).toBe(301).or(200); // Because redirect might happen
+            expect([301, 200]).toContain(response.status);
         });
     });
 
