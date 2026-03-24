@@ -4,6 +4,7 @@ import { Pharmacy } from '../models/Pharmacy';
 import { Order } from '../models/Order';
 import { Medicine } from '../models/Medicine';
 import { Message } from '../models/Message';
+import { Notification } from '../models/Notification';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { createNotification } from '../services/notification.service';
@@ -216,4 +217,63 @@ export const deleteMedicine = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Medicine not found.', 404, ERROR_CODES.MEDICINE_NOT_FOUND);
   }
   res.json({ success: true, data: { message: 'Medicine deactivated.' } });
+});
+
+export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+  const user = await User.findById(req.params.id);
+  if (!user) throw new AppError('User not found.', 404, ERROR_CODES.USER_NOT_FOUND);
+  if (user.role === 'admin') throw new AppError('Cannot delete an admin account.', 400, ERROR_CODES.FORBIDDEN);
+
+  // Delete all related data
+  await Promise.all([
+    Pharmacy.deleteMany({ userId: user._id }),
+    Order.deleteMany({ patientId: user._id }),
+    Message.deleteMany({ senderId: user._id }),
+    Notification.deleteMany({ userId: user._id }),
+    User.findByIdAndDelete(user._id),
+  ]);
+
+  res.json({ success: true, data: { message: 'User and all related data deleted.' } });
+});
+
+export const deleteOrder = asyncHandler(async (req: Request, res: Response) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
+
+  await Promise.all([
+    Message.deleteMany({ orderId: order._id }),
+    Order.findByIdAndDelete(order._id),
+  ]);
+
+  res.json({ success: true, data: { message: 'Order deleted.' } });
+});
+
+export const deletePharmacy = asyncHandler(async (req: Request, res: Response) => {
+  const pharmacy = await Pharmacy.findById(req.params.id);
+  if (!pharmacy) throw new AppError('Pharmacy not found.', 404, ERROR_CODES.PHARMACY_NOT_FOUND);
+
+  await Pharmacy.findByIdAndDelete(pharmacy._id);
+
+  res.json({ success: true, data: { message: 'Pharmacy deleted.' } });
+});
+
+export const getAllPharmacies = asyncHandler(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
+  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const skip = (page - 1) * limit;
+
+  const [pharmacies, total] = await Promise.all([
+    Pharmacy.find()
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Pharmacy.countDocuments(),
+  ]);
+
+  res.json({
+    success: true,
+    data: pharmacies,
+    pagination: getPagination(page, limit, total),
+  });
 });

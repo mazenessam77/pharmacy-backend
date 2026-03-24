@@ -7,7 +7,8 @@ import { Order } from '@/types';
 import Badge from '@/components/ui/Badge';
 import { ListSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const FILTERS = [
   { value: '', label: 'All' },
@@ -43,6 +44,18 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, [filter]);
 
+  const handleDelete = async (orderId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!confirm('Delete this order and its messages? This cannot be undone.')) return;
+    try {
+      await adminService.deleteOrder(orderId);
+      setOrders(orders.filter((o) => o._id !== orderId));
+      toast.success('Order deleted');
+    } catch {
+      toast.error('Delete failed');
+    }
+  };
+
   return (
     <div className="max-w-5xl">
       <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Oversight</p>
@@ -75,27 +88,35 @@ export default function AdminOrdersPage() {
         <div className="border border-neutral-200">
           <div className="grid grid-cols-12 gap-4 px-5 py-3 border-b border-neutral-200 bg-neutral-50">
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">ID</div>
-            <div className="col-span-4 text-[10px] uppercase tracking-widest text-neutral-400">Medicines</div>
+            <div className="col-span-3 text-[10px] uppercase tracking-widest text-neutral-400">Medicines</div>
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">Type</div>
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">Status</div>
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">Date</div>
+            <div className="col-span-1 text-[10px] uppercase tracking-widest text-neutral-400 text-right"></div>
           </div>
           {orders.map((order) => (
-            <Link
-              key={order._id}
-              href={`/admin/orders/${order._id}`}
-              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-neutral-100 items-center hover:bg-neutral-50 transition-colors"
-            >
-              <div className="col-span-2 text-[12px] text-neutral-500">#{order._id.slice(-8)}</div>
-              <div className="col-span-4 text-[13px] truncate">
+            <div key={order._id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-neutral-100 items-center hover:bg-neutral-50 transition-colors">
+              <Link href={`/admin/orders/${order._id}`} className="col-span-2 text-[12px] text-neutral-500">
+                #{order._id.slice(-8)}
+              </Link>
+              <Link href={`/admin/orders/${order._id}`} className="col-span-3 text-[13px] truncate">
                 {order.medicines.map((m) => m.name).join(', ')}
-              </div>
-              <div className="col-span-2 text-[12px] capitalize">{order.deliveryType}</div>
-              <div className="col-span-2">
+              </Link>
+              <Link href={`/admin/orders/${order._id}`} className="col-span-2 text-[12px] capitalize">{order.deliveryType}</Link>
+              <Link href={`/admin/orders/${order._id}`} className="col-span-2">
                 <Badge variant={statusVariant(order.status)}>{statusLabel(order.status)}</Badge>
+              </Link>
+              <Link href={`/admin/orders/${order._id}`} className="col-span-2 text-[12px] text-neutral-500">{formatDate(order.createdAt)}</Link>
+              <div className="col-span-1 text-right">
+                <button
+                  onClick={(e) => handleDelete(order._id, e)}
+                  className="text-neutral-400 hover:text-red-600 transition-colors"
+                  title="Delete order"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
-              <div className="col-span-2 text-[12px] text-neutral-500">{formatDate(order.createdAt)}</div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

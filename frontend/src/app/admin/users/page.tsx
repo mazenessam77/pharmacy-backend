@@ -8,7 +8,7 @@ import Input from '@/components/ui/Input';
 import Badge from '@/components/ui/Badge';
 import { ListSkeleton } from '@/components/ui/Skeleton';
 import toast from 'react-hot-toast';
-import { Ban, CheckCircle, Users } from 'lucide-react';
+import { Ban, CheckCircle, Trash2, Users } from 'lucide-react';
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -45,6 +45,17 @@ export default function AdminUsersPage() {
       toast.success('User status updated');
     } catch {
       toast.error('Action failed');
+    }
+  };
+
+  const handleDelete = async (userId: string, userName: string) => {
+    if (!confirm(`Delete "${userName}" and all their data? This cannot be undone.`)) return;
+    try {
+      await adminService.deleteUser(userId);
+      setUsers(users.filter((u) => u._id !== userId));
+      toast.success('User deleted');
+    } catch {
+      toast.error('Delete failed');
     }
   };
 
@@ -94,6 +105,7 @@ export default function AdminUsersPage() {
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">Role</div>
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400">Status</div>
             <div className="col-span-2 text-[10px] uppercase tracking-widest text-neutral-400 text-right">Actions</div>
+
           </div>
           {users.map((u) => (
             <div key={u._id} className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-neutral-100 items-center">
@@ -109,15 +121,24 @@ export default function AdminUsersPage() {
                   <Badge variant="success">Active</Badge>
                 )}
               </div>
-              <div className="col-span-2 text-right">
+              <div className="col-span-2 text-right flex justify-end gap-3">
                 {u.role !== 'admin' && (
-                  <button
-                    onClick={() => handleBan(u._id)}
-                    className="text-neutral-400 hover:text-black transition-colors"
-                    title={u.isBanned ? 'Unban' : 'Ban'}
-                  >
-                    {u.isBanned ? <CheckCircle className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
-                  </button>
+                  <>
+                    <button
+                      onClick={() => handleBan(u._id)}
+                      className="text-neutral-400 hover:text-black transition-colors"
+                      title={u.isBanned ? 'Unban' : 'Ban'}
+                    >
+                      {u.isBanned ? <CheckCircle className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(u._id, u.name)}
+                      className="text-neutral-400 hover:text-red-600 transition-colors"
+                      title="Delete user"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
                 )}
               </div>
             </div>

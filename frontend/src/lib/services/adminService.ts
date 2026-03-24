@@ -18,12 +18,25 @@ export const adminService = {
   banUser: (id: string) =>
     api.put(`/admin/users/${id}/ban`),
 
+  deleteUser: (id: string) =>
+    api.delete(`/admin/users/${id}`),
+
   // Orders
   getOrders: (params?: { page?: number; limit?: number; status?: string }) =>
     api.get('/admin/orders', { params }),
 
   getOrderDetail: (id: string) =>
     api.get(`/admin/orders/${id}`),
+
+  deleteOrder: (id: string) =>
+    api.delete(`/admin/orders/${id}`),
+
+  // Pharmacies
+  getAllPharmacies: (params?: { page?: number; limit?: number }) =>
+    api.get('/admin/pharmacies', { params }),
+
+  deletePharmacy: (id: string) =>
+    api.delete(`/admin/pharmacies/${id}`),
 
   // Medicines
   createMedicine: (data: { name: string; genericName?: string; category?: string; requiresPrescription?: boolean; description?: string }) =>

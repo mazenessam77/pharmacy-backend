@@ -10,11 +10,15 @@ router.use(authorize('admin'));
 
 router.get('/stats', adminController.getStats);
 router.get('/pharmacies/pending', adminController.getPendingPharmacies);
+router.get('/pharmacies', adminController.getAllPharmacies);
 router.put('/pharmacies/:id/verify', adminController.verifyPharmacy);
+router.delete('/pharmacies/:id', adminController.deletePharmacy);
 router.get('/users', adminController.getUsers);
 router.put('/users/:id/ban', adminController.banUser);
+router.delete('/users/:id', adminController.deleteUser);
 router.get('/orders', adminController.getAllOrders);
 router.get('/orders/:id', adminController.getOrderDetails);
+router.delete('/orders/:id', adminController.deleteOrder);
 
 // Medicine catalog CRUD
 router.post('/medicines', adminController.createMedicine);
