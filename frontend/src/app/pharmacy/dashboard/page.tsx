@@ -5,23 +5,28 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 import { useOrderStore } from '@/store/orderStore';
 import { pharmacyService } from '@/lib/services/pharmacyService';
+import { userService } from '@/lib/services/userService';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
 import { getSocket } from '@/lib/socket';
-import { Order } from '@/types';
 import toast from 'react-hot-toast';
 import { Power, ArrowRight } from 'lucide-react';
 
 export default function PharmacyDashboard() {
   const { user } = useAuthStore();
   const { orders, fetchOrders, isLoading } = useOrderStore();
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
   const [toggling, setToggling] = useState(false);
 
   useEffect(() => {
     fetchOrders({ page: 1 });
+    // Load actual isOpen state from pharmacy profile
+    userService.getProfile().then((res) => {
+      const pharmacy = res.data.data?.pharmacyProfile || res.data.data?.pharmacy;
+      if (pharmacy) setIsOnline(pharmacy.isOpen ?? true);
+    }).catch(() => {});
 
     let cleanup = false;
     const setup = async () => {
@@ -54,7 +59,7 @@ export default function PharmacyDashboard() {
     }
   };
 
-  const pendingOrders = orders.filter((o) => o.status === 'pending');
+  const pendingOrders = orders.filter((o) => ['pending', 'offered'].includes(o.status));
   const activeOrders = orders.filter((o) => ['confirmed', 'preparing', 'out_for_delivery'].includes(o.status));
   const deliveredCount = orders.filter((o) => o.status === 'delivered').length;
 

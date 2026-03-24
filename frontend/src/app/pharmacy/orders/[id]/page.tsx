@@ -140,7 +140,7 @@ export default function PharmacyOrderDetailPage() {
 
       {/* Actions */}
       <div className="flex gap-3 flex-wrap">
-        {currentOrder.status === 'pending' && (
+        {['pending', 'offered'].includes(currentOrder.status) && (
           <Button onClick={() => setOfferModal(true)}>
             <Send className="w-3.5 h-3.5" />
             Submit Offer

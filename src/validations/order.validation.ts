@@ -11,10 +11,7 @@ export const createOrderSchema = z.object({
     )
     .min(1),
   prescriptionId: z.string().optional(),
-  location: z.object({
-    lat: z.number().min(-90).max(90),
-    lng: z.number().min(-180).max(180),
-  }),
+  governorate: z.string().min(2),
   deliveryType: z.enum(['delivery', 'pickup']).default('delivery'),
   notes: z.string().max(500).optional(),
 });

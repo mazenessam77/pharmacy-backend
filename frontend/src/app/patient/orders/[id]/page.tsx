@@ -155,7 +155,7 @@ export default function OrderDetailPage() {
                     {resp.availableMeds.map((med, i) => (
                       <div key={i} className="flex justify-between text-[13px]">
                         <span>{med.name} {!med.inStock && <span className="text-neutral-400">(out of stock)</span>}</span>
-                        <span>{med.inStock ? `$${med.price}` : '—'}</span>
+                        <span>{med.inStock ? `${med.price} EGP` : '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -173,8 +173,8 @@ export default function OrderDetailPage() {
 
                   <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
                     <div className="text-[12px] text-neutral-500">
-                      Total: <span className="text-black font-medium">${resp.totalPrice}</span>
-                      {resp.deliveryFee > 0 && ` + $${resp.deliveryFee} delivery`}
+                      Total: <span className="text-black font-medium">{resp.totalPrice} EGP</span>
+                      {resp.deliveryFee > 0 && ` + ${resp.deliveryFee} EGP delivery`}
                       {resp.estimatedTime && ` · ${resp.estimatedTime}`}
                     </div>
                     {resp.status === 'offered' && currentOrder.status !== 'confirmed' && (
