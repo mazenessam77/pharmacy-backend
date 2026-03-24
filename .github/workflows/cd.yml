@@ -29,7 +29,6 @@ jobs:
     needs: ci
     environment:
       name: production
-      url: https://${{ secrets.PRODUCTION_HOST }}
 
     steps:
       - name: Deploy via SSH
