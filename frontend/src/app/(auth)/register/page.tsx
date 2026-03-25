@@ -81,7 +81,7 @@ export default function RegisterPage() {
             size="large"
             text="signup_with"
             shape="rectangular"
-            width="320"
+            width="360"
           />
         </div>
         <p className="text-center text-[10px] uppercase tracking-widest text-neutral-400 mt-2">
@@ -216,7 +216,7 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Input
                 label="Opening Time"
                 type="time"

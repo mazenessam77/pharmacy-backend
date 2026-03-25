@@ -1,10 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
 import { LayoutDashboard, ShoppingBag, Package, MessageCircle, Settings } from 'lucide-react';
-import { useEffect } from 'react';
 import { useNotificationStore } from '@/store/notificationStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
 
@@ -18,6 +18,7 @@ const links: SidebarLink[] = [
 
 export default function PharmacyLayout({ children }: { children: React.ReactNode }) {
   const { fetch: fetchNotifications } = useNotificationStore();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     connectSocket();
@@ -28,10 +29,14 @@ export default function PharmacyLayout({ children }: { children: React.ReactNode
   return (
     <ProtectedRoute roles={['pharmacy']}>
       <div className="min-h-screen bg-white">
-        <Navbar />
+        <Navbar onMenuToggle={() => setSidebarOpen(true)} />
         <div className="flex">
-          <Sidebar links={links} />
-          <main className="flex-1 p-8">{children}</main>
+          <Sidebar
+            links={links}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+          <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-x-hidden">{children}</main>
         </div>
       </div>
     </ProtectedRoute>

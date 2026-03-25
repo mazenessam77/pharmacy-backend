@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
@@ -13,9 +14,10 @@ const links: SidebarLink[] = [
 ];
 
 export default function PatientLayout({ children }: { children: React.ReactNode }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <ProtectedRoute roles={['patient']}>
-      {/* Soft page background with subtle noise-like gradient */}
       <div
         className="min-h-screen"
         style={{
@@ -25,10 +27,17 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
             'linear-gradient(180deg, #f0f4ff 0%, #f8f9ff 50%, #fafbff 100%)',
         }}
       >
-        <Navbar />
+        <Navbar onMenuToggle={() => setSidebarOpen(true)} />
         <div className="flex">
-          <Sidebar links={links} variant="indigo" />
-          <main className="flex-1 p-8 min-h-[calc(100vh-3.5rem)]">{children}</main>
+          <Sidebar
+            links={links}
+            variant="indigo"
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+          />
+          <main className="flex-1 p-4 sm:p-6 md:p-8 min-h-[calc(100vh-3.5rem)] overflow-x-hidden">
+            {children}
+          </main>
         </div>
       </div>
     </ProtectedRoute>

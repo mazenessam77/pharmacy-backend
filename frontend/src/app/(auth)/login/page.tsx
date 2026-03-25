@@ -63,7 +63,7 @@ export default function LoginPage() {
             size="large"
             text="continue_with"
             shape="rectangular"
-            width="320"
+            width="360"
           />
         </div>
       </div>

@@ -122,7 +122,7 @@ export default function NewOrderPage() {
   };
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl w-full">
       {/* Header */}
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
@@ -130,9 +130,9 @@ export default function NewOrderPage() {
         <p className="text-[13px] text-neutral-500 mt-1">Fill in the details and pharmacies will send you offers.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* Medicines */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
               <Pill className="w-4 h-4 text-indigo-600" />
@@ -181,7 +181,7 @@ export default function NewOrderPage() {
         </div>
 
         {/* Prescription Upload */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
               <FileImage className="w-4 h-4 text-purple-600" />
@@ -219,7 +219,7 @@ export default function NewOrderPage() {
         </div>
 
         {/* Governorate */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <MapPin className="w-4 h-4 text-blue-600" />
@@ -301,14 +301,14 @@ export default function NewOrderPage() {
         </div>
 
         {/* Delivery Type */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
               <Truck className="w-4 h-4 text-cyan-600" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Delivery Method</p>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {(['delivery', 'pickup'] as const).map((type) => (
               <button
                 key={type}
@@ -339,7 +339,7 @@ export default function NewOrderPage() {
           </div>
           <p className="text-[11px] text-neutral-400 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
             {/* Cash */}
             <button
               type="button"
@@ -421,7 +421,7 @@ export default function NewOrderPage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+        <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
               <StickyNote className="w-4 h-4 text-amber-600" />

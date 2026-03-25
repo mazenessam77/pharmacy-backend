@@ -70,11 +70,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* ── Right — Auth form ─────────────────────────────────────────── */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-16 sm:px-16 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-5 py-10 sm:px-10 sm:py-16 lg:px-16 bg-white overflow-y-auto">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
-          <div className="mb-12 lg:hidden">
-            <h1 className="text-[24px] font-light uppercase tracking-ultra">PharmaLink</h1>
+          <div className="mb-8 sm:mb-12 lg:hidden">
+            <h1 className="text-[22px] sm:text-[24px] font-light uppercase tracking-ultra">PharmaLink</h1>
           </div>
           {children}
         </div>

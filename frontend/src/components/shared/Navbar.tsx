@@ -5,9 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useNotificationStore } from '@/store/notificationStore';
-import { Bell, LogOut, User, ChevronDown } from 'lucide-react';
+import { Bell, LogOut, User, ChevronDown, Menu } from 'lucide-react';
 
-export default function Navbar() {
+interface NavbarProps {
+  onMenuToggle?: () => void;
+}
+
+export default function Navbar({ onMenuToggle }: NavbarProps) {
   const { user, logout } = useAuthStore();
   const { unreadCount } = useNotificationStore();
   const router = useRouter();
@@ -32,12 +36,25 @@ export default function Navbar() {
   const basePath = user?.role === 'admin' ? '/admin' : user?.role === 'pharmacy' ? '/pharmacy' : '/patient';
 
   return (
-    <header className="h-14 border-b border-neutral-200 bg-white flex items-center px-6 justify-between">
-      <Link href={`${basePath}/dashboard`} className="text-[13px] uppercase tracking-ultra font-light">
-        PharmaLink
-      </Link>
+    <header className="h-14 border-b border-neutral-200 bg-white flex items-center px-4 sm:px-6 justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-3">
+        {/* Hamburger — mobile only */}
+        {onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            className="md:hidden p-1.5 rounded-lg text-neutral-500 hover:text-black hover:bg-neutral-100 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
 
-      <div className="flex items-center gap-5">
+        <Link href={`${basePath}/dashboard`} className="text-[13px] uppercase tracking-ultra font-light">
+          PharmaLink
+        </Link>
+      </div>
+
+      <div className="flex items-center gap-4 sm:gap-5">
         {/* Notifications */}
         <Link href={`${basePath}/notifications`} className="relative text-neutral-500 hover:text-black transition-colors">
           <Bell className="w-4 h-4" />
@@ -52,14 +69,14 @@ export default function Navbar() {
         <div ref={menuRef} className="relative">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-neutral-600 hover:text-black transition-colors"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-neutral-600 hover:text-black transition-colors"
           >
-            {user?.name?.split(' ')[0]}
-            <ChevronDown className="w-3 h-3" />
+            <span className="max-w-[80px] truncate">{user?.name?.split(' ')[0]}</span>
+            <ChevronDown className="w-3 h-3 shrink-0" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-neutral-200 z-50">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-neutral-200 shadow-lg z-50">
               <Link
                 href={`${basePath}/profile`}
                 className="flex items-center gap-2 px-4 py-3 text-[11px] uppercase tracking-widest text-neutral-600 hover:bg-neutral-50 transition-colors"
