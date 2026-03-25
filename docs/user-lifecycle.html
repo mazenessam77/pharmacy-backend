@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PharmaLink — User Lifecycle</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0f;
+      color: #e8e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────────── */
+    header {
+      padding: 48px 60px 36px;
+      border-bottom: 1px solid #1e1e2e;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    header .brand { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #555; }
+    header h1 { font-size: 32px; font-weight: 300; letter-spacing: .08em; margin-top: 6px; }
+    header p  { font-size: 13px; color: #666; margin-top: 4px; }
+    .badge {
+      font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+      padding: 5px 12px; border: 1px solid #2a2a3e; border-radius: 20px;
+      color: #666; background: #111120;
+    }
+
+    /* ── Legend ───────────────────────────────────────────────── */
+    .legend {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      padding: 20px 60px;
+      border-bottom: 1px solid #1a1a2a;
+      background: #0d0d18;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #888; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-patient  { background: #6366f1; }
+    .dot-pharmacy { background: #10b981; }
+    .dot-admin    { background: #f59e0b; }
+    .dot-system   { background: #3b82f6; }
+    .dot-shared   { background: #8b5cf6; }
+
+    /* ── Tabs ─────────────────────────────────────────────────── */
+    .tabs {
+      display: flex; gap: 2px;
+      padding: 24px 60px 0;
+      border-bottom: 1px solid #1a1a2a;
+    }
+    .tab {
+      padding: 10px 20px; font-size: 11px; letter-spacing: .14em;
+      text-transform: uppercase; cursor: pointer; border: none;
+      background: none; color: #555; border-bottom: 2px solid transparent;
+      transition: all .2s; white-space: nowrap;
+    }
+    .tab:hover { color: #aaa; }
+    .tab.active { color: #e8e8f0; border-bottom-color: #6366f1; }
+
+    /* ── Diagram sections ─────────────────────────────────────── */
+    .section { display: none; padding: 40px 60px 60px; }
+    .section.active { display: block; }
+
+    .section-header { margin-bottom: 32px; }
+    .section-header h2 { font-size: 20px; font-weight: 300; letter-spacing: .06em; }
+    .section-header p  { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.6; }
+
+    .diagram-wrap {
+      background: #0d0d18; border: 1px solid #1e1e2e;
+      border-radius: 12px; padding: 40px;
+      overflow-x: auto;
+    }
+
+    /* ── Mermaid theme overrides ──────────────────────────────── */
+    .mermaid svg { max-width: 100%; height: auto; }
+
+    /* ── Two-column layout for smaller diagrams ──────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media(max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── Step timeline (visual supplement) ───────────────────── */
+    .timeline {
+      display: flex; flex-direction: column; gap: 0;
+      margin-bottom: 40px;
+    }
+    .step {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding: 18px 0; border-bottom: 1px solid #14141e;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%; shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; letter-spacing: .05em;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .num-patient  { background: rgba(99,102,241,.2); color: #818cf8; border: 1px solid rgba(99,102,241,.3); }
+    .num-pharmacy { background: rgba(16,185,129,.2); color: #34d399; border: 1px solid rgba(16,185,129,.3); }
+    .num-system   { background: rgba(59,130,246,.2); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .step-content h3 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .step-content p  { font-size: 12px; color: #666; line-height: 1.6; }
+    .step-content .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .tag {
+      font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 4px;
+      background: #13131e; border: 1px solid #222232; color: #777;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">PharmaLink</div>
+    <h1>User Lifecycle</h1>
+    <p>Complete data flow from registration to order completion</p>
+  </div>
+  <div class="badge">v1.0 — 2026</div>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot dot-patient"></div> Patient</div>
+  <div class="legend-item"><div class="dot dot-pharmacy"></div> Pharmacy</div>
+  <div class="legend-item"><div class="dot dot-admin"></div> Admin</div>
+  <div class="legend-item"><div class="dot dot-system"></div> System / Backend</div>
+  <div class="legend-item"><div class="dot dot-shared"></div> Shared</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('full')">Full Lifecycle</button>
+  <button class="tab" onclick="show('auth')">Authentication</button>
+  <button class="tab" onclick="show('patient')">Patient Journey</button>
+  <button class="tab" onclick="show('pharmacy')">Pharmacy Journey</button>
+  <button class="tab" onclick="show('order')">Order State Machine</button>
+  <button class="tab" onclick="show('payment')">Payment Flow</button>
+  <button class="tab" onclick="show('realtime')">Real-time Events</button>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 1 — Full Lifecycle -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section active" id="full">
+  <div class="section-header">
+    <h2>Complete User Lifecycle — A to Z</h2>
+    <p>Every actor (Patient, Pharmacy, Admin) from first visit through the full order cycle.</p>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart TD
+    VISIT(["🌐 User visits\nmymedcine.duckdns.org"])
+
+    VISIT --> AUTH{{"Has\naccount?"}}
+    AUTH -->|No| REGISTER["Register\n/register"]
+    AUTH -->|Yes| LOGIN["Login\n/login"]
+
+    REGISTER --> ROLE{Select\nRole}
+    ROLE -->|Patient| RP["Patient Registration\nName · Email · Password"]
+    ROLE -->|Pharmacy| RX["Pharmacy Registration\n+ Pharmacy Name\n+ Address · Governorate\n+ Working Hours"]
+
+    RP --> TOKENS
+    RX --> PENDING_VERIFY["Account created\n⏳ Awaiting admin\nverification"]
+    LOGIN --> TOKENS
+
+    PENDING_VERIFY --> ADMIN_REVIEW
+
+    subgraph ADMIN_REVIEW["🛡️ Admin Panel"]
+        ADM1["Admin reviews\npharmacy profile"]
+        ADM1 --> ADM2{Decision}
+        ADM2 -->|Approve| ADM3["isVerified = true\n🔔 Notify pharmacy"]
+        ADM2 -->|Reject| ADM4["Send rejection reason\n🔔 Notify pharmacy"]
+    end
+
+    ADM3 --> PHARMACY_ACTIVE
+
+    TOKENS["Issue JWT\nAccess + Refresh Token\nStored in localStorage"]
+    TOKENS --> DASHBOARD{Route by\nRole}
+
+    DASHBOARD -->|patient| PATIENT_DASH
+    DASHBOARD -->|pharmacy| PHARMACY_WAIT
+    DASHBOARD -->|admin| ADMIN_DASH
+
+    subgraph PATIENT_JOURNEY["👤 Patient Journey"]
+        PATIENT_DASH["Patient Dashboard\n/patient/dashboard"]
+        PATIENT_DASH --> NEW_ORDER["Create New Order\n/patient/orders/new"]
+        NEW_ORDER --> FORM_FILL["Fill Order Form\n• Add medicines\n• Upload prescription\n• Select governorate\n• Use current location\n• Choose delivery type\n• Choose payment method"]
+        FORM_FILL --> SUBMIT_ORDER["POST /api/orders"]
+        SUBMIT_ORDER --> WAIT_OFFERS["Waiting for offers\nfrom pharmacies 🔔"]
+        WAIT_OFFERS --> GOT_OFFER["Pharmacy offer received\n📱 Real-time notification"]
+        GOT_OFFER --> REVIEW_OFFER["Review offer details\nPrice · Delivery fee\nEstimated time"]
+        REVIEW_OFFER --> CONFIRM_OFFER["Confirm offer\nPOST /api/orders/:id/confirm"]
+        CONFIRM_OFFER --> TRACK["Track order status\nin real-time"]
+        TRACK --> DELIVERED["Order Delivered ✅"]
+        DELIVERED --> REVIEW_ACT["Leave review\n⭐ Rate pharmacy"]
+    end
+
+    subgraph PHARMACY_JOURNEY["🏪 Pharmacy Journey"]
+        PHARMACY_WAIT["Pharmacy pending\nverification"]
+        PHARMACY_ACTIVE["Pharmacy Dashboard\n/pharmacy/dashboard"]
+        PHARMACY_ACTIVE --> SEE_ORDERS["See incoming orders\nin your governorate 🔔"]
+        SEE_ORDERS --> SUBMIT_OFFER["Submit price offer\n• Available medicines\n• Total price\n• Delivery fee\n• Estimated time"]
+        SUBMIT_OFFER --> WAIT_CONFIRM["Waiting for patient\nto confirm"]
+        WAIT_CONFIRM --> ORDER_CONFIRMED["Order confirmed! 🎉\nStart preparing"]
+        ORDER_CONFIRMED --> STATUS_PREPARING["Update: Preparing 🔄"]
+        STATUS_PREPARING --> STATUS_DELIVERY["Update: Out for Delivery 🚚"]
+        STATUS_DELIVERY --> STATUS_DONE["Update: Delivered ✅"]
+    end
+
+    subgraph ADMIN_JOURNEY["🛡️ Admin Journey"]
+        ADMIN_DASH["Admin Dashboard\n/admin/dashboard"]
+        ADMIN_DASH --> ADMIN_OPS["Platform Operations\n• Verify pharmacies\n• Manage users\n• View stats\n• Monitor orders"]
+    end
+
+    style PATIENT_JOURNEY fill:#0f0f1f,stroke:#6366f1,stroke-width:1px,color:#e8e8f0
+    style PHARMACY_JOURNEY fill:#0a1a14,stroke:#10b981,stroke-width:1px,color:#e8e8f0
+    style ADMIN_JOURNEY fill:#1a1400,stroke:#f59e0b,stroke-width:1px,color:#e8e8f0
+    style ADMIN_REVIEW fill:#1a1400,stroke:#f59e0b,stroke-width:1px,color:#e8e8f0
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 2 — Authentication -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="auth">
+  <div class="section-header">
+    <h2>Authentication Flow</h2>
+    <p>Email/password and Google OAuth paths, token lifecycle, and role-based routing.</p>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    actor U as User (Browser)
+    participant FE as Next.js Frontend
+    participant API as Express Backend
+    participant GOOGLE as Google OAuth
+    participant DB as MongoDB
+
+    Note over U,DB: ── Email / Password Registration ──────────────────
+    U->>FE: Fill register form + submit
+    FE->>API: POST /api/auth/register { name, email, password, role, ... }
+    API->>API: Validate with Zod schema
+    API->>DB: Check email not already taken
+    API->>API: bcrypt.hash(password, 12)
+    API->>DB: User.create({ ...data, isActive: true })
+    alt role === pharmacy
+        API->>DB: Pharmacy.create({ userId, pharmacyName, ... })
+    end
+    API->>API: Sign accessToken (15min) + refreshToken (7d)
+    API-->>FE: 201 { accessToken, refreshToken, user }
+    FE->>FE: Store tokens in localStorage
+    FE->>U: Redirect to /[role]/dashboard
+
+    Note over U,DB: ── Email / Password Login ─────────────────────────
+    U->>FE: Enter email + password
+    FE->>API: POST /api/auth/login { email, password }
+    API->>DB: User.findOne({ email })
+    API->>API: bcrypt.compare(password, hash)
+    alt invalid credentials
+        API-->>FE: 401 Unauthorized
+        FE-->>U: Show error message
+    else valid
+        API->>API: Sign new tokens
+        API-->>FE: 200 { accessToken, refreshToken, user }
+        FE->>U: Redirect to dashboard
+    end
+
+    Note over U,DB: ── Google OAuth ────────────────────────────────────
+    U->>FE: Click "Continue with Google"
+    FE->>GOOGLE: Open OAuth popup
+    GOOGLE-->>FE: credential (ID Token)
+    FE->>API: POST /api/auth/google { idToken }
+    API->>GOOGLE: googleClient.verifyIdToken(idToken)
+    GOOGLE-->>API: { email, name, googleId, picture }
+    API->>DB: User.findOne({ email }) or User.create()
+    API->>API: Sign tokens
+    API-->>FE: 200 { accessToken, refreshToken, user }
+    FE->>U: Redirect to dashboard
+
+    Note over U,DB: ── Token Refresh ───────────────────────────────────
+    U->>FE: Any authenticated request
+    FE->>API: Request with Authorization: Bearer {accessToken}
+    alt token expired
+        API-->>FE: 401 TokenExpired
+        FE->>API: POST /api/auth/refresh { refreshToken }
+        API->>DB: Verify refreshToken stored on user
+        API->>API: Issue new accessToken
+        API-->>FE: 200 { accessToken }
+        FE->>API: Retry original request
+    end
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 3 — Patient Journey -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="patient">
+  <div class="section-header">
+    <h2>Patient Journey — Complete Flow</h2>
+    <p>Every decision point a patient encounters from login to order completion.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="step">
+      <div class="step-num num-patient">01</div>
+      <div class="step-content">
+        <h3>Login / Register</h3>
+        <p>Patient signs in with email+password or Google OAuth. Redirected to /patient/dashboard.</p>
+        <div class="tags"><span class="tag">JWT issued</span><span class="tag">Role: patient</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">02</div>
+      <div class="step-content">
+        <h3>Create Medicine Request</h3>
+        <p>Navigates to New Request. Adds medicines, optional prescription image, selects governorate, optionally shares current GPS location, chooses delivery type and payment method.</p>
+        <div class="tags"><span class="tag">Geolocation API</span><span class="tag">Prescription upload</span><span class="tag">Payment required</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-system">03</div>
+      <div class="step-content">
+        <h3>Backend broadcasts to pharmacies</h3>
+        <p>Backend finds all verified pharmacies in the same governorate and emits pharmacy:new-order via Socket.io + push notification to each.</p>
+        <div class="tags"><span class="tag">Socket.io</span><span class="tag">Notification service</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">04</div>
+      <div class="step-content">
+        <h3>Receive & Compare Offers</h3>
+        <p>Real-time notification arrives. Patient opens order detail page to see all pharmacy offers with prices, delivery fees, estimated times, and pharmacy ratings.</p>
+        <div class="tags"><span class="tag">Real-time update</span><span class="tag">Compare offers</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">05</div>
+      <div class="step-content">
+        <h3>Confirm Offer</h3>
+        <p>Patient selects one pharmacy offer. All other offers are automatically rejected. Order status moves to confirmed.</p>
+        <div class="tags"><span class="tag">Other offers rejected</span><span class="tag">Status: confirmed</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">06</div>
+      <div class="step-content">
+        <h3>Track Order in Real-time</h3>
+        <p>Live status updates: Preparing → Out for Delivery → Delivered. Each update triggers a push notification.</p>
+        <div class="tags"><span class="tag">Live tracking</span><span class="tag">Push notifications</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">07</div>
+      <div class="step-content">
+        <h3>Receive Order & Pay</h3>
+        <p>Cash: pay delivery person directly. InstaPay: transfer via mobile wallet using instructions sent through chat.</p>
+        <div class="tags"><span class="tag">Cash on delivery</span><span class="tag">InstaPay</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-patient">08</div>
+      <div class="step-content">
+        <h3>Leave Review</h3>
+        <p>Rate the pharmacy (1–5 stars) with optional comment. Updates pharmacy's average rating on the platform.</p>
+        <div class="tags"><span class="tag">Star rating</span><span class="tag">Updates pharmacy.rating</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart LR
+    A([Login]) --> B[Dashboard]
+    B --> C[New Request]
+    C --> D["Add medicines\n+ prescription?\n+ location?\n+ payment method"]
+    D --> E[POST /api/orders]
+    E --> F{Offers\narriving?}
+    F -->|Waiting| F
+    F -->|Offer received| G[Review offers\nPrice · Time · Rating]
+    G --> H{Confirm\noffer?}
+    H -->|Cancel order| Z([Order Cancelled])
+    H -->|Confirm| I[Order Confirmed]
+    I --> J[Preparing 🔄]
+    J --> K[Out for Delivery 🚚]
+    K --> L[Delivered ✅]
+    L --> M{Payment\nmethod?}
+    M -->|Cash| N[Pay cash to\ndelivery person]
+    M -->|InstaPay| O[Transfer via\nmobile wallet]
+    N --> P[Leave Review ⭐]
+    O --> P
+    P --> B
+
+    style A fill:#1a1a2e,stroke:#6366f1,color:#818cf8
+    style Z fill:#1a0e0e,stroke:#ef4444,color:#f87171
+    style L fill:#0a1a14,stroke:#10b981,color:#34d399
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 4 — Pharmacy Journey -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="pharmacy">
+  <div class="section-header">
+    <h2>Pharmacy Journey — Complete Flow</h2>
+    <p>From initial registration through verification to daily order operations.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="step">
+      <div class="step-num num-pharmacy">01</div>
+      <div class="step-content">
+        <h3>Register as Pharmacy</h3>
+        <p>Fills registration form with pharmacy name, address, governorate, working hours. Account created with isVerified: false.</p>
+        <div class="tags"><span class="tag">isVerified: false</span><span class="tag">Awaiting approval</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">02</div>
+      <div class="step-content">
+        <h3>Admin Verifies Account</h3>
+        <p>Admin reviews pharmacy details and approves. Pharmacy receives notification: "Your account has been verified".</p>
+        <div class="tags"><span class="tag">isVerified: true</span><span class="tag">Push notification</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">03</div>
+      <div class="step-content">
+        <h3>Set Up Profile</h3>
+        <p>Uploads working hours, sets pharmacy location, manages inventory of available medicines and prices.</p>
+        <div class="tags"><span class="tag">Location set</span><span class="tag">Inventory management</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">04</div>
+      <div class="step-content">
+        <h3>Receive New Order Alerts</h3>
+        <p>When a patient in the same governorate creates an order, pharmacy gets a real-time Socket.io event and push notification.</p>
+        <div class="tags"><span class="tag">Socket.io event</span><span class="tag">pharmacy:new-order</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">05</div>
+      <div class="step-content">
+        <h3>Submit Price Offer</h3>
+        <p>Reviews the order, checks inventory, and submits an offer with available medicines, alternatives, total price, delivery fee, and estimated time.</p>
+        <div class="tags"><span class="tag">POST /api/orders/:id/responses</span><span class="tag">Offer expires if not confirmed</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">06</div>
+      <div class="step-content">
+        <h3>Order Confirmed by Patient</h3>
+        <p>Real-time notification that the patient accepted the offer. All other pharmacy offers for this order are rejected.</p>
+        <div class="tags"><span class="tag">order:confirmed event</span><span class="tag">Status: confirmed</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">07</div>
+      <div class="step-content">
+        <h3>Update Order Status</h3>
+        <p>Moves order through: Preparing → Out for Delivery → Delivered. Each step notifies the patient in real-time.</p>
+        <div class="tags"><span class="tag">PUT /api/orders/:id/status</span><span class="tag">3 transitions</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num num-pharmacy">08</div>
+      <div class="step-content">
+        <h3>Receive Rating</h3>
+        <p>After delivery, patient leaves a star review. Rating is averaged into pharmacy's public profile score.</p>
+        <div class="tags"><span class="tag">Affects pharmacy ranking</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart LR
+    A([Register]) --> B{Admin\nVerified?}
+    B -->|Pending| B
+    B -->|Approved| C[Pharmacy Dashboard]
+    C --> D[Manage Inventory\n& Profile]
+    D --> E{New order\nin governorate?}
+    E -->|Waiting| E
+    E -->|Notified| F[Review Order Details]
+    F --> G{Submit\nOffer?}
+    G -->|Skip| E
+    G -->|Submit offer| H[Offer submitted\nWaiting for patient]
+    H --> I{Patient\nConfirms?}
+    I -->|Rejected or expired| E
+    I -->|Confirmed ✅| J[Start Preparing 🔄]
+    J --> K[Out for Delivery 🚚]
+    K --> L[Mark Delivered ✅]
+    L --> M[Receive Rating ⭐]
+    M --> E
+
+    style A fill:#0a1a14,stroke:#10b981,color:#34d399
+    style L fill:#0a1a14,stroke:#10b981,color:#34d399
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 5 — Order State Machine -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="order">
+  <div class="section-header">
+    <h2>Order Status — State Machine</h2>
+    <p>Every possible status transition with actor and trigger.</p>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+stateDiagram-v2
+    direction LR
+
+    [*] --> pending : Patient submits order\n(POST /api/orders)
+
+    pending --> offered : Any pharmacy submits offer\n→ patient notified via Socket.io
+    pending --> cancelled : Patient cancels\n(PUT /api/orders/:id/cancel)
+
+    offered --> confirmed : Patient confirms one offer\n→ other offers auto-rejected\n→ pharmacy notified
+    offered --> cancelled : Patient cancels
+
+    confirmed --> preparing : Pharmacy updates status\n(PUT /api/orders/:id/status)
+    confirmed --> cancelled : Patient cancels
+
+    preparing --> out_for_delivery : Pharmacy dispatches\n→ patient notified
+    out_for_delivery --> delivered : Pharmacy marks delivered\n→ deliveredAt timestamp set\n→ patient notified
+
+    cancelled --> [*]
+    delivered --> [*]
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 6 — Payment Flow -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="payment">
+  <div class="section-header">
+    <h2>Payment Flow</h2>
+    <p>Cash on delivery and InstaPay paths from order creation to settlement.</p>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+flowchart TD
+    START(["Patient selects\npayment method\n⚠️ Required before submit"])
+    START --> M{Payment\nMethod}
+
+    M -->|💵 Cash| C1
+    M -->|📱 InstaPay| I1
+
+    subgraph CASH["Cash on Delivery"]
+        C1["Order created\npaymentMethod: cash"]
+        C1 --> C2["Pharmacy prepares\nand dispatches order"]
+        C2 --> C3["Delivery person\narrives at patient"]
+        C3 --> C4["Patient pays cash\nto delivery person"]
+        C4 --> C5["Pharmacy marks\norder as delivered"]
+    end
+
+    subgraph INSTAPAY["InstaPay (Mobile Wallet)"]
+        I1["Order created\npaymentMethod: instapay"]
+        I1 --> I2["Patient confirms\npharmacy offer"]
+        I2 --> I3["Pharmacy sends InstaPay\nnumber via in-app chat"]
+        I3 --> I4["Patient opens InstaPay app\nand transfers payment"]
+        I4 --> I5["Pharmacy confirms\npayment received"]
+        I5 --> I6["Pharmacy dispatches order"]
+        I6 --> I7["Pharmacy marks\norder as delivered"]
+    end
+
+    C5 --> DONE(["Order Complete ✅\nPatient leaves review"])
+    I7 --> DONE
+
+    style CASH fill:#0d1a0d,stroke:#10b981,stroke-width:1px,color:#e8e8f0
+    style INSTAPAY fill:#0d0d1a,stroke:#6366f1,stroke-width:1px,color:#e8e8f0
+    style DONE fill:#0a1a14,stroke:#10b981,color:#34d399
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- TAB 7 — Real-time Events -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div class="section" id="realtime">
+  <div class="section-header">
+    <h2>Real-time Event Flow</h2>
+    <p>Socket.io events that power live updates between patients, pharmacies, and the backend.</p>
+  </div>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    actor P as 👤 Patient
+    actor PH as 🏪 Pharmacy
+    participant API as Backend
+    participant WS as Socket.io
+    participant N as Notifications
+
+    Note over P,N: ── Step 1: Patient creates order ───────────────────
+    P->>API: POST /api/orders
+    API->>WS: emit "pharmacy:new-order" to pharmacy:{id} room
+    API->>N: Push notification to each pharmacy
+    WS-->>PH: 🔔 New order in your area!
+
+    Note over P,N: ── Step 2: Pharmacy submits offer ───────────────────
+    PH->>API: POST /api/orders/:id/responses
+    API->>WS: emit "order:new-offer" to order:{id} room
+    API->>N: Push notification to patient
+    WS-->>P: 🔔 You have a new offer!
+
+    Note over P,N: ── Step 3: Patient confirms offer ───────────────────
+    P->>API: POST /api/orders/:id/confirm
+    API->>WS: emit "order:confirmed" to order:{id} room
+    API->>N: Push notification to accepted pharmacy
+    WS-->>PH: 🎉 Your offer was accepted!
+
+    Note over P,N: ── Step 4: Status updates ──────────────────────────
+    PH->>API: PUT /api/orders/:id/status { preparing }
+    API->>WS: emit "order:status-updated"
+    WS-->>P: 🔄 Status: Preparing
+
+    PH->>API: PUT /api/orders/:id/status { out_for_delivery }
+    API->>WS: emit "order:status-updated"
+    WS-->>P: 🚚 Status: Out for Delivery
+
+    PH->>API: PUT /api/orders/:id/status { delivered }
+    API->>WS: emit "order:status-updated"
+    API->>N: Push notification to patient
+    WS-->>P: ✅ Order Delivered!
+
+    Note over P,N: ── Step 5: Cancellation ────────────────────────────
+    P->>API: PUT /api/orders/:id/cancel
+    API->>WS: emit "order:cancelled" to order:{id} room
+    API->>N: Push notification to pharmacy
+    WS-->>PH: ❌ Order cancelled by patient
+    </div>
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1e1e3f',
+      primaryTextColor: '#e8e8f0',
+      primaryBorderColor: '#6366f1',
+      lineColor: '#4a4a6a',
+      secondaryColor: '#0d1a14',
+      tertiaryColor: '#1a1400',
+      background: '#0d0d18',
+      mainBkg: '#0d0d18',
+      nodeBorder: '#333350',
+      clusterBkg: '#0d0d18',
+      titleColor: '#e8e8f0',
+      edgeLabelBackground: '#0d0d18',
+      actorBkg: '#1e1e3f',
+      actorBorder: '#6366f1',
+      actorTextColor: '#e8e8f0',
+      actorLineColor: '#4a4a6a',
+      signalColor: '#e8e8f0',
+      signalTextColor: '#e8e8f0',
+      labelBoxBkgColor: '#1e1e3f',
+      labelBoxBorderColor: '#6366f1',
+      labelTextColor: '#e8e8f0',
+      loopTextColor: '#e8e8f0',
+      noteBorderColor: '#f59e0b',
+      noteBkgColor: '#1a1400',
+      noteTextColor: '#fbbf24',
+      activationBorderColor: '#6366f1',
+      activationBkgColor: '#1e1e3f',
+      sequenceNumberColor: '#0a0a0f',
+    },
+    flowchart: { htmlLabels: true, curve: 'basis' },
+    sequence: { actorMargin: 60, messageMargin: 35, mirrorActors: false },
+  });
+
+  function show(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
