@@ -45,11 +45,26 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Create certbot webroot dir for ACME challenges
+            # ── SSL: Install certbot if missing ──────────────────────
+            if ! command -v certbot &>/dev/null; then
+              sudo apt-get update -qq && sudo apt-get install -y certbot
+            fi
+
             mkdir -p nginx/certbot/www
 
-            # Renew Let's Encrypt cert if within 30 days of expiry
-            # --pre/post hooks stop nginx briefly only when renewal actually runs
+            # ── SSL: Issue cert if it doesn't exist yet ───────────────
+            if [ ! -f /etc/letsencrypt/live/mymedcine.duckdns.org/fullchain.pem ]; then
+              echo "No cert found — obtaining Let's Encrypt cert..."
+              docker stop pharma-nginx 2>/dev/null || true
+              sudo certbot certonly --standalone \
+                -d mymedcine.duckdns.org \
+                --agree-tos \
+                --non-interactive \
+                -m admin@mymedcine.duckdns.org
+              echo "Cert obtained successfully"
+            fi
+
+            # ── SSL: Renew if within 30 days of expiry ────────────────
             sudo certbot renew --quiet \
               --pre-hook "docker stop pharma-nginx 2>/dev/null || true" \
               --post-hook "docker start pharma-nginx 2>/dev/null || true" \
