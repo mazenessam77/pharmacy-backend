@@ -7,7 +7,7 @@ const pharmacySchema = new Schema<PharmacyDocument>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
     pharmacyName: { type: String, required: true, trim: true },
-    license: { type: String, required: true },
+    license: { type: String },
     licenseImage: { type: String },
     location: {
       type: { type: String, enum: ['Point'], default: 'Point' },

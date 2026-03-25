@@ -25,7 +25,6 @@ export const registerSchema = z.discriminatedUnion('role', [
     confirmPassword: z.string(),
     phone: z.string().optional(),
     pharmacyName: z.string().min(2, 'Pharmacy name is required'),
-    license: z.string().min(2, 'License number is required'),
     address: z.string().min(2, 'Address is required'),
     governorate: z.string().min(2, 'Governorate is required'),
     workingHoursOpen: z.string().min(1, 'Opening time is required'),

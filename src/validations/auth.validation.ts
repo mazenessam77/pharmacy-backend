@@ -25,11 +25,11 @@ export const registerSchema = z.object({
 }).refine(
   (data) => {
     if (data.role === 'pharmacy') {
-      return !!data.pharmacyName && !!data.license && !!data.location;
+      return !!data.pharmacyName;
     }
     return true;
   },
-  { message: 'Pharmacy registration requires pharmacyName, license, and location.' }
+  { message: 'Pharmacy registration requires pharmacyName.' }
 );
 
 export const loginSchema = z.object({

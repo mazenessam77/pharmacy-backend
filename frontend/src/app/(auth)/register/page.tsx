@@ -44,7 +44,6 @@ export default function RegisterPage() {
 
       if (data.role === 'pharmacy') {
         payload.pharmacyName = data.pharmacyName;
-        payload.license = data.license;
         payload.address = data.address;
         payload.governorate = data.governorate;
         payload.workingHours = { open: data.workingHoursOpen, close: data.workingHoursClose };
@@ -179,20 +178,12 @@ export default function RegisterPage() {
               <div className="flex-1 h-px bg-neutral-200" />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Input
-                label="Pharmacy Name"
-                placeholder="My Pharmacy"
-                error={(errors as any).pharmacyName?.message}
-                {...register('pharmacyName' as any)}
-              />
-              <Input
-                label="License Number"
-                placeholder="PH-2024-XXX"
-                error={(errors as any).license?.message}
-                {...register('license' as any)}
-              />
-            </div>
+            <Input
+              label="Pharmacy Name"
+              placeholder="My Pharmacy"
+              error={(errors as any).pharmacyName?.message}
+              {...register('pharmacyName' as any)}
+            />
 
             <Input
               label="Address"

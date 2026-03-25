@@ -28,7 +28,7 @@ export interface IPharmacy {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   pharmacyName: string;
-  license: string;
+  license?: string;
   licenseImage?: string;
   location: {
     type: string;
