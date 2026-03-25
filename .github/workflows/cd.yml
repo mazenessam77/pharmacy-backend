@@ -104,8 +104,9 @@ jobs:
               sleep 5
             done
 
-            # Now reload nginx — both upstreams are alive, no 502 window
-            docker exec pharma-nginx nginx -s reload
+            # Now start/reload nginx — both upstreams are alive, no 502 window
+            # (nginx may have been stopped by certbot standalone; `up -d` handles both cases)
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d nginx
 
             # Clean up dangling images
             docker image prune -f
