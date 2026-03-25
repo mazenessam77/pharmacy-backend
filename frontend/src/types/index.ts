@@ -119,6 +119,7 @@ export interface CreateOrderData {
   governorate: string;
   deliveryType: 'delivery' | 'pickup';
   notes?: string;
+  patientLocation?: { lat: number; lng: number };
 }
 
 // ── Order Response (Offer) ──

@@ -12,7 +12,7 @@ import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT
 import { sendOrderConfirmationEmail } from '../services/email.service';
 
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
-  const { medicines, prescriptionId, governorate, deliveryType, notes } = req.body;
+  const { medicines, prescriptionId, governorate, deliveryType, notes, patientLocation } = req.body;
   const patientId = req.user!._id;
 
   if (!governorate) {
@@ -34,6 +34,12 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
     governorate,
     deliveryType,
     notes,
+    ...(patientLocation && {
+      patientLocation: {
+        type: 'Point',
+        coordinates: [patientLocation.lng, patientLocation.lat], // GeoJSON: [lng, lat]
+      },
+    }),
   });
 
   // Find all pharmacies in the same governorate

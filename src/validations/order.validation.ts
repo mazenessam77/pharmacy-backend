@@ -14,6 +14,10 @@ export const createOrderSchema = z.object({
   governorate: z.string().min(2),
   deliveryType: z.enum(['delivery', 'pickup']).default('delivery'),
   notes: z.string().max(500).optional(),
+  patientLocation: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }).optional(),
 });
 
 export const cancelOrderSchema = z.object({

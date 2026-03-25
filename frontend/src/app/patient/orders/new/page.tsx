@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote } from 'lucide-react';
+import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote, LocateFixed } from 'lucide-react';
 import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 
 interface MedicineEntry {
@@ -26,6 +26,41 @@ export default function NewOrderPage() {
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation is not supported by your browser.');
+      return;
+    }
+    setLocating(true);
+    setLocationError(null);
+    setLocation(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const result = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+        setLocation(result);
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setLocationError('Location permission denied. Please allow access in your browser settings.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setLocationError('Location unavailable. Check your device GPS or network.');
+        } else {
+          setLocationError('Location request timed out. Please try again.');
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
 
   const addMedicine = () => setMedicines([...medicines, { name: '', quantity: 1 }]);
 
@@ -69,6 +104,7 @@ export default function NewOrderPage() {
         notes: notes || undefined,
         prescriptionId: prescriptionId || undefined,
         governorate,
+        patientLocation: location || undefined,
       });
       toast.success('Order created');
       router.push(`/patient/orders/${order._id}`);
@@ -192,6 +228,68 @@ export default function NewOrderPage() {
             ))}
           </select>
           <p className="text-[11px] text-neutral-400 mt-2">All pharmacies in this governorate will see your order</p>
+
+          {/* Current location */}
+          <div className="mt-4 pt-4 border-t border-neutral-100">
+
+            {/* Button */}
+            {!location && (
+              <button
+                type="button"
+                onClick={handleGetLocation}
+                disabled={locating}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 text-[12px] font-semibold hover:bg-blue-100 active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+              >
+                <LocateFixed className={`w-3.5 h-3.5 ${locating ? 'animate-spin' : ''}`} />
+                {locating ? 'Detecting location...' : 'Use Current Location'}
+              </button>
+            )}
+
+            {/* Loading state */}
+            {locating && (
+              <p className="text-[11px] text-blue-500 mt-2">
+                Requesting location permission from your browser...
+              </p>
+            )}
+
+            {/* Error state */}
+            {locationError && (
+              <div className="mt-2 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5">
+                <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-red-600">{locationError}</p>
+              </div>
+            )}
+
+            {/* Success — structured location object */}
+            {location && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 text-emerald-700">
+                    <LocateFixed className="w-3.5 h-3.5" />
+                    <span className="text-[12px] font-semibold">Location Detected</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setLocation(null); setLocationError(null); }}
+                    className="text-[11px] text-neutral-400 hover:text-red-500 transition-colors"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-white rounded-lg px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">Latitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800">{location.lat.toFixed(6)}</p>
+                  </div>
+                  <div className="bg-white rounded-lg px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">Longitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800">{location.lng.toFixed(6)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
         </div>
 
         {/* Delivery Type */}
