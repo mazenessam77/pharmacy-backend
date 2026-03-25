@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import Providers from '@/components/shared/Providers';
 import './globals.css';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -19,22 +20,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={jakarta.variable}>
       <body>
-        {children}
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: '#000',
-              color: '#fff',
-              borderRadius: '0',
-              fontSize: '12px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontWeight: 300,
-            },
-          }}
-        />
+        <Providers>
+          {children}
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#000',
+                color: '#fff',
+                borderRadius: '0',
+                fontSize: '12px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                fontWeight: 300,
+              },
+            }}
+          />
+        </Providers>
       </body>
     </html>
   );

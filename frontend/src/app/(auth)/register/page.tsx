@@ -11,9 +11,10 @@ import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
 import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 import { ArrowRight } from 'lucide-react';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 export default function RegisterPage() {
-  const { register: registerUser, isLoading } = useAuthStore();
+  const { register: registerUser, googleLogin, isLoading } = useAuthStore();
   const [role, setRole] = useState<'patient' | 'pharmacy'>('patient');
 
   const {
@@ -56,10 +57,45 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) return;
+    try {
+      await googleLogin(credentialResponse.credential);
+      toast.success('Account created');
+    } catch (err: any) {
+      toast.error(err.response?.data?.error?.message || 'Google sign-in failed.');
+    }
+  };
+
   return (
     <div>
       <h2 className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Join us</h2>
-      <h3 className="text-[28px] font-light uppercase tracking-wide mb-8">Create Account</h3>
+      <h3 className="text-[28px] font-light uppercase tracking-wide mb-6">Create Account</h3>
+
+      {/* Google button — patients only */}
+      <div className="mb-2">
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error('Google sign-in failed.')}
+            theme="outline"
+            size="large"
+            text="signup_with"
+            shape="rectangular"
+            width="320"
+          />
+        </div>
+        <p className="text-center text-[10px] uppercase tracking-widest text-neutral-400 mt-2">
+          Patients only — instant sign-up
+        </p>
+      </div>
+
+      {/* Divider */}
+      <div className="flex items-center gap-4 my-6">
+        <div className="flex-1 h-px bg-neutral-200" />
+        <span className="text-[10px] uppercase tracking-widest text-neutral-400">or register with email</span>
+        <div className="flex-1 h-px bg-neutral-200" />
+      </div>
 
       {/* Role Selector — sliding pill */}
       <div className="relative flex bg-neutral-100 rounded-xl overflow-hidden mb-8">
@@ -216,7 +252,7 @@ export default function RegisterPage() {
         </div>
       </form>
 
-      <div className="mt-10 text-center">
+      <div className="mt-8 text-center">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400">
           Already have an account?{' '}
           <Link

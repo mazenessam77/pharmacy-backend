@@ -10,9 +10,10 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
 import { AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 export default function LoginPage() {
-  const { login, isLoading } = useAuthStore();
+  const { login, googleLogin, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -35,10 +36,44 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) return;
+    setLoginError(null);
+    try {
+      await googleLogin(credentialResponse.credential);
+      toast.success('Welcome back');
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || 'Google sign-in failed.';
+      setLoginError(msg);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Welcome back</h2>
-      <h3 className="text-[28px] font-light uppercase tracking-wide mb-10">Sign In</h3>
+      <h3 className="text-[28px] font-light uppercase tracking-wide mb-8">Sign In</h3>
+
+      {/* Google button */}
+      <div className="mb-6">
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setLoginError('Google sign-in failed. Please try again.')}
+            theme="outline"
+            size="large"
+            text="continue_with"
+            shape="rectangular"
+            width="320"
+          />
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-1 h-px bg-neutral-200" />
+        <span className="text-[10px] uppercase tracking-widest text-neutral-400">or sign in with email</span>
+        <div className="flex-1 h-px bg-neutral-200" />
+      </div>
 
       {/* Inline error banner */}
       {loginError && (
@@ -89,7 +124,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-2">
           <Button type="submit" isLoading={isLoading} className="w-full group" size="lg">
             Sign In
             {!isLoading && (
@@ -99,7 +134,7 @@ export default function LoginPage() {
         </div>
       </form>
 
-      <div className="mt-10 text-center">
+      <div className="mt-8 text-center">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400">
           Don&apos;t have an account?{' '}
           <Link
