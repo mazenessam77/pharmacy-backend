@@ -40,6 +40,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: https://13.135.1.250/api
         NEXT_PUBLIC_SOCKET_URL: https://13.135.1.250
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     ports: []
     volumes: []
     deploy:
