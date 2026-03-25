@@ -11,6 +11,18 @@ const team = [
     role: 'Full-Stack Developer',
     focus: 'Backend Architecture & DevOps',
   },
+  {
+    initials: 'AM',
+    name: 'Adham Mohamed',
+    role: 'Team Member',
+    focus: 'Development & Collaboration',
+  },
+  {
+    initials: 'AM',
+    name: 'Abdelrahman Mohamed',
+    role: 'Team Member',
+    focus: 'Development & Collaboration',
+  },
 ];
 
 const techStack = [
