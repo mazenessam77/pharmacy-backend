@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaLink - Project Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 3px solid #00d4ff;
+        }
+        .header h1 {
+            font-size: 2.8em;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+        .header p {
+            font-size: 1.2em;
+            color: #a0c4ff;
+            letter-spacing: 1px;
+        }
+        .nav {
+            background: #111;
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+        .nav a {
+            color: #aaa;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            border: 1px solid #333;
+        }
+        .nav a:hover {
+            color: #00d4ff;
+            border-color: #00d4ff;
+            background: rgba(0,212,255,0.1);
+        }
+        .section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .section h2 {
+            font-size: 1.8em;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a3a5c;
+            letter-spacing: 1px;
+        }
+        .section .subtitle {
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+        .diagram-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .tech-card {
+            background: #151525;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .tech-card:hover {
+            transform: translateY(-3px);
+            border-color: #00d4ff;
+        }
+        .tech-card h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .tech-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        .tech-card ul li {
+            padding: 4px 0;
+            color: #bbb;
+            font-size: 0.9em;
+        }
+        .tech-card ul li::before {
+            content: "▸ ";
+            color: #00d4ff;
+        }
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .flow-step {
+            background: #151525;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-align: center;
+            min-width: 140px;
+            position: relative;
+        }
+        .flow-step .step-num {
+            background: #00d4ff;
+            color: #000;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin: 0 auto 8px;
+        }
+        .flow-step .step-title {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .flow-step .step-desc {
+            color: #888;
+            font-size: 0.78em;
+            margin-top: 4px;
+        }
+        .arrow-right {
+            display: flex;
+            align-items: center;
+            color: #00d4ff;
+            font-size: 1.5em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th {
+            background: #1a1a2e;
+            color: #00d4ff;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #222;
+            font-size: 0.88em;
+            color: #ccc;
+        }
+        tr:hover td { background: #151525; }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78em;
+            font-weight: 600;
+        }
+        .badge-blue { background: #0f3460; color: #00d4ff; }
+        .badge-green { background: #0a3d2a; color: #00ff88; }
+        .badge-orange { background: #3d2a0a; color: #ffaa00; }
+        .badge-red { background: #3d0a0a; color: #ff4444; }
+        .badge-purple { background: #2a0a3d; color: #aa44ff; }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #555;
+            border-top: 1px solid #222;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>&#9883; PHARMALINK</h1>
+    <p>Pharmacy Medicine Delivery Platform &mdash; Graduation Project Architecture</p>
+</div>
+
+<div class="nav">
+    <a href="#overview">Overview</a>
+    <a href="#system-arch">System Architecture</a>
+    <a href="#aws-infra">AWS Infrastructure</a>
+    <a href="#database">Database ER</a>
+    <a href="#order-flow">Order Flow</a>
+    <a href="#patient-flow">Patient Journey</a>
+    <a href="#pharmacy-flow">Pharmacy Journey</a>
+    <a href="#admin-flow">Admin Journey</a>
+    <a href="#realtime">Real-Time</a>
+    <a href="#cicd">CI/CD Pipeline</a>
+    <a href="#tech-stack">Tech Stack</a>
+    <a href="#api">API Endpoints</a>
+    <a href="#security">Security</a>
+</div>
+
+<!-- ===== 1. OVERVIEW ===== -->
+<div class="section" id="overview">
+    <h2>1. Project Overview</h2>
+    <p class="subtitle">High-level view of how users interact with the platform</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TB
+    subgraph Users["&#128100; Users"]
+        P["&#128113; Patient"]
+        PH["&#127978; Pharmacy"]
+        A["&#128119; Admin"]
+    end
+
+    subgraph Frontend["&#127760; Frontend - Next.js 14"]
+        PD["Patient Dashboard"]
+        PHD["Pharmacy Dashboard"]
+        AD["Admin Dashboard"]
+        AUTH["Auth Pages"]
+        CHAT["Real-Time Chat"]
+    end
+
+    subgraph Backend["&#9881; Backend - Express.js + TypeScript"]
+        API["REST API"]
+        WS["Socket.IO Server"]
+        OCR["OCR Engine<br/>Tesseract.js"]
+        GEO["Geolocation Service<br/>MongoDB $geoNear"]
+        NOTIF["Notification Service"]
+    end
+
+    subgraph Data["&#128451; Data Layer"]
+        DB[("MongoDB 7.0<br/>10 Collections")]
+        REDIS[("Redis 7<br/>Caching")]
+        CLOUD["Cloudinary<br/>Image Storage"]
+    end
+
+    subgraph External["&#128279; External Services"]
+        FCM["Firebase FCM<br/>Push Notifications"]
+        SMTP["SendGrid SMTP<br/>Email Service"]
+        GAUTH["Google OAuth"]
+    end
+
+    P --> PD
+    PH --> PHD
+    A --> AD
+    PD --> API
+    PHD --> API
+    AD --> API
+    PD --> WS
+    PHD --> WS
+    CHAT --> WS
+    AUTH --> API
+    API --> DB
+    API --> REDIS
+    API --> CLOUD
+    API --> OCR
+    API --> GEO
+    WS --> DB
+    NOTIF --> FCM
+    NOTIF --> SMTP
+    API --> GAUTH
+    GEO --> DB
+
+    style Users fill:#1a1a2e,stroke:#00d4ff,color:#fff
+    style Frontend fill:#0f3460,stroke:#00d4ff,color:#fff
+    style Backend fill:#16213e,stroke:#00ff88,color:#fff
+    style Data fill:#1a0a3d,stroke:#aa44ff,color:#fff
+    style External fill:#3d2a0a,stroke:#ffaa00,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 2. SYSTEM ARCHITECTURE ===== -->
+<div class="section" id="system-arch">
+    <h2>2. System Architecture</h2>
+    <p class="subtitle">Request flow from client to server and back</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph LR
+    subgraph Client["Client Browser / Mobile"]
+        NEXT["Next.js 14<br/>React 18 + TypeScript"]
+        AXIOS["Axios HTTP Client"]
+        SIO_C["Socket.IO Client"]
+        ZUST["Zustand Stores"]
+    end
+
+    subgraph Nginx["Nginx Reverse Proxy"]
+        SSL["TLS 1.2/1.3<br/>HTTPS :443"]
+        RL["Rate Limiter<br/>10 req/min auth"]
+        GZIP["Gzip Compression"]
+        CACHE["Static Cache<br/>365 days"]
+    end
+
+    subgraph Express["Express.js Application"]
+        MW["Middleware Stack"]
+        HELM["Helmet"]
+        CORS_M["CORS"]
+        JWT_M["JWT Auth"]
+        VALID["Zod Validation"]
+        ROLE["Role Authorization"]
+    end
+
+    subgraph Routes["API Routes"]
+        R_AUTH["/api/auth"]
+        R_ORDER["/api/orders"]
+        R_PRES["/api/prescriptions"]
+        R_INV["/api/inventory"]
+        R_MSG["/api/messages"]
+        R_ADMIN["/api/admin"]
+    end
+
+    subgraph Services["Business Services"]
+        S_GEO["Geolocation<br/>$geoNear"]
+        S_OCR["OCR<br/>Tesseract.js + Sharp"]
+        S_UPLOAD["Upload<br/>Cloudinary"]
+        S_EMAIL["Email<br/>Nodemailer"]
+        S_NOTIF["Notifications<br/>FCM + Socket.IO"]
+        S_MATCH["Medicine Matcher<br/>Fuzzy Search"]
+    end
+
+    NEXT --> AXIOS --> SSL
+    NEXT --> SIO_C -->|WebSocket| SSL
+    SSL --> RL --> GZIP
+    GZIP --> MW
+    MW --> HELM --> CORS_M --> JWT_M --> VALID --> ROLE
+    ROLE --> Routes
+    Routes --> Services
+    Services --> DB[("MongoDB")]
+    Services --> REDIS_S[("Redis")]
+    Services --> EXT["External APIs"]
+
+    style Client fill:#0f3460,stroke:#00d4ff,color:#fff
+    style Nginx fill:#1a3d0a,stroke:#00ff88,color:#fff
+    style Express fill:#3d1a0a,stroke:#ffaa00,color:#fff
+    style Routes fill:#1a1a2e,stroke:#00d4ff,color:#fff
+    style Services fill:#2a0a3d,stroke:#aa44ff,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 3. AWS INFRASTRUCTURE ===== -->
+<div class="section" id="aws-infra">
+    <h2>3. AWS Infrastructure (Terraform)</h2>
+    <p class="subtitle">Cloud infrastructure provisioned with Infrastructure as Code</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TB
+    INET["&#127760; Internet"] --> EIP["Elastic IP<br/>Static Public IP"]
+
+    subgraph AWS["AWS Cloud - us-east-1"]
+        subgraph VPC["VPC 10.0.0.0/16"]
+            IGW["Internet Gateway"]
+            subgraph PUB_SUB["Public Subnet 10.0.1.0/24 - AZ us-east-1a"]
+                subgraph SG["Security Group"]
+                    direction TB
+                    SG_IN["Inbound Rules:<br/>SSH :22<br/>HTTP :80<br/>HTTPS :443"]
+                    subgraph EC2["EC2 Instance - t3.medium"]
+                        subgraph Docker["Docker Engine"]
+                            NGX["&#128274; Nginx<br/>:80 / :443<br/>SSL Termination"]
+                            BE["&#9881; Backend<br/>Node.js :5000"]
+                            FE["&#127760; Frontend<br/>Next.js :3000"]
+                            MONGO["&#128451; MongoDB 7.0<br/>:27017"]
+                            REDIS_I["&#128451; Redis 7<br/>:6379"]
+                        end
+                        EBS["EBS 30GB gp3<br/>Encrypted"]
+                    end
+                end
+            end
+        end
+    end
+
+    EIP --> IGW --> SG
+    NGX -->|/api/*| BE
+    NGX -->|/socket.io| BE
+    NGX -->|/*| FE
+    BE --> MONGO
+    BE --> REDIS_I
+
+    style AWS fill:#1a1a2e,stroke:#ff9900,color:#fff
+    style VPC fill:#16213e,stroke:#00d4ff,color:#fff
+    style PUB_SUB fill:#0f3460,stroke:#00ff88,color:#fff
+    style EC2 fill:#1a3d0a,stroke:#00ff88,color:#fff
+    style Docker fill:#0a2a3d,stroke:#00d4ff,color:#fff
+    style SG fill:#2a1a0a,stroke:#ffaa00,color:#fff
+        </pre>
+    </div>
+
+    <div class="tech-grid">
+        <div class="tech-card">
+            <h3>Terraform Resources</h3>
+            <ul>
+                <li>VPC + Public Subnet</li>
+                <li>Internet Gateway + Route Table</li>
+                <li>Security Group (SSH, HTTP, HTTPS)</li>
+                <li>EC2 t3.medium (Ubuntu 24.04)</li>
+                <li>Elastic IP (Static)</li>
+                <li>30GB Encrypted EBS (gp3)</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>Docker Containers (Production)</h3>
+            <ul>
+                <li>Nginx Alpine (reverse proxy, SSL)</li>
+                <li>Backend (multi-stage, non-root)</li>
+                <li>Frontend (3-stage, standalone)</li>
+                <li>MongoDB 7.0 (512MB limit)</li>
+                <li>Redis 7 Alpine (256MB limit)</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>Nginx Configuration</h3>
+            <ul>
+                <li>HTTPS with TLS 1.2/1.3</li>
+                <li>HTTP &rarr; HTTPS redirect</li>
+                <li>Gzip compression (level 6)</li>
+                <li>Rate limiting (auth: 10 req/min)</li>
+                <li>WebSocket proxy for Socket.IO</li>
+                <li>Static asset cache (365 days)</li>
+                <li>Security headers (HSTS, XSS, etc.)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 4. DATABASE ER DIAGRAM ===== -->
+<div class="section" id="database">
+    <h2>4. Database Schema (MongoDB - 10 Collections)</h2>
+    <p class="subtitle">Entity Relationship Diagram with all collections and relationships</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+erDiagram
+    USERS {
+        ObjectId _id PK
+        String name
+        String email UK
+        String password
+        String phone
+        String role "patient | pharmacy | admin"
+        GeoJSON location "2dsphere index"
+        String address
+        Number searchRadius "1-10 km"
+        String fcmToken
+        Boolean isActive
+        Boolean isBanned
+        String googleId
+        String refreshToken
+        String avatar
+    }
+
+    PHARMACIES {
+        ObjectId _id PK
+        ObjectId userId FK "unique"
+        String pharmacyName
+        String license
+        String licenseImage
+        GeoJSON location "2dsphere index"
+        Object workingHours "open/close"
+        Number rating "0-5"
+        Number totalReviews
+        Boolean isVerified
+        Boolean isOpen
+        String rejectionReason
+    }
+
+    MEDICINES {
+        ObjectId _id PK
+        String name "text index"
+        String genericName "text index"
+        String category
+        Boolean requiresPrescription
+        String description
+        Array alternatives "Medicine refs"
+        Boolean isActive
+    }
+
+    ORDERS {
+        ObjectId _id PK
+        ObjectId patientId FK
+        Array medicines "name qty medicineId"
+        ObjectId prescriptionId FK
+        GeoJSON patientLocation "2dsphere"
+        String status "7 states"
+        String deliveryType "delivery | pickup"
+        ObjectId acceptedPharmacy FK
+        ObjectId acceptedResponse FK
+        String notes
+        String cancelReason
+        Date deliveredAt
+    }
+
+    ORDER_RESPONSES {
+        ObjectId _id PK
+        ObjectId orderId FK
+        ObjectId pharmacyId FK
+        Array availableMeds "name price inStock"
+        Array alternatives
+        Number totalPrice
+        Number deliveryFee
+        Number distanceKm
+        String estimatedTime
+        String status "offered | accepted | rejected"
+    }
+
+    PRESCRIPTIONS {
+        ObjectId _id PK
+        ObjectId patientId FK
+        String imageUrl
+        String extractedText
+        Array extractedMeds "name confidence"
+        Boolean isVerified
+        String doctorName
+    }
+
+    INVENTORY {
+        ObjectId _id PK
+        ObjectId pharmacyId FK
+        ObjectId medicineId FK
+        String medicineName "text index"
+        String genericName
+        Number price
+        Number quantity
+        Boolean isAvailable
+    }
+
+    MESSAGES {
+        ObjectId _id PK
+        ObjectId orderId FK
+        ObjectId senderId FK
+        ObjectId receiverId FK
+        String senderRole
+        String content
+        String messageType "text | image | alternative"
+        String imageUrl
+        Object alternativeData
+        Boolean isRead
+    }
+
+    REVIEWS {
+        ObjectId _id PK
+        ObjectId patientId FK
+        ObjectId pharmacyId FK
+        ObjectId orderId FK "unique"
+        Number rating "1-5"
+        String comment
+    }
+
+    NOTIFICATIONS {
+        ObjectId _id PK
+        ObjectId userId FK
+        String type "8 types"
+        String title
+        String body
+        Mixed data
+        Boolean isRead
+    }
+
+    USERS ||--o| PHARMACIES : "has pharmacy profile"
+    USERS ||--o{ ORDERS : "places orders"
+    USERS ||--o{ PRESCRIPTIONS : "uploads"
+    USERS ||--o{ REVIEWS : "writes"
+    USERS ||--o{ NOTIFICATIONS : "receives"
+    USERS ||--o{ MESSAGES : "sends/receives"
+    PHARMACIES ||--o{ ORDER_RESPONSES : "submits offers"
+    PHARMACIES ||--o{ INVENTORY : "manages stock"
+    PHARMACIES ||--o{ REVIEWS : "receives"
+    ORDERS ||--o{ ORDER_RESPONSES : "has offers"
+    ORDERS ||--o{ MESSAGES : "has chat"
+    ORDERS ||--o| PRESCRIPTIONS : "may require"
+    ORDERS ||--o| REVIEWS : "gets reviewed"
+    MEDICINES ||--o{ INVENTORY : "stocked at"
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 5. ORDER FLOW STATE MACHINE ===== -->
+<div class="section" id="order-flow">
+    <h2>5. Order Lifecycle (State Machine)</h2>
+    <p class="subtitle">Complete order status transitions from creation to delivery</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+stateDiagram-v2
+    [*] --> pending : Patient creates order
+
+    pending --> offered : Pharmacy submits offer
+    pending --> cancelled : Patient cancels
+
+    offered --> offered : More pharmacies respond
+    offered --> confirmed : Patient accepts an offer
+    offered --> cancelled : Patient cancels
+
+    confirmed --> preparing : Pharmacy starts preparation
+    confirmed --> cancelled : Patient cancels
+
+    preparing --> out_for_delivery : Pharmacy dispatches
+
+    out_for_delivery --> delivered : Order reaches patient
+
+    delivered --> [*] : Complete &#10003;
+    cancelled --> [*] : Terminated &#10007;
+
+    note right of pending
+        Nearby pharmacies notified
+        via Socket.IO + FCM Push
+    end note
+
+    note right of offered
+        Patient compares offers:
+        price, distance, ETA
+    end note
+
+    note right of confirmed
+        Other offers auto-rejected
+        Confirmation email sent
+    end note
+
+    note left of delivered
+        Patient can now
+        leave a review (1-5 stars)
+    end note
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 6. PATIENT JOURNEY ===== -->
+<div class="section" id="patient-flow">
+    <h2>6. Patient User Journey</h2>
+    <p class="subtitle">Step-by-step flow of how a patient uses the platform</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    A["&#128113; Patient Opens App"] --> B{Registered?}
+    B -->|No| C["Register<br/>Email + Password<br/>or Google OAuth"]
+    B -->|Yes| D["Login"]
+    C --> D
+    D --> E["&#127968; Patient Dashboard<br/>Stats + Recent Orders"]
+
+    E --> F["Create New Order"]
+    F --> G{Has Prescription?}
+
+    G -->|Yes| H["&#128247; Upload Prescription Image"]
+    H --> I["&#129302; OCR Scans Image<br/>Tesseract.js + Sharp"]
+    I --> J["Extracted Medicines<br/>with Confidence Scores"]
+    J --> K["Verify/Edit Medicines"]
+
+    G -->|No| L["&#128221; Type Medicine Names<br/>Autocomplete Search"]
+
+    K --> M["Select Delivery Type<br/>Delivery or Pickup"]
+    L --> M
+
+    M --> N["&#128205; Set Location<br/>+ Search Radius (1-10km)"]
+    N --> O["Submit Order"]
+
+    O --> P["&#128225; System Finds<br/>Nearby Pharmacies<br/>MongoDB $geoNear"]
+    P --> Q["&#128276; Pharmacies Notified<br/>Socket.IO + FCM Push"]
+
+    Q --> R["&#9203; Wait for Offers"]
+    R --> S["&#128200; Compare Offers<br/>Price | Distance | ETA"]
+    S --> T["&#10004; Accept Best Offer"]
+
+    T --> U["&#128172; Chat with Pharmacy<br/>Real-time via Socket.IO"]
+    U --> V["&#128230; Track Order Status<br/>Live Updates"]
+    V --> W["&#128666; Out for Delivery"]
+    W --> X["&#10004; Order Delivered!"]
+    X --> Y["&#11088; Leave Review<br/>1-5 Stars + Comment"]
+
+    style A fill:#0f3460,stroke:#00d4ff,color:#fff
+    style E fill:#0f3460,stroke:#00d4ff,color:#fff
+    style I fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style P fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style T fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style X fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style Y fill:#3d2a0a,stroke:#ffaa00,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 7. PHARMACY JOURNEY ===== -->
+<div class="section" id="pharmacy-flow">
+    <h2>7. Pharmacy User Journey</h2>
+    <p class="subtitle">How a pharmacy operates on the platform</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    A["&#127978; Pharmacy Registers<br/>License + Location + Hours"] --> B["&#9203; Awaiting Verification"]
+    B --> C{Admin Decision}
+    C -->|Rejected| D["&#10060; Rejected<br/>Reason Emailed"]
+    D --> E["Fix Issues &<br/>Reapply"]
+    C -->|Approved| F["&#10004; Verified!<br/>Email + Push Notification"]
+
+    F --> G["&#127978; Pharmacy Dashboard"]
+    G --> H["Toggle Online/Offline<br/>via Socket.IO"]
+
+    H --> I["&#128230; Manage Inventory"]
+    I --> I1["Add Items Manually"]
+    I --> I2["&#128196; Bulk CSV Import"]
+    I --> I3["Update Prices/Stock"]
+
+    H --> J["&#128276; Receive New Order<br/>Real-time Notification"]
+    J --> K["View Patient Request<br/>Medicines + Location"]
+    K --> L["Submit Offer"]
+    L --> L1["Set Prices per Medicine"]
+    L --> L2["Mark In-Stock Status"]
+    L --> L3["Suggest Alternatives"]
+    L --> L4["Set Delivery Fee + ETA"]
+
+    L1 & L2 & L3 & L4 --> M["&#9203; Wait for Patient<br/>to Accept"]
+    M --> N{Accepted?}
+    N -->|No| O["Offer Rejected<br/>or Expired"]
+    N -->|Yes| P["&#10004; Order Confirmed!"]
+
+    P --> Q["&#128172; Chat with Patient"]
+    Q --> R["Update Status:<br/>Preparing"]
+    R --> S["Update Status:<br/>Out for Delivery"]
+    S --> T["Update Status:<br/>Delivered &#10004;"]
+
+    style A fill:#3d2a0a,stroke:#ffaa00,color:#fff
+    style F fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style G fill:#0f3460,stroke:#00d4ff,color:#fff
+    style J fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style P fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style T fill:#0a3d2a,stroke:#00ff88,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 8. ADMIN JOURNEY ===== -->
+<div class="section" id="admin-flow">
+    <h2>8. Admin User Journey</h2>
+    <p class="subtitle">Administrative operations and platform management</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    A["&#128119; Admin Login"] --> B["&#128202; Dashboard"]
+
+    B --> C["&#128200; View Statistics"]
+    C --> C1["Total Patients"]
+    C --> C2["Total Pharmacies"]
+    C --> C3["Total Orders"]
+    C --> C4["Today's Orders"]
+    C --> C5["Delivered Count"]
+
+    B --> D["&#127978; Pharmacy Verification"]
+    D --> D1["View Pending<br/>Pharmacies"]
+    D1 --> D2{Review License}
+    D2 -->|Approve| D3["&#10004; Verify Pharmacy<br/>Email + Push Sent"]
+    D2 -->|Reject| D4["&#10060; Reject with Reason<br/>Email + Push Sent"]
+
+    B --> E["&#128101; User Management"]
+    E --> E1["Search Users"]
+    E --> E2["Filter by Role"]
+    E --> E3["Ban/Unban Users"]
+
+    B --> F["&#128230; Order Management"]
+    F --> F1["View All Orders"]
+    F --> F2["Filter by Status"]
+    F --> F3["View Order Details<br/>+ Messages"]
+
+    B --> G["&#128138; Medicine Catalog"]
+    G --> G1["Create Medicine"]
+    G --> G2["Update Medicine"]
+    G --> G3["Delete Medicine<br/>Soft Delete"]
+
+    style A fill:#3d0a0a,stroke:#ff4444,color:#fff
+    style B fill:#0f3460,stroke:#00d4ff,color:#fff
+    style D3 fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style D4 fill:#3d0a0a,stroke:#ff4444,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 9. REAL-TIME ARCHITECTURE ===== -->
+<div class="section" id="realtime">
+    <h2>9. Real-Time Architecture (Socket.IO)</h2>
+    <p class="subtitle">WebSocket events and room management</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TB
+    subgraph Client_P["&#128113; Patient Client"]
+        P_EMIT["Emits"]
+        P_LISTEN["Listens"]
+    end
+
+    subgraph Client_PH["&#127978; Pharmacy Client"]
+        PH_EMIT["Emits"]
+        PH_LISTEN["Listens"]
+    end
+
+    subgraph Server["&#9881; Socket.IO Server"]
+        AUTH_MW["JWT Auth Middleware"]
+        subgraph Rooms["Room Management"]
+            R_USER["user:{userId}"]
+            R_PHARMA["pharmacy:{pharmacyId}"]
+            R_ORDER["order:{orderId}"]
+        end
+        subgraph Handlers["Event Handlers"]
+            H_CHAT["Chat Handler"]
+            H_ORDER["Order Handler"]
+            H_PHARMA["Pharmacy Handler"]
+        end
+    end
+
+    P_EMIT -->|"chat:send-message"| H_CHAT
+    P_EMIT -->|"chat:start-typing"| H_CHAT
+    P_EMIT -->|"chat:respond-alternative"| H_CHAT
+    P_EMIT -->|"order:join / order:leave"| H_ORDER
+
+    PH_EMIT -->|"chat:send-message"| H_CHAT
+    PH_EMIT -->|"chat:send-alternative"| H_CHAT
+    PH_EMIT -->|"pharmacy:go-online"| H_PHARMA
+    PH_EMIT -->|"pharmacy:go-offline"| H_PHARMA
+
+    H_CHAT -->|"chat:new-message"| R_ORDER
+    H_CHAT -->|"chat:typing"| R_ORDER
+    H_CHAT -->|"chat:alternative-response"| R_ORDER
+    H_ORDER -->|"order:status-updated"| R_ORDER
+    H_ORDER -->|"pharmacy:new-order"| R_PHARMA
+    H_ORDER -->|"order:new-response"| R_USER
+    H_ORDER -->|"order:confirmed"| R_PHARMA
+
+    R_ORDER --> P_LISTEN
+    R_ORDER --> PH_LISTEN
+    R_USER --> P_LISTEN
+    R_PHARMA --> PH_LISTEN
+
+    style Client_P fill:#0f3460,stroke:#00d4ff,color:#fff
+    style Client_PH fill:#3d2a0a,stroke:#ffaa00,color:#fff
+    style Server fill:#1a1a2e,stroke:#00ff88,color:#fff
+    style Rooms fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style Handlers fill:#0a3d2a,stroke:#00ff88,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 10. CI/CD PIPELINE ===== -->
+<div class="section" id="cicd">
+    <h2>10. CI/CD Pipeline (GitHub Actions)</h2>
+    <p class="subtitle">Automated testing, security scanning, and deployment</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    A["&#128187; Developer Pushes<br/>to main branch"] --> B["&#9881; GitHub Actions Triggered"]
+
+    subgraph CI["CI Pipeline (ci.yml)"]
+        C["&#128270; Lint + Type Check<br/>tsc --noEmit + ESLint"]
+        C --> D["&#129514; Run Tests<br/>Jest + Coverage<br/>MongoDB + Redis services"]
+        C --> E["&#128274; Security Audit"]
+        E --> E1["npm audit<br/>HIGH + CRITICAL"]
+        E --> E2["Trivy Scan<br/>Filesystem"]
+        D --> F["&#128230; Docker Build<br/>Multi-stage Production"]
+        E --> F
+        F --> G["&#128270; Docker Image Scan<br/>Trivy + SARIF Upload"]
+    end
+
+    G --> H{All Checks<br/>Pass?}
+    H -->|No| I["&#10060; Pipeline Failed<br/>PR Blocked"]
+
+    H -->|Yes| J["&#128640; CD Pipeline Triggered"]
+
+    subgraph CD["CD Pipeline (cd.yml)"]
+        K["&#128273; SSH to EC2<br/>via appleboy/ssh-action"]
+        K --> L["git pull origin main"]
+        L --> M["docker compose up<br/>--build -d"]
+        M --> N["docker image prune"]
+        N --> O["&#128154; Health Check<br/>/api/health<br/>6 retries x 10s"]
+    end
+
+    J --> K
+    O --> P{Healthy?}
+    P -->|Yes| Q["&#10004; Deploy Successful!"]
+    P -->|No| R["&#10060; Deploy Failed<br/>Alert Triggered"]
+
+    subgraph Weekly["Weekly Scans"]
+        W1["CodeQL Analysis<br/>Security + Quality"]
+        W2["Dependabot<br/>npm + Docker + Actions"]
+    end
+
+    style CI fill:#1a1a2e,stroke:#00d4ff,color:#fff
+    style CD fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style Weekly fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style Q fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style I fill:#3d0a0a,stroke:#ff4444,color:#fff
+    style R fill:#3d0a0a,stroke:#ff4444,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== 11. TECH STACK ===== -->
+<div class="section" id="tech-stack">
+    <h2>11. Technology Stack</h2>
+    <p class="subtitle">All technologies used across the project</p>
+    <div class="tech-grid">
+        <div class="tech-card">
+            <h3>&#127760; Frontend</h3>
+            <ul>
+                <li>Next.js 14 (App Router)</li>
+                <li>React 18 + TypeScript 5</li>
+                <li>Tailwind CSS 3.4</li>
+                <li>Zustand (State Management)</li>
+                <li>React Hook Form + Zod</li>
+                <li>Axios (HTTP Client)</li>
+                <li>Socket.IO Client</li>
+                <li>Lucide React (Icons)</li>
+                <li>Framer Motion (Animations)</li>
+                <li>Date-fns (Date Utilities)</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#9881; Backend</h3>
+            <ul>
+                <li>Node.js + Express.js 4.18</li>
+                <li>TypeScript 5.3</li>
+                <li>Mongoose 8.1 (MongoDB ODM)</li>
+                <li>Socket.IO 4.7 (Real-time)</li>
+                <li>JWT (Access + Refresh Tokens)</li>
+                <li>bcrypt.js (Password Hashing)</li>
+                <li>Zod (Input Validation)</li>
+                <li>Winston (Logging)</li>
+                <li>Swagger (API Documentation)</li>
+                <li>Multer (File Upload)</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#129302; AI / Processing</h3>
+            <ul>
+                <li>Tesseract.js 5.0 (OCR Engine)</li>
+                <li>Sharp 0.33 (Image Processing)</li>
+                <li>Levenshtein Distance (Fuzzy Match)</li>
+                <li>Regex Pattern Extraction</li>
+                <li>Confidence Scoring (0-1)</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#128451; Database & Storage</h3>
+            <ul>
+                <li>MongoDB 7.0 (Document DB)</li>
+                <li>Redis 7 (Caching Layer)</li>
+                <li>Cloudinary (Image CDN)</li>
+                <li>GeoJSON + 2dsphere Indexes</li>
+                <li>Full-text Search Indexes</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#128279; External Services</h3>
+            <ul>
+                <li>Firebase Cloud Messaging (Push)</li>
+                <li>SendGrid SMTP (Email)</li>
+                <li>Google OAuth 2.0</li>
+                <li>Cloudinary API</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#128274; Security</h3>
+            <ul>
+                <li>Helmet (HTTP Headers)</li>
+                <li>express-rate-limit</li>
+                <li>CORS Configuration</li>
+                <li>HTTPS / TLS 1.2+</li>
+                <li>HSTS (1 year)</li>
+                <li>bcrypt (12 salt rounds)</li>
+                <li>Role-Based Access Control</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#128640; DevOps & Infra</h3>
+            <ul>
+                <li>AWS EC2 (t3.medium)</li>
+                <li>Terraform (Infrastructure as Code)</li>
+                <li>Docker + Docker Compose</li>
+                <li>Nginx (Reverse Proxy + SSL)</li>
+                <li>GitHub Actions (CI/CD)</li>
+                <li>Multi-stage Docker Builds</li>
+                <li>Non-root Container Users</li>
+            </ul>
+        </div>
+        <div class="tech-card">
+            <h3>&#128270; Quality & Monitoring</h3>
+            <ul>
+                <li>Jest (Unit Testing)</li>
+                <li>ESLint + TypeScript Check</li>
+                <li>CodeQL (SAST Scanning)</li>
+                <li>Trivy (Container Scanning)</li>
+                <li>Dependabot (Dependency Updates)</li>
+                <li>npm audit (Vulnerability Check)</li>
+                <li>Health Check Endpoint</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ===== 12. API ENDPOINTS ===== -->
+<div class="section" id="api">
+    <h2>12. API Endpoints Summary</h2>
+    <p class="subtitle">All REST API routes organized by module</p>
+
+    <table>
+        <tr><th>Module</th><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Authentication (/api/auth)</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/register</td><td>Public</td><td>Register patient or pharmacy</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/login</td><td>Public</td><td>Login, returns JWT tokens</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/logout</td><td>&#128274;</td><td>Clear refresh token</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/refresh-token</td><td>Public</td><td>Refresh access token</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/forgot-password</td><td>Public</td><td>Send reset email</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/reset-password</td><td>Public</td><td>Reset with token</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/me</td><td>&#128274;</td><td>Get authenticated user</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/google</td><td>Public</td><td>Google OAuth login</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Orders (/api/orders)</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/</td><td>Patient</td><td>Create medicine order</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/</td><td>&#128274;</td><td>List orders (role-filtered)</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/:id</td><td>&#128274;</td><td>Order details</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/:id/cancel</td><td>Patient</td><td>Cancel order</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/:id/status</td><td>Pharmacy</td><td>Update order status</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/:id/reorder</td><td>Patient</td><td>Reorder from past order</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Order Responses (/api/orders/:orderId/responses)</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/</td><td>Pharmacy</td><td>Submit offer with pricing</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/</td><td>Patient</td><td>View all offers</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/:responseId/accept</td><td>Patient</td><td>Accept offer</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Prescriptions (/api/prescriptions)</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/upload</td><td>Patient</td><td>Upload prescription image</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/scan</td><td>Patient</td><td>OCR scan prescription</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/</td><td>Patient</td><td>List prescriptions</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/:id/verify</td><td>Patient</td><td>Verify extracted medicines</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Pharmacy (/api/pharmacies)</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/nearby</td><td>&#128274;</td><td>Find pharmacies within radius</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/status</td><td>Pharmacy</td><td>Toggle online/offline</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/:id</td><td>&#128274;</td><td>Pharmacy details</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Inventory (/api/inventory)</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/</td><td>Pharmacy</td><td>View inventory</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/</td><td>Pharmacy</td><td>Add medicine to stock</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/:id</td><td>Pharmacy</td><td>Update stock item</td></tr>
+        <tr><td></td><td><span class="badge badge-red">DELETE</span></td><td>/:id</td><td>Pharmacy</td><td>Remove stock item</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/bulk-import</td><td>Pharmacy</td><td>CSV bulk import</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Messages (/api/messages)</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/:orderId/:recipientId</td><td>&#128274;</td><td>Chat history</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/</td><td>&#128274;</td><td>Send message</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/read-all/:orderId</td><td>&#128274;</td><td>Mark all read</td></tr>
+
+        <tr><td colspan="5" style="background:#0f3460;color:#00d4ff;font-weight:bold;">Admin (/api/admin)</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/stats</td><td>Admin</td><td>Dashboard statistics</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/pharmacies/pending</td><td>Admin</td><td>Pending verifications</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/pharmacies/:id/verify</td><td>Admin</td><td>Approve/reject pharmacy</td></tr>
+        <tr><td></td><td><span class="badge badge-blue">GET</span></td><td>/users</td><td>Admin</td><td>List all users</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/users/:id/ban</td><td>Admin</td><td>Ban/unban user</td></tr>
+        <tr><td></td><td><span class="badge badge-green">POST</span></td><td>/medicines</td><td>Admin</td><td>Create medicine</td></tr>
+        <tr><td></td><td><span class="badge badge-orange">PUT</span></td><td>/medicines/:id</td><td>Admin</td><td>Update medicine</td></tr>
+        <tr><td></td><td><span class="badge badge-red">DELETE</span></td><td>/medicines/:id</td><td>Admin</td><td>Soft delete medicine</td></tr>
+    </table>
+</div>
+
+<!-- ===== 13. SECURITY ===== -->
+<div class="section" id="security">
+    <h2>13. Security Architecture</h2>
+    <p class="subtitle">Multi-layered security approach across the stack</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph TD
+    subgraph Layer1["Layer 1: Network"]
+        A1["AWS Security Group<br/>Only SSH + HTTP + HTTPS"]
+        A2["Nginx TLS 1.2/1.3<br/>HSTS 1 year"]
+        A3["HTTP &rarr; HTTPS Redirect"]
+    end
+
+    subgraph Layer2["Layer 2: Application Gateway"]
+        B1["Nginx Rate Limiting<br/>Auth: 10 req/min"]
+        B2["express-rate-limit<br/>General: 1000/15min<br/>Auth: 100/15min<br/>Upload: 30/15min"]
+        B3["Helmet Security Headers<br/>X-Frame, XSS, noSniff"]
+        B4["CORS Whitelist<br/>Frontend URL Only"]
+    end
+
+    subgraph Layer3["Layer 3: Authentication"]
+        C1["JWT Access Token<br/>15 min expiry"]
+        C2["JWT Refresh Token<br/>7 day expiry, hashed in DB"]
+        C3["bcrypt Password Hash<br/>12 salt rounds"]
+        C4["Google OAuth 2.0<br/>Social Login"]
+    end
+
+    subgraph Layer4["Layer 4: Authorization"]
+        D1["Role-Based Access<br/>patient | pharmacy | admin"]
+        D2["Resource Ownership<br/>Users access own data only"]
+        D3["Ban System<br/>Checked at auth level"]
+        D4["Pharmacy Verification<br/>Must be verified to operate"]
+    end
+
+    subgraph Layer5["Layer 5: Input Validation"]
+        E1["Zod Schema Validation<br/>All request bodies"]
+        E2["Multer File Filters<br/>Whitelist: jpeg, png, webp"]
+        E3["File Size Limits<br/>Images: 10MB, CSV: 5MB"]
+        E4["Mongoose Sanitization<br/>NoSQL injection prevention"]
+    end
+
+    subgraph Layer6["Layer 6: Container Security"]
+        F1["Non-root Users<br/>appuser:1001"]
+        F2["Multi-stage Builds<br/>Minimal attack surface"]
+        F3["Encrypted EBS Volume"]
+        F4["Internal-only Ports<br/>Only Nginx exposed"]
+    end
+
+    subgraph Layer7["Layer 7: CI/CD Security"]
+        G1["CodeQL SAST<br/>Weekly scanning"]
+        G2["Trivy Container Scan"]
+        G3["npm audit<br/>HIGH + CRITICAL"]
+        G4["Dependabot<br/>Auto-updates"]
+    end
+
+    Layer1 --> Layer2 --> Layer3 --> Layer4 --> Layer5
+    Layer6 -.-> Layer1
+    Layer7 -.-> Layer6
+
+    style Layer1 fill:#3d0a0a,stroke:#ff4444,color:#fff
+    style Layer2 fill:#3d2a0a,stroke:#ffaa00,color:#fff
+    style Layer3 fill:#2a3d0a,stroke:#88ff00,color:#fff
+    style Layer4 fill:#0a3d2a,stroke:#00ff88,color:#fff
+    style Layer5 fill:#0a2a3d,stroke:#00aaff,color:#fff
+    style Layer6 fill:#0f3460,stroke:#00d4ff,color:#fff
+    style Layer7 fill:#2a0a3d,stroke:#aa44ff,color:#fff
+        </pre>
+    </div>
+</div>
+
+<!-- ===== OCR PIPELINE ===== -->
+<div class="section" id="ocr">
+    <h2>14. Prescription OCR Pipeline</h2>
+    <p class="subtitle">AI-powered medicine extraction from prescription images</p>
+    <div class="diagram-box">
+        <pre class="mermaid">
+graph LR
+    A["&#128247; Patient Uploads<br/>Prescription Image"] --> B["&#128444; Sharp Preprocessing"]
+
+    B --> B1["Auto-rotate"]
+    B --> B2["Grayscale Convert"]
+    B --> B3["Contrast Enhancement"]
+    B --> B4["Sharpen"]
+    B --> B5["Resize to 2000px"]
+
+    B1 & B2 & B3 & B4 & B5 --> C["&#129302; Tesseract.js OCR<br/>English Language"]
+
+    C --> D["Raw Extracted Text"]
+    D --> E["&#128270; Regex Pattern Matching"]
+
+    E --> E1["Rx Patterns<br/>Tab, Cap, Syp, Inj + Dosage"]
+    E --> E2["Numbered Lists<br/>1. Medicine Name"]
+    E --> E3["Filter Non-Medicine<br/>Dr, Patient, Date, etc."]
+
+    E1 & E2 & E3 --> F["Candidate Medicine Names"]
+    F --> G["&#127919; Medicine Matcher"]
+
+    G --> G1["1. Exact Match<br/>Confidence: 1.0"]
+    G --> G2["2. Partial Match<br/>Confidence: 0.8"]
+    G --> G3["3. Text Search<br/>MongoDB $text"]
+    G --> G4["4. Fuzzy Match<br/>Levenshtein Distance"]
+    G --> G5["5. No Match<br/>Confidence: 0.2"]
+
+    G1 & G2 & G3 & G4 & G5 --> H["&#10004; Results:<br/>Medicine Names +<br/>Confidence Scores"]
+    H --> I["Patient Verifies /<br/>Edits Medicines"]
+
+    style A fill:#0f3460,stroke:#00d4ff,color:#fff
+    style C fill:#2a0a3d,stroke:#aa44ff,color:#fff
+    style G fill:#3d2a0a,stroke:#ffaa00,color:#fff
+    style H fill:#0a3d2a,stroke:#00ff88,color:#fff
+        </pre>
+    </div>
+</div>
+
+<div class="footer">
+    <p>PharmaLink &mdash; Graduation Project &mdash; Architecture Diagrams</p>
+    <p style="margin-top:8px; font-size:0.85em;">Open this file in a browser to view all diagrams</p>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis'
+        },
+        er: {
+            useMaxWidth: true
+        }
+    });
+</script>
+
+</body>
+</html>
