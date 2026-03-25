@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Upload, CheckCircle2, MapPin, Truck, FileImage, StickyNote, LocateFixed, Banknote, Smartphone } from 'lucide-react';
+import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote, LocateFixed, Banknote, Smartphone } from 'lucide-react';
 import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 import MedicineIcon from '@/components/shared/MedicineIcon';
 
