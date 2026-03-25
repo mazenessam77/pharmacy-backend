@@ -7,7 +7,8 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { ListSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
-import { Plus, ShoppingBag, Pill, ChevronRight } from 'lucide-react';
+import { Plus, ShoppingBag, ChevronRight } from 'lucide-react';
+import MedicineIcon, { getMedicineColors } from '@/components/shared/MedicineIcon';
 
 const STATUS_FILTERS = [
   { value: '', label: 'All' },
@@ -86,37 +87,43 @@ export default function PatientOrdersPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map((order) => (
-            <Link
-              key={order._id}
-              href={`/patient/orders/${order._id}`}
-              className={`flex items-center gap-4 bg-white border border-neutral-200 border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-xl p-4 hover:shadow-md hover:shadow-neutral-100 transition-all duration-200 group`}
-            >
-              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center shrink-0">
-                <Pill className="w-5 h-5 text-indigo-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] text-neutral-400 uppercase tracking-widest">
-                    #{order._id.slice(-8)}
+          {orders.map((order) => {
+            const firstName = order.medicines[0]?.name ?? 'Medicine';
+            const { accent } = getMedicineColors(firstName);
+            return (
+              <Link
+                key={order._id}
+                href={`/patient/orders/${order._id}`}
+                className={`flex items-center gap-4 bg-white border border-neutral-200 border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-xl p-4 hover:shadow-md hover:shadow-neutral-100 transition-all duration-200 group`}
+              >
+                <MedicineIcon name={firstName} size="md" />
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[10px] text-neutral-400 uppercase tracking-widest">
+                      #{order._id.slice(-8)}
+                    </p>
+                    <Badge variant={statusVariant(order.status)}>
+                      {statusLabel(order.status)}
+                    </Badge>
+                  </div>
+                  <p className="text-[13px] font-medium text-neutral-800 truncate">
+                    {order.medicines.map((m) => `${m.name} ×${m.quantity}`).join(', ')}
                   </p>
-                  <Badge variant={statusVariant(order.status)}>
-                    {statusLabel(order.status)}
-                  </Badge>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-[11px] text-neutral-400">
+                      {order.deliveryType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
+                    </p>
+                    <p className="text-[11px] text-neutral-400">{formatDate(order.createdAt)}</p>
+                  </div>
                 </div>
-                <p className="text-[13px] font-medium text-neutral-800 truncate">
-                  {order.medicines.map((m) => `${m.name} ×${m.quantity}`).join(', ')}
-                </p>
-                <div className="flex items-center justify-between mt-1">
-                  <p className="text-[11px] text-neutral-400">
-                    {order.deliveryType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
-                  </p>
-                  <p className="text-[11px] text-neutral-400">{formatDate(order.createdAt)}</p>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-neutral-300 group-hover:text-indigo-400 shrink-0 transition-colors" />
-            </Link>
-          ))}
+                <ChevronRight className="w-4 h-4 text-neutral-300 shrink-0 transition-colors" style={{ color: undefined }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = accent)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '')}
+                />
+              </Link>
+            );
+          })}
         </div>
       )}
 

@@ -8,8 +8,9 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote, LocateFixed, Banknote, Smartphone } from 'lucide-react';
+import { Plus, Trash2, Upload, CheckCircle2, MapPin, Truck, FileImage, StickyNote, LocateFixed, Banknote, Smartphone } from 'lucide-react';
 import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
+import MedicineIcon from '@/components/shared/MedicineIcon';
 
 interface MedicineEntry {
   name: string;
@@ -142,6 +143,10 @@ export default function NewOrderPage() {
           <div className="space-y-3">
             {medicines.map((med, i) => (
               <div key={i} className="flex gap-3 items-end">
+                {/* Live medicine icon */}
+                <div className={i === 0 ? 'mb-[2px]' : 'mb-[2px]'}>
+                  <MedicineIcon name={med.name || 'medicine'} size="sm" />
+                </div>
                 <div className="flex-1">
                   <Input
                     label={i === 0 ? 'Medicine Name' : undefined}
@@ -150,7 +155,7 @@ export default function NewOrderPage() {
                     onChange={(e) => updateMedicine(i, 'name', e.target.value)}
                   />
                 </div>
-                <div className="w-24">
+                <div className="w-20">
                   <Input
                     label={i === 0 ? 'Qty' : undefined}
                     type="number"

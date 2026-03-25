@@ -8,39 +8,7 @@ import Badge from '@/components/ui/Badge';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDate } from '@/lib/helpers';
 import { ShoppingBag, Plus, ArrowRight, Clock, CheckCircle2, Sparkles } from 'lucide-react';
-
-// ─── Medicine Avatar ──────────────────────────────────────────────────────────
-// Generates a deterministic pastel circle with the medicine's initials.
-// Replaces the generic pill icon so each medicine looks visually distinct.
-const AVATAR_PALETTES = [
-  { bg: '#e0e7ff', fg: '#4338ca' }, // indigo
-  { bg: '#d1fae5', fg: '#065f46' }, // emerald
-  { bg: '#fef3c7', fg: '#92400e' }, // amber
-  { bg: '#fce7f3', fg: '#9d174d' }, // pink
-  { bg: '#ede9fe', fg: '#5b21b6' }, // violet
-  { bg: '#e0f2fe', fg: '#075985' }, // sky
-  { bg: '#dcfce7', fg: '#15803d' }, // green
-  { bg: '#fff7ed', fg: '#9a3412' }, // orange
-];
-
-function MedicineAvatar({ name }: { name: string }) {
-  const code = Array.from(name).reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  const { bg, fg } = AVATAR_PALETTES[code % AVATAR_PALETTES.length];
-  const initials = name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .join('');
-
-  return (
-    <div
-      className="w-11 h-11 rounded-2xl flex items-center justify-center text-[11px] font-bold shrink-0 select-none"
-      style={{ backgroundColor: bg, color: fg }}
-    >
-      {initials}
-    </div>
-  );
-}
+import MedicineIcon from '@/components/shared/MedicineIcon';
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 export default function PatientDashboard() {
@@ -204,8 +172,7 @@ export default function PatientDashboard() {
                 href={`/patient/orders/${order._id}`}
                 className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-indigo-50/60 active:scale-[0.99] transition-all duration-200 group"
               >
-                {/* Medicine avatar — unique per medicine name */}
-                <MedicineAvatar name={order.medicines[0]?.name ?? 'Medicine'} />
+                <MedicineIcon name={order.medicines[0]?.name ?? 'Medicine'} size="md" />
 
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-semibold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">
