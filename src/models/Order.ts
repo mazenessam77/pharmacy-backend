@@ -25,6 +25,7 @@ const orderSchema = new Schema<OrderDocument>(
       default: 'pending',
     },
     deliveryType: { type: String, enum: ['delivery', 'pickup'], default: 'delivery' },
+    paymentMethod: { type: String, enum: ['cash', 'instapay'], default: 'cash' },
     acceptedPharmacy: { type: Schema.Types.ObjectId, ref: 'Pharmacy' },
     acceptedResponse: { type: Schema.Types.ObjectId, ref: 'OrderResponse' },
     notes: { type: String },

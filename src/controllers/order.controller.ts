@@ -12,7 +12,7 @@ import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT
 import { sendOrderConfirmationEmail } from '../services/email.service';
 
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
-  const { medicines, prescriptionId, governorate, deliveryType, notes, patientLocation } = req.body;
+  const { medicines, prescriptionId, governorate, deliveryType, paymentMethod, notes, patientLocation } = req.body;
   const patientId = req.user!._id;
 
   if (!governorate) {
@@ -33,6 +33,7 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
     prescriptionId,
     governorate,
     deliveryType,
+    paymentMethod,
     notes,
     ...(patientLocation && {
       patientLocation: {

@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import toast from 'react-hot-toast';
-import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote, LocateFixed } from 'lucide-react';
+import { Plus, Trash2, Upload, CheckCircle2, Pill, MapPin, Truck, FileImage, StickyNote, LocateFixed, Banknote, Smartphone } from 'lucide-react';
 import { EGYPTIAN_GOVERNORATES } from '@/lib/governorates';
 
 interface MedicineEntry {
@@ -26,6 +26,7 @@ export default function NewOrderPage() {
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'instapay' | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -97,10 +98,17 @@ export default function NewOrderPage() {
       return;
     }
 
+    if (!paymentMethod) {
+      toast.error('Please select a payment method');
+      document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
     try {
       const order = await createOrder({
         medicines: validMeds,
         deliveryType,
+        paymentMethod,
         notes: notes || undefined,
         prescriptionId: prescriptionId || undefined,
         governorate,
@@ -318,6 +326,100 @@ export default function NewOrderPage() {
           </div>
         </div>
 
+        {/* Payment Method */}
+        <div id="payment-section" className={`bg-white rounded-2xl border p-6 transition-colors duration-200 ${paymentMethod === null ? 'border-neutral-200' : 'border-emerald-200'}`}>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${paymentMethod ? 'bg-emerald-100' : 'bg-neutral-100'}`}>
+                <Banknote className={`w-4 h-4 transition-colors duration-200 ${paymentMethod ? 'text-emerald-600' : 'text-neutral-400'}`} />
+              </div>
+              <p className="text-[13px] font-semibold text-neutral-800">Payment Method</p>
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-red-400">Required</span>
+          </div>
+          <p className="text-[11px] text-neutral-400 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
+
+          <div className="grid grid-cols-2 gap-3">
+            {/* Cash */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cash')}
+              className={`relative group flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                paymentMethod === 'cash'
+                  ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100'
+                  : 'border-neutral-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/40'
+              }`}
+            >
+              {/* Selected check */}
+              <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                paymentMethod === 'cash'
+                  ? 'bg-emerald-500 border-emerald-500'
+                  : 'border-neutral-300 bg-white group-hover:border-emerald-300'
+              }`}>
+                {paymentMethod === 'cash' && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                paymentMethod === 'cash' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
+              }`}>
+                <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500 group-hover:text-emerald-600'}`} />
+              </div>
+
+              <div>
+                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-emerald-700' : 'text-neutral-700'}`}>Cash</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5 leading-snug">Pay in cash when you receive your order</p>
+              </div>
+            </button>
+
+            {/* InstaPay */}
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('instapay')}
+              className={`relative group flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+                paymentMethod === 'instapay'
+                  ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100'
+                  : 'border-neutral-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/40'
+              }`}
+            >
+              {/* Selected check */}
+              <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                paymentMethod === 'instapay'
+                  ? 'bg-emerald-500 border-emerald-500'
+                  : 'border-neutral-300 bg-white group-hover:border-emerald-300'
+              }`}>
+                {paymentMethod === 'instapay' && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
+                paymentMethod === 'instapay' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
+              }`}>
+                <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500 group-hover:text-emerald-600'}`} />
+              </div>
+
+              <div>
+                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-emerald-700' : 'text-neutral-700'}`}>InstaPay</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5 leading-snug">Pay instantly via your mobile wallet</p>
+              </div>
+            </button>
+          </div>
+
+          {/* InstaPay note */}
+          {paymentMethod === 'instapay' && (
+            <div className="mt-4 flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 animate-fade-in-up">
+              <Smartphone className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-blue-600">Payment instructions will be sent after you confirm a pharmacy offer.</p>
+            </div>
+          )}
+        </div>
+
         {/* Notes */}
         <div className="bg-white rounded-2xl border border-neutral-200 p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -335,7 +437,20 @@ export default function NewOrderPage() {
         </div>
 
         {/* Submit */}
-        <Button type="submit" variant="indigo" isLoading={isLoading} className="w-full rounded-xl" size="lg">
+        {!paymentMethod && (
+          <p className="text-center text-[11px] text-amber-500 font-medium flex items-center justify-center gap-1.5 animate-fade-in-up">
+            <Banknote className="w-3.5 h-3.5" />
+            Select a payment method above to continue
+          </p>
+        )}
+        <Button
+          type="submit"
+          variant="indigo"
+          isLoading={isLoading}
+          disabled={!paymentMethod}
+          className="w-full rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          size="lg"
+        >
           Submit Medicine Request
         </Button>
       </form>

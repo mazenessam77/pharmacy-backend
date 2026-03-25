@@ -13,6 +13,7 @@ export const createOrderSchema = z.object({
   prescriptionId: z.string().optional(),
   governorate: z.string().min(2),
   deliveryType: z.enum(['delivery', 'pickup']).default('delivery'),
+  paymentMethod: z.enum(['cash', 'instapay']),
   notes: z.string().max(500).optional(),
   patientLocation: z.object({
     lat: z.number(),

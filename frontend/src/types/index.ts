@@ -104,6 +104,7 @@ export interface Order {
   patientLocation: { type: string; coordinates: [number, number] };
   status: OrderStatus;
   deliveryType: 'delivery' | 'pickup';
+  paymentMethod: 'cash' | 'instapay';
   acceptedPharmacy?: string | Pharmacy;
   acceptedResponse?: string | OrderResponse;
   notes?: string;
@@ -118,6 +119,7 @@ export interface CreateOrderData {
   prescriptionId?: string;
   governorate: string;
   deliveryType: 'delivery' | 'pickup';
+  paymentMethod: 'cash' | 'instapay';
   notes?: string;
   patientLocation?: { lat: number; lng: number };
 }

@@ -64,6 +64,7 @@ export interface IOrder {
   };
   status: 'pending' | 'offered' | 'confirmed' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
   deliveryType: 'delivery' | 'pickup';
+  paymentMethod: 'cash' | 'instapay';
   acceptedPharmacy?: Types.ObjectId;
   acceptedResponse?: Types.ObjectId;
   notes?: string;
