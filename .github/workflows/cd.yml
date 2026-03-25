@@ -45,14 +45,15 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Generate self-signed SSL cert for mymedcine.duckdns.org if not present
-            mkdir -p nginx/ssl
-            if [ ! -f nginx/ssl/self.crt ]; then
-              openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-                -keyout nginx/ssl/self.key -out nginx/ssl/self.crt \
-                -subj "/CN=mymedcine.duckdns.org" 2>/dev/null
-              echo "SSL cert generated"
-            fi
+            # Create certbot webroot dir for ACME challenges
+            mkdir -p nginx/certbot/www
+
+            # Renew Let's Encrypt cert if within 30 days of expiry
+            # --pre/post hooks stop nginx briefly only when renewal actually runs
+            sudo certbot renew --quiet \
+              --pre-hook "docker stop pharma-nginx 2>/dev/null || true" \
+              --post-hook "docker start pharma-nginx 2>/dev/null || true" \
+              2>/dev/null || true
 
             # Rebuild only the app containers (not mongodb/redis/nginx which don't change)
             docker compose -f docker-compose.yml -f docker-compose.prod.yml build backend frontend
