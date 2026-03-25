@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import toast from 'react-hot-toast';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, isLoading } = useAuthStore();
@@ -37,14 +37,14 @@ export default function LoginPage() {
 
   return (
     <div>
-      <h2 className="text-[11px] uppercase tracking-widest text-neutral-500 mb-1">Welcome back</h2>
+      <h2 className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Welcome back</h2>
       <h3 className="text-[28px] font-light uppercase tracking-wide mb-10">Sign In</h3>
 
       {/* Inline error banner */}
       {loginError && (
-        <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-[13px] text-red-700">{loginError}</p>
+        <div className="flex items-start gap-3 border-l-2 border-red-500 bg-red-50 pl-4 py-2.5 mb-6">
+          <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-red-600 font-medium">{loginError}</p>
         </div>
       )}
 
@@ -68,28 +68,33 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-7 text-neutral-400 hover:text-black transition-colors"
+            className="absolute right-0 top-7 text-neutral-400 hover:text-black transition-colors duration-200 active:scale-90"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
 
         <div className="flex items-center justify-between pt-1">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer group">
             <input type="checkbox" className="w-3.5 h-3.5 border-neutral-300 accent-black" />
-            <span className="text-[11px] uppercase tracking-widest text-neutral-500">Remember me</span>
+            <span className="text-[11px] uppercase tracking-widest text-neutral-500 group-hover:text-black transition-colors duration-200">
+              Remember me
+            </span>
           </label>
           <Link
             href="/forgot-password"
-            className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-black transition-colors"
+            className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-black after:transition-all after:duration-300 hover:after:w-full"
           >
             Forgot password?
           </Link>
         </div>
 
         <div className="pt-4">
-          <Button type="submit" isLoading={isLoading} className="w-full" size="lg">
+          <Button type="submit" isLoading={isLoading} className="w-full group" size="lg">
             Sign In
+            {!isLoading && (
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            )}
           </Button>
         </div>
       </form>
@@ -97,7 +102,10 @@ export default function LoginPage() {
       <div className="mt-10 text-center">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400">
           Don&apos;t have an account?{' '}
-          <Link href="/register" className="text-black hover:underline">
+          <Link
+            href="/register"
+            className="text-black hover:opacity-60 transition-opacity duration-200 underline underline-offset-4"
+          >
             Register
           </Link>
         </p>
