@@ -25,6 +25,7 @@ services:
     environment:
       NODE_ENV: production
       FRONTEND_URL: https://mymedcine.duckdns.org
+      GOOGLE_CLIENT_ID: 350366296907-uusg9qh2kh53r5kacjtp2kr7r0h4t7np.apps.googleusercontent.com
     volumes: []
     deploy:
       resources:
@@ -39,7 +40,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: https://mymedcine.duckdns.org/api
         NEXT_PUBLIC_SOCKET_URL: https://mymedcine.duckdns.org
-        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: 350366296907-uusg9qh2kh53r5kacjtp2kr7r0h4t7np.apps.googleusercontent.com
     ports: []
     volumes: []
     deploy:
