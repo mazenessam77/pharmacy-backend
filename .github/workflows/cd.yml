@@ -42,9 +42,17 @@ jobs:
             cd /opt/pharma-app
 
             # Discard any local changes and pull latest code
-            # (git pull fails if the server has stale manual edits)
             git fetch origin main
             git reset --hard origin/main
+
+            # Generate self-signed SSL cert for mymedcine.duckdns.org if not present
+            mkdir -p nginx/ssl
+            if [ ! -f nginx/ssl/self.crt ]; then
+              openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+                -keyout nginx/ssl/self.key -out nginx/ssl/self.crt \
+                -subj "/CN=mymedcine.duckdns.org" 2>/dev/null
+              echo "SSL cert generated"
+            fi
 
             # Rebuild only the app containers (not mongodb/redis/nginx which don't change)
             docker compose -f docker-compose.yml -f docker-compose.prod.yml build backend frontend
@@ -96,7 +104,7 @@ jobs:
 
           for i in {1..12}; do
             STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
-              https://${{ secrets.PRODUCTION_HOST }}/api/health || echo "000")
+              https://mymedcine.duckdns.org/api/health || echo "000")
 
             if [ "$STATUS" = "200" ]; then
               echo "✓ Production healthy (HTTP $STATUS)"

@@ -24,8 +24,7 @@ services:
     ports: []
     environment:
       NODE_ENV: production
-      # Allow the browser frontend to call the API (CORS)
-      FRONTEND_URL: http://13-135-1-250.nip.io
+      FRONTEND_URL: https://mymedcine.duckdns.org
     volumes: []
     deploy:
       resources:
@@ -38,8 +37,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        NEXT_PUBLIC_API_URL: http://13-135-1-250.nip.io/api
-        NEXT_PUBLIC_SOCKET_URL: http://13-135-1-250.nip.io
+        NEXT_PUBLIC_API_URL: https://mymedcine.duckdns.org/api
+        NEXT_PUBLIC_SOCKET_URL: https://mymedcine.duckdns.org
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     ports: []
     volumes: []
@@ -58,6 +57,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - backend
       - frontend
