@@ -40,13 +40,13 @@ export default function PatientProfilePage() {
       </div>
 
       {/* Avatar banner */}
-      <div className="bg-gradient-to-br from-indigo-600 to-blue-500 rounded-2xl p-6 mb-6 text-white flex items-center gap-5 shadow-lg shadow-indigo-100">
+      <div className="bg-gradient-to-br from-sky-600 to-teal-500 rounded-2xl p-6 mb-6 text-white flex items-center gap-5 shadow-lg shadow-sky-100">
         <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
           {initials}
         </div>
         <div>
           <p className="text-lg font-semibold">{user?.name || 'Patient'}</p>
-          <p className="text-indigo-200 text-[13px]">{user?.email}</p>
+          <p className="text-sky-200 text-[13px]">{user?.email}</p>
           <span className="inline-block mt-1.5 px-2.5 py-0.5 bg-white/20 rounded-full text-[10px] uppercase tracking-widest">
             Patient
           </span>

@@ -22,9 +22,9 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
         className="min-h-screen"
         style={{
           background:
-            'radial-gradient(ellipse at 80% 0%, rgba(99,102,241,0.06) 0%, transparent 60%),' +
-            'radial-gradient(ellipse at 0% 100%, rgba(59,130,246,0.05) 0%, transparent 60%),' +
-            'linear-gradient(180deg, #f0f4ff 0%, #f8f9ff 50%, #fafbff 100%)',
+            'radial-gradient(ellipse at 80% 0%, rgba(14,165,233,0.07) 0%, transparent 60%),' +
+            'radial-gradient(ellipse at 0% 100%, rgba(13,148,136,0.05) 0%, transparent 60%),' +
+            'linear-gradient(180deg, #f0f9ff 0%, #f8fffe 50%, #fafffe 100%)',
         }}
       >
         <Navbar onMenuToggle={() => setSidebarOpen(true)} />

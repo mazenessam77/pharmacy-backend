@@ -135,8 +135,8 @@ export default function NewOrderPage() {
         {/* Medicines */}
         <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-              <Pill className="w-4 h-4 text-indigo-600" />
+            <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
+              <Pill className="w-4 h-4 text-sky-600" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Medicines</p>
           </div>
@@ -179,7 +179,7 @@ export default function NewOrderPage() {
           <button
             type="button"
             onClick={addMedicine}
-            className="mt-4 text-[12px] text-indigo-600 hover:text-indigo-800 transition-colors inline-flex items-center gap-1.5 font-medium"
+            className="mt-4 text-[12px] text-sky-600 hover:text-sky-800 transition-colors inline-flex items-center gap-1.5 font-medium"
           >
             <Plus className="w-3.5 h-3.5" /> Add Medicine
           </button>
@@ -188,8 +188,8 @@ export default function NewOrderPage() {
         {/* Prescription Upload */}
         <div className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <FileImage className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+              <FileImage className="w-4 h-4 text-teal-600" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Prescription <span className="text-neutral-400 font-normal">(Optional)</span></p>
           </div>
@@ -199,7 +199,7 @@ export default function NewOrderPage() {
               <span className="text-[13px] font-medium">Prescription uploaded successfully</span>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-neutral-200 rounded-xl p-5 text-center hover:border-indigo-300 transition-colors">
+            <div className="border-2 border-dashed border-neutral-200 rounded-xl p-5 text-center hover:border-sky-300 transition-colors">
               <input
                 type="file"
                 accept="image/*"
@@ -234,7 +234,7 @@ export default function NewOrderPage() {
           <select
             value={governorate}
             onChange={(e) => setGovernorate(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 border border-neutral-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-all"
+            className="w-full px-4 py-3 bg-slate-50 border border-neutral-200 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition-all"
           >
             {EGYPTIAN_GOVERNORATES.map((g) => (
               <option key={g} value={g}>{g}</option>
@@ -321,8 +321,8 @@ export default function NewOrderPage() {
                 onClick={() => setDeliveryType(type)}
                 className={`py-3 rounded-xl text-[12px] font-medium uppercase tracking-wide transition-all duration-200 ${
                   deliveryType === type
-                    ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                    : 'bg-slate-50 text-neutral-500 hover:bg-indigo-50 hover:text-indigo-600 border border-neutral-200'
+                    ? 'bg-sky-600 text-white shadow-sm shadow-sky-200'
+                    : 'bg-slate-50 text-neutral-500 hover:bg-sky-50 hover:text-sky-600 border border-neutral-200'
                 }`}
               >
                 {type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}

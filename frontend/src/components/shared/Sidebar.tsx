@@ -34,8 +34,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
               onClick={onClose}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[12px] font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200/60'
-                  : 'text-slate-500 hover:bg-white/80 hover:text-indigo-700 hover:shadow-sm'
+                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-200/60'
+                  : 'text-slate-500 hover:bg-white/80 hover:text-sky-700 hover:shadow-sm'
               }`}
             >
               <link.icon className="w-4 h-4 shrink-0" />
@@ -91,7 +91,7 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } ${
           isIndigo
-            ? 'bg-white border-r border-indigo-100'
+            ? 'bg-white border-r border-sky-100'
             : 'bg-white border-r border-neutral-200'
         }`}
       >

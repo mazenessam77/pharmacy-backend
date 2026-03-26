@@ -24,7 +24,7 @@ const STATUS_FILTERS = [
 const statusBorderColor: Record<string, string> = {
   pending: 'border-l-amber-400',
   offered: 'border-l-blue-400',
-  confirmed: 'border-l-indigo-400',
+  confirmed: 'border-l-sky-400',
   preparing: 'border-l-purple-400',
   out_for_delivery: 'border-l-cyan-400',
   delivered: 'border-l-emerald-400',
@@ -63,8 +63,8 @@ export default function PatientOrdersPage() {
             onClick={() => setStatusFilter(f.value)}
             className={`px-4 py-1.5 text-[11px] rounded-full font-medium transition-all duration-200 ${
               statusFilter === f.value
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-200'
-                : 'bg-white text-neutral-500 border border-neutral-200 hover:border-indigo-300 hover:text-indigo-600'
+                ? 'bg-sky-600 text-white shadow-sm shadow-sky-200'
+                : 'bg-white text-neutral-500 border border-neutral-200 hover:border-sky-300 hover:text-sky-600'
             }`}
           >
             {f.label}
@@ -77,8 +77,8 @@ export default function PatientOrdersPage() {
         <ListSkeleton count={5} />
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-neutral-200 py-16 text-center">
-          <div className="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-3">
-            <ShoppingBag className="w-7 h-7 text-indigo-300" />
+          <div className="w-14 h-14 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <ShoppingBag className="w-7 h-7 text-sky-300" />
           </div>
           <p className="text-[13px] text-neutral-500 mb-4">No orders found</p>
           <Link href="/patient/orders/new">
@@ -136,8 +136,8 @@ export default function PatientOrdersPage() {
               onClick={() => fetchOrders({ page: i + 1, status: statusFilter || undefined })}
               className={`w-9 h-9 text-[12px] rounded-lg font-medium transition-colors ${
                 pagination.page === i + 1
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-white border border-neutral-200 text-neutral-600 hover:border-indigo-300'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'bg-white border border-neutral-200 text-neutral-600 hover:border-sky-300'
               }`}
             >
               {i + 1}

@@ -13,7 +13,7 @@ const variants = {
   primary:
     'bg-black text-white hover:bg-neutral-900 hover:shadow-[0_8px_28px_rgba(0,0,0,0.22)] active:scale-[0.97] btn-shine',
   indigo:
-    'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-300/40 active:scale-[0.97] btn-shine',
+    'bg-sky-600 text-white hover:bg-sky-700 hover:shadow-lg hover:shadow-sky-300/40 active:scale-[0.97] btn-shine',
   danger:  'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97]',
   success: 'bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.97]',
   outline:

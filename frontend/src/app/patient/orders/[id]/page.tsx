@@ -80,13 +80,13 @@ export default function OrderDetailPage() {
         <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-4 h-4 text-indigo-500" />
+              <Pill className="w-4 h-4 text-sky-500" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Medicines</p>
             </div>
             <ul className="space-y-1.5">
               {currentOrder.medicines.map((m, i) => (
                 <li key={i} className="flex items-center gap-2 text-[13px]">
-                  <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-sky-400 rounded-full shrink-0" />
                   <span className="font-medium">{m.name}</span>
                   <span className="text-neutral-400">×{m.quantity}</span>
                 </li>
@@ -150,7 +150,7 @@ export default function OrderDetailPage() {
       {responses.length > 0 && currentOrder.status !== 'cancelled' && (
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-4">
-            <Tag className="w-4 h-4 text-indigo-500" />
+            <Tag className="w-4 h-4 text-sky-500" />
             <p className="text-[13px] font-semibold text-neutral-800">
               Pharmacy Offers ({responses.length})
             </p>
@@ -208,7 +208,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
                     <div className="text-[13px] text-neutral-600">
                       Total:{' '}
-                      <span className="text-indigo-700 font-semibold">{resp.totalPrice} EGP</span>
+                      <span className="text-sky-700 font-semibold">{resp.totalPrice} EGP</span>
                       {resp.deliveryFee > 0 && (
                         <span className="text-neutral-400 text-[12px]"> + {resp.deliveryFee} EGP delivery</span>
                       )}

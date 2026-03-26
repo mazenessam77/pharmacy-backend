@@ -59,7 +59,7 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
         <Link href={`${basePath}/notifications`} className="relative text-neutral-500 hover:text-black transition-colors">
           <Bell className="w-4 h-4" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-black text-white text-[9px] flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-sky-600 text-white text-[9px] rounded-full flex items-center justify-center">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}

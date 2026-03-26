@@ -50,9 +50,9 @@ export default function PatientDashboard() {
             </div>
             <h1 className="text-[28px] font-extrabold leading-tight">
               {greeting()},{' '}
-              <span className="text-indigo-200">{user?.name?.split(' ')[0]}</span> 👋
+              <span className="text-sky-200">{user?.name?.split(' ')[0]}</span> 👋
             </h1>
-            <p className="text-indigo-100/80 mt-1.5 text-[13px] font-medium">
+            <p className="text-sky-100/80 mt-1.5 text-[13px] font-medium">
               Your health, delivered — across all of Egypt.
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function PatientDashboard() {
           {/* High-contrast FAB inside hero */}
           <Link
             href="/patient/orders/new"
-            className="shrink-0 flex items-center gap-2 bg-white text-indigo-700 font-bold text-[13px] px-5 py-3 rounded-2xl hover:bg-indigo-50 active:scale-95 transition-all duration-200"
+            className="shrink-0 flex items-center gap-2 bg-white text-sky-700 font-bold text-[13px] px-5 py-3 rounded-2xl hover:bg-sky-50 active:scale-95 transition-all duration-200"
             style={{ boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }}
           >
             <Plus className="w-4 h-4" />
@@ -77,7 +77,7 @@ export default function PatientDashboard() {
           ].map((s) => (
             <div key={s.label} className="bg-white/15 rounded-2xl px-4 py-3 backdrop-blur-sm">
               <p className="text-2xl font-extrabold">{s.value}</p>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-200 mt-0.5">{s.label}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-sky-200 mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
@@ -90,9 +90,9 @@ export default function PatientDashboard() {
             label: 'Total Orders',
             value: orders.length,
             icon: ShoppingBag,
-            accent: '#e0e7ff',
-            iconColor: '#4338ca',
-            bar: 'bg-indigo-500',
+            accent: '#e0f2fe',
+            iconColor: '#0284c7',
+            bar: 'bg-sky-500',
           },
           {
             label: 'In Progress',
@@ -136,7 +136,7 @@ export default function PatientDashboard() {
           <h2 className="text-[15px] font-bold text-slate-800">Recent Orders</h2>
           <Link
             href="/patient/orders"
-            className="text-[12px] text-indigo-600 font-semibold hover:text-indigo-800 transition-colors inline-flex items-center gap-1"
+            className="text-[12px] text-sky-600 font-semibold hover:text-sky-700 transition-colors inline-flex items-center gap-1"
           >
             View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -150,15 +150,15 @@ export default function PatientDashboard() {
           <div className="py-14 text-center">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: '#e0e7ff' }}
+              style={{ background: '#e0f2fe' }}
             >
-              <ShoppingBag className="w-7 h-7" style={{ color: '#4338ca' }} />
+              <ShoppingBag className="w-7 h-7" style={{ color: '#0284c7' }} />
             </div>
             <p className="text-[13px] font-medium text-slate-500 mb-4">No orders yet — start your first request!</p>
             <Link
               href="/patient/orders/new"
-              className="inline-flex items-center gap-2 bg-indigo-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-xl hover:bg-indigo-700 active:scale-95 transition-all duration-200"
-              style={{ boxShadow: '0 4px 14px rgba(99,102,241,0.4)' }}
+              className="inline-flex items-center gap-2 bg-sky-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-xl hover:bg-sky-700 active:scale-95 transition-all duration-200"
+              style={{ boxShadow: '0 4px 14px rgba(2,132,199,0.4)' }}
             >
               <Plus className="w-3.5 h-3.5" />
               New Request
@@ -170,12 +170,12 @@ export default function PatientDashboard() {
               <Link
                 key={order._id}
                 href={`/patient/orders/${order._id}`}
-                className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-indigo-50/60 active:scale-[0.99] transition-all duration-200 group"
+                className="flex items-center gap-4 p-3.5 rounded-2xl hover:bg-sky-50/60 active:scale-[0.99] transition-all duration-200 group"
               >
                 <MedicineIcon name={order.medicines[0]?.name ?? 'Medicine'} size="md" />
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">
+                  <p className="text-[13px] font-semibold text-slate-800 truncate group-hover:text-sky-700 transition-colors">
                     {order.medicines.map((m) => m.name).join(', ')}
                   </p>
                   <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{formatDate(order.createdAt)}</p>
@@ -185,7 +185,7 @@ export default function PatientDashboard() {
                   <Badge variant={statusVariant(order.status)}>
                     {statusLabel(order.status)}
                   </Badge>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-sky-400 transition-colors" />
                 </div>
               </Link>
             ))}
@@ -197,8 +197,8 @@ export default function PatientDashboard() {
       <Link
         href="/patient/orders/new"
         aria-label="New medicine request"
-        className="fixed bottom-8 right-8 w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 active:scale-95 transition-all duration-200 z-50"
-        style={{ boxShadow: '0 8px 25px rgba(99,102,241,0.55)' }}
+        className="fixed bottom-8 right-8 w-14 h-14 bg-sky-600 text-white rounded-full flex items-center justify-center hover:bg-sky-700 active:scale-95 transition-all duration-200 z-50"
+        style={{ boxShadow: '0 8px 25px rgba(2,132,199,0.55)' }}
       >
         <Plus className="w-6 h-6" />
       </Link>
