@@ -34,8 +34,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
               onClick={onClose}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[12px] font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-200/60'
-                  : 'text-slate-500 hover:bg-white/80 hover:text-sky-700 hover:shadow-sm'
+                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-200/60 dark:shadow-sky-900/40'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-slate-700/60 hover:text-sky-700 dark:hover:text-sky-300 hover:shadow-sm'
               }`}
             >
               <link.icon className="w-4 h-4 shrink-0" />
@@ -52,8 +52,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
             onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2.5 text-[11px] uppercase tracking-widest transition-all duration-200 ${
               isActive
-                ? 'bg-black text-white'
-                : 'text-neutral-500 hover:text-black hover:bg-neutral-50'
+                ? 'bg-black dark:bg-sky-600 text-white'
+                : 'text-neutral-500 dark:text-slate-400 hover:text-black dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-slate-700'
             }`}
           >
             <link.icon className="w-4 h-4 shrink-0" />
@@ -68,10 +68,10 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
     <>
       {/* ── Desktop sidebar (md+) ─────────────────────────────────── */}
       <aside
-        className={`hidden md:block w-60 min-h-[calc(100vh-3.5rem)] py-6 px-3 shrink-0 ${
+        className={`hidden md:block w-60 min-h-[calc(100vh-3.5rem)] py-6 px-3 shrink-0 transition-colors duration-200 ${
           isIndigo
-            ? 'glass border-r border-white/40'
-            : 'bg-white border-r border-neutral-200'
+            ? 'glass border-r border-white/40 dark:border-slate-700/60'
+            : 'bg-white dark:bg-slate-900 border-r border-neutral-200 dark:border-slate-800'
         }`}
       >
         {navContent}
@@ -91,16 +91,16 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } ${
           isIndigo
-            ? 'bg-white border-r border-sky-100'
-            : 'bg-white border-r border-neutral-200'
+            ? 'bg-white dark:bg-slate-900 border-r border-sky-100 dark:border-slate-800'
+            : 'bg-white dark:bg-slate-900 border-r border-neutral-200 dark:border-slate-800'
         }`}
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between mb-6 px-1.5">
-          <span className="text-[13px] uppercase tracking-[0.2em] font-light">PharmaLink</span>
+          <span className="text-[13px] font-bold text-slate-800 dark:text-slate-100 tracking-tight">PharmaLink</span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors"
+            className="p-1.5 rounded-lg text-neutral-400 dark:text-slate-500 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-slate-700 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

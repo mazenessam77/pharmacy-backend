@@ -54,7 +54,7 @@ export default function PatientProfilePage() {
       </div>
 
       {/* Form card */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
           <Input label="Email" value={user?.email || ''} disabled className="text-neutral-400" />
