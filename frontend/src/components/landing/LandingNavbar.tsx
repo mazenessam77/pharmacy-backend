@@ -34,7 +34,7 @@ export default function LandingNavbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm shadow-slate-100 dark:shadow-black/20 border-b border-slate-100 dark:border-slate-800'
+            ? 'bg-white/95 dark:bg-black/95 backdrop-blur-md shadow-sm shadow-slate-100 dark:shadow-black/40 border-b border-slate-100 dark:border-zinc-800'
             : 'bg-transparent'
         }`}
       >
@@ -59,7 +59,7 @@ export default function LandingNavbar() {
                 onClick={() => scrollTo(link.href)}
                 className={`text-[13px] font-medium transition-colors duration-200 ${
                   scrolled
-                    ? 'text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400'
+                    ? 'text-slate-500 dark:text-zinc-400 hover:text-sky-600 dark:hover:text-sky-400'
                     : 'text-white/80 hover:text-white'
                 }`}
               >
@@ -75,7 +75,7 @@ export default function LandingNavbar() {
               href="/login"
               className={`text-[13px] font-medium px-4 py-2 rounded-xl transition-colors duration-200 ${
                 scrolled
-                  ? 'text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30'
+                  ? 'text-slate-600 dark:text-zinc-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30'
                   : 'text-white/80 hover:text-white'
               }`}
             >
@@ -96,7 +96,7 @@ export default function LandingNavbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`p-2 rounded-lg transition-colors ${
                 scrolled
-                  ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                   : 'text-white hover:bg-white/10'
               }`}
             >
@@ -114,24 +114,24 @@ export default function LandingNavbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-40 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-100/50 dark:shadow-black/30 px-6 py-6"
+            className="fixed inset-x-0 top-16 z-40 bg-white dark:bg-zinc-950 border-b border-slate-100 dark:border-zinc-800 shadow-lg shadow-slate-100/50 dark:shadow-black/50 px-6 py-6"
           >
             <div className="flex flex-col gap-1 mb-6">
               {navLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => scrollTo(link.href)}
-                  className="text-left px-4 py-3 text-[14px] font-medium text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-xl transition-colors"
+                  className="text-left px-4 py-3 text-[14px] font-medium text-slate-700 dark:text-zinc-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded-xl transition-colors"
                 >
                   {link.label}
                 </button>
               ))}
             </div>
-            <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex flex-col gap-3 pt-4 border-t border-slate-100 dark:border-zinc-800">
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="w-full py-3 text-center text-[14px] font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-sky-300 hover:text-sky-600 dark:hover:border-sky-700 dark:hover:text-sky-400 transition-colors"
+                className="w-full py-3 text-center text-[14px] font-semibold text-slate-700 dark:text-zinc-300 border border-slate-200 dark:border-zinc-800 rounded-xl hover:border-sky-300 hover:text-sky-600 dark:hover:border-sky-700 dark:hover:text-sky-400 transition-colors"
               >
                 Sign In
               </Link>

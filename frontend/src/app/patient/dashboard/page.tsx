@@ -95,7 +95,7 @@ export default function PatientDashboard() {
               <s.icon className="w-4.5 h-4.5" style={{ color: s.iconColor, width: 18, height: 18 }} />
             </div>
             <p className="text-3xl font-extrabold text-slate-800 dark:text-white">{s.value}</p>
-            <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-wide">{s.label}</p>
+            <p className="text-[11px] font-semibold text-slate-400 dark:text-zinc-500 mt-1 uppercase tracking-wide">{s.label}</p>
           </div>
         ))}
       </div>
@@ -103,7 +103,7 @@ export default function PatientDashboard() {
       {/* ── Recent Orders ──────────────────────────────────────────────── */}
       <div className="glass rounded-3xl card-shadow p-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-[15px] font-bold text-slate-800 dark:text-slate-100">Recent Orders</h2>
+          <h2 className="text-[15px] font-bold text-slate-800 dark:text-zinc-100">Recent Orders</h2>
           <Link href="/patient/orders" className="text-[12px] text-sky-600 dark:text-sky-400 font-semibold hover:text-sky-700 dark:hover:text-sky-300 transition-colors inline-flex items-center gap-1">
             View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -113,10 +113,10 @@ export default function PatientDashboard() {
           <div className="space-y-3">{[1, 2, 3].map((i) => <CardSkeleton key={i} />)}</div>
         ) : recentOrders.length === 0 ? (
           <div className="py-14 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-sky-50 dark:bg-sky-900/30">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-sky-50 dark:bg-sky-950/40">
               <ShoppingBag className="w-7 h-7 text-sky-500 dark:text-sky-400" />
             </div>
-            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-4">No orders yet — start your first request!</p>
+            <p className="text-[13px] font-medium text-slate-500 dark:text-zinc-400 mb-4">No orders yet — start your first request!</p>
             <Link
               href="/patient/orders/new"
               className="inline-flex items-center gap-2 bg-sky-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-xl hover:bg-sky-700 active:scale-95 transition-all duration-200"
@@ -136,14 +136,14 @@ export default function PatientDashboard() {
               >
                 <MedicineIcon name={order.medicines[0]?.name ?? 'Medicine'} size="md" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 truncate group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                  <p className="text-[13px] font-semibold text-slate-800 dark:text-zinc-100 truncate group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
                     {order.medicines.map((m) => m.name).join(', ')}
                   </p>
-                  <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium">{formatDate(order.createdAt)}</p>
+                  <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-0.5 font-medium">{formatDate(order.createdAt)}</p>
                 </div>
                 <div className="flex items-center gap-2.5 shrink-0">
                   <Badge variant={statusVariant(order.status)}>{statusLabel(order.status)}</Badge>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-sky-400 transition-colors" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-300 dark:text-zinc-500 group-hover:text-sky-400 transition-colors" />
                 </div>
               </Link>
             ))}

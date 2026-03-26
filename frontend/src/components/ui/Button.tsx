@@ -17,8 +17,8 @@ const variants = {
   danger:  'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97]',
   success: 'bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.97]',
   outline:
-    'border border-black dark:border-slate-500 text-black dark:text-slate-200 hover:bg-black dark:hover:bg-slate-700 hover:text-white active:scale-[0.97]',
-  ghost: 'text-black dark:text-slate-200 hover:underline',
+    'border border-black dark:border-slate-500 text-black dark:text-zinc-200 hover:bg-black dark:hover:bg-zinc-800 hover:text-white active:scale-[0.97]',
+  ghost: 'text-black dark:text-zinc-200 hover:underline',
 };
 
 const sizes = {

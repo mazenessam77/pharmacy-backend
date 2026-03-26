@@ -17,7 +17,7 @@ const categories = [
 
 export default function MedicineShowcase() {
   return (
-    <section id="categories" className="py-28 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
+    <section id="categories" className="py-28 bg-slate-50 dark:bg-zinc-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
           <div>
@@ -27,7 +27,7 @@ export default function MedicineShowcase() {
             <h2 className="text-[clamp(28px,3.5vw,40px)] font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
               Browse by Category
             </h2>
-            <p className="text-[14px] text-slate-500 dark:text-slate-400 mt-2 max-w-md">
+            <p className="text-[14px] text-slate-500 dark:text-zinc-400 mt-2 max-w-md">
               Hundreds of medicines across all major categories, available from
               nearby pharmacies in real-time.
             </p>

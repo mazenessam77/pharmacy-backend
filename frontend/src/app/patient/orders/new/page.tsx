@@ -126,19 +126,19 @@ export default function NewOrderPage() {
     <div className="max-w-2xl w-full">
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-widest text-neutral-400 dark:text-slate-500 mb-1">Patient</p>
-        <h1 className="text-2xl font-semibold text-neutral-800 dark:text-slate-100">Request Medicines</h1>
-        <p className="text-[13px] text-neutral-500 dark:text-slate-400 mt-1">Fill in the details and pharmacies will send you offers.</p>
+        <p className="text-[11px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-1">Patient</p>
+        <h1 className="text-2xl font-semibold text-neutral-800 dark:text-zinc-100">Request Medicines</h1>
+        <p className="text-[13px] text-neutral-500 dark:text-zinc-400 mt-1">Fill in the details and pharmacies will send you offers.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* Medicines */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
               <Pill className="w-4 h-4 text-sky-600" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Medicines</p>
+            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Medicines</p>
           </div>
           <div className="space-y-3">
             {medicines.map((med, i) => (
@@ -186,12 +186,12 @@ export default function NewOrderPage() {
         </div>
 
         {/* Prescription Upload */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
               <FileImage className="w-4 h-4 text-teal-600" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Prescription <span className="text-neutral-400 dark:text-slate-500 font-normal">(Optional)</span></p>
+            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Prescription <span className="text-neutral-400 dark:text-zinc-500 font-normal">(Optional)</span></p>
           </div>
           {prescriptionId ? (
             <div className="flex items-center gap-2 text-emerald-600">
@@ -199,12 +199,12 @@ export default function NewOrderPage() {
               <span className="text-[13px] font-medium">Prescription uploaded successfully</span>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-neutral-200 dark:border-slate-600 rounded-xl p-5 text-center hover:border-sky-300 dark:hover:border-sky-700 transition-colors">
+            <div className="border-2 border-dashed border-neutral-200 dark:border-zinc-700 rounded-xl p-5 text-center hover:border-sky-300 dark:hover:border-sky-700 transition-colors">
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => setPrescriptionFile(e.target.files?.[0] || null)}
-                className="text-[12px] text-neutral-500 dark:text-slate-400 w-full"
+                className="text-[12px] text-neutral-500 dark:text-zinc-400 w-full"
               />
               {prescriptionFile && (
                 <Button
@@ -224,26 +224,26 @@ export default function NewOrderPage() {
         </div>
 
         {/* Governorate */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <MapPin className="w-4 h-4 text-blue-600" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Governorate</p>
+            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Governorate</p>
           </div>
           <select
             value={governorate}
             onChange={(e) => setGovernorate(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700/50 border border-neutral-200 dark:border-slate-600 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-700 focus:border-sky-400 dark:focus:border-sky-600 dark:bg-slate-700/50 dark:text-slate-100 transition-all"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-700 focus:border-sky-400 dark:focus:border-sky-600 dark:bg-zinc-800/50 dark:text-zinc-100 transition-all"
           >
             {EGYPTIAN_GOVERNORATES.map((g) => (
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-          <p className="text-[11px] text-neutral-400 dark:text-slate-500 mt-2">All pharmacies in this governorate will see your order</p>
+          <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-2">All pharmacies in this governorate will see your order</p>
 
           {/* Current location */}
-          <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-slate-700">
+          <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-zinc-800">
 
             {/* Button */}
             {!location && (
@@ -284,19 +284,19 @@ export default function NewOrderPage() {
                   <button
                     type="button"
                     onClick={() => { setLocation(null); setLocationError(null); }}
-                    className="text-[11px] text-neutral-400 dark:text-slate-500 hover:text-red-500 transition-colors"
+                    className="text-[11px] text-neutral-400 dark:text-zinc-500 hover:text-red-500 transition-colors"
                   >
                     Remove
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-white rounded-lg px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-slate-500 mb-0.5">Latitude</p>
-                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-slate-100">{location.lat.toFixed(6)}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-0.5">Latitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-zinc-100">{location.lat.toFixed(6)}</p>
                   </div>
                   <div className="bg-white rounded-lg px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-slate-500 mb-0.5">Longitude</p>
-                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-slate-100">{location.lng.toFixed(6)}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-0.5">Longitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-zinc-100">{location.lng.toFixed(6)}</p>
                   </div>
                 </div>
               </div>
@@ -306,12 +306,12 @@ export default function NewOrderPage() {
         </div>
 
         {/* Delivery Type */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
               <Truck className="w-4 h-4 text-cyan-600" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Delivery Method</p>
+            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Delivery Method</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {(['delivery', 'pickup'] as const).map((type) => (
@@ -322,7 +322,7 @@ export default function NewOrderPage() {
                 className={`py-3 rounded-xl text-[12px] font-medium uppercase tracking-wide transition-all duration-200 ${
                   deliveryType === type
                     ? 'bg-sky-600 text-white shadow-sm shadow-sky-200'
-                    : 'bg-slate-50 text-neutral-500 dark:text-slate-400 hover:bg-sky-50 hover:text-sky-600 border border-neutral-200'
+                    : 'bg-slate-50 text-neutral-500 dark:text-zinc-400 hover:bg-sky-50 hover:text-sky-600 border border-neutral-200'
                 }`}
               >
                 {type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
@@ -332,17 +332,17 @@ export default function NewOrderPage() {
         </div>
 
         {/* Payment Method */}
-        <div id="payment-section" className={`bg-white dark:bg-slate-800 rounded-2xl border p-6 transition-colors duration-200 ${paymentMethod === null ? 'border-neutral-200 dark:border-slate-700' : 'border-emerald-200 dark:border-emerald-800'}`}>
+        <div id="payment-section" className={`bg-white dark:bg-zinc-900 rounded-2xl border p-6 transition-colors duration-200 ${paymentMethod === null ? 'border-neutral-200 dark:border-zinc-800' : 'border-emerald-200 dark:border-emerald-800'}`}>
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${paymentMethod ? 'bg-emerald-100' : 'bg-neutral-100'}`}>
-                <Banknote className={`w-4 h-4 transition-colors duration-200 ${paymentMethod ? 'text-emerald-600' : 'text-neutral-400 dark:text-slate-500'}`} />
+                <Banknote className={`w-4 h-4 transition-colors duration-200 ${paymentMethod ? 'text-emerald-600' : 'text-neutral-400 dark:text-zinc-500'}`} />
               </div>
-              <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Payment Method</p>
+              <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Payment Method</p>
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-widest text-red-400">Required</span>
           </div>
-          <p className="text-[11px] text-neutral-400 dark:text-slate-500 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
+          <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
 
           <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
             {/* Cash */}
@@ -371,12 +371,12 @@ export default function NewOrderPage() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
                 paymentMethod === 'cash' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
               }`}>
-                <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500 dark:text-slate-400 group-hover:text-emerald-600'}`} />
+                <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500 dark:text-zinc-400 group-hover:text-emerald-600'}`} />
               </div>
 
               <div>
                 <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-emerald-700' : 'text-neutral-700'}`}>Cash</p>
-                <p className="text-[11px] text-neutral-400 dark:text-slate-500 mt-0.5 leading-snug">Pay in cash when you receive your order</p>
+                <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-0.5 leading-snug">Pay in cash when you receive your order</p>
               </div>
             </button>
 
@@ -406,12 +406,12 @@ export default function NewOrderPage() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
                 paymentMethod === 'instapay' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
               }`}>
-                <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500 dark:text-slate-400 group-hover:text-emerald-600'}`} />
+                <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500 dark:text-zinc-400 group-hover:text-emerald-600'}`} />
               </div>
 
               <div>
                 <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-emerald-700' : 'text-neutral-700'}`}>InstaPay</p>
-                <p className="text-[11px] text-neutral-400 dark:text-slate-500 mt-0.5 leading-snug">Pay instantly via your mobile wallet</p>
+                <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-0.5 leading-snug">Pay instantly via your mobile wallet</p>
               </div>
             </button>
           </div>
@@ -426,12 +426,12 @@ export default function NewOrderPage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-neutral-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
               <StickyNote className="w-4 h-4 text-amber-600" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-slate-100">Notes <span className="text-neutral-400 dark:text-slate-500 font-normal">(Optional)</span></p>
+            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Notes <span className="text-neutral-400 dark:text-zinc-500 font-normal">(Optional)</span></p>
           </div>
           <Textarea
             placeholder="Any special instructions for the pharmacy..."
