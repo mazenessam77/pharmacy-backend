@@ -1,108 +1,161 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
-const medicines = [
+const categories = [
   {
-    name: 'Amoxicillin',
-    dosage: '500mg Capsule',
-    category: 'Antibiotic',
-    color: 'bg-amber-50 border-amber-200',
-    accent: 'bg-amber-500',
+    name: 'Pain Relief',
+    desc: 'Paracetamol, Ibuprofen, Aspirin & more',
+    count: '80+ products',
+    gradient: 'from-sky-500 via-blue-600 to-blue-700',
+    glow: 'rgba(14,165,233,0.25)',
+    icon: '💊',
+    tag: 'Most Popular',
   },
   {
-    name: 'Paracetamol',
-    dosage: '500mg Tablet',
-    category: 'Analgesic',
-    color: 'bg-blue-50 border-blue-200',
-    accent: 'bg-blue-500',
+    name: 'Antibiotics',
+    desc: 'Amoxicillin, Azithromycin & capsules',
+    count: '45+ products',
+    gradient: 'from-amber-400 via-orange-500 to-orange-600',
+    glow: 'rgba(245,158,11,0.25)',
+    icon: '🔬',
+    tag: 'Prescription',
   },
   {
-    name: 'Omeprazole',
-    dosage: '20mg Capsule',
-    category: 'Antacid',
-    color: 'bg-purple-50 border-purple-200',
-    accent: 'bg-purple-500',
+    name: 'Vitamins & Wellness',
+    desc: 'Vitamin C, D, B-Complex & supplements',
+    count: '120+ products',
+    gradient: 'from-emerald-400 via-teal-500 to-teal-600',
+    glow: 'rgba(16,185,129,0.25)',
+    icon: '🌿',
+    tag: 'OTC',
   },
   {
-    name: 'Metformin',
-    dosage: '850mg Tablet',
-    category: 'Antidiabetic',
-    color: 'bg-emerald-50 border-emerald-200',
-    accent: 'bg-emerald-500',
+    name: 'Chronic Disease',
+    desc: 'Diabetes, Blood Pressure & Cholesterol',
+    count: '60+ products',
+    gradient: 'from-violet-500 via-purple-600 to-purple-700',
+    glow: 'rgba(139,92,246,0.25)',
+    icon: '❤️',
+    tag: 'Long-term',
   },
   {
-    name: 'Cetirizine',
-    dosage: '10mg Tablet',
-    category: 'Antihistamine',
-    color: 'bg-rose-50 border-rose-200',
-    accent: 'bg-rose-500',
+    name: 'First Aid',
+    desc: 'Bandages, Antiseptics & Wound care',
+    count: '35+ products',
+    gradient: 'from-rose-400 via-red-500 to-red-600',
+    glow: 'rgba(244,63,94,0.25)',
+    icon: '🩹',
+    tag: 'Emergency',
   },
   {
-    name: 'Ibuprofen',
-    dosage: '400mg Tablet',
-    category: 'Anti-inflammatory',
-    color: 'bg-orange-50 border-orange-200',
-    accent: 'bg-orange-500',
+    name: 'Eye & Ear Care',
+    desc: 'Eye drops, Ear drops & solutions',
+    count: '30+ products',
+    gradient: 'from-cyan-400 via-cyan-500 to-sky-600',
+    glow: 'rgba(6,182,212,0.25)',
+    icon: '👁️',
+    tag: 'Specialist',
+  },
+  {
+    name: 'Skincare & Dermatology',
+    desc: 'Creams, ointments & topical gels',
+    count: '55+ products',
+    gradient: 'from-pink-400 via-rose-500 to-pink-600',
+    glow: 'rgba(236,72,153,0.25)',
+    icon: '✨',
+    tag: 'Topical',
+  },
+  {
+    name: 'Baby & Mother Care',
+    desc: 'Infant formulas, supplements & care',
+    count: '40+ products',
+    gradient: 'from-fuchsia-400 via-purple-500 to-violet-600',
+    glow: 'rgba(217,70,239,0.25)',
+    icon: '🍼',
+    tag: 'Pediatric',
   },
 ];
 
 export default function MedicineShowcase() {
   return (
-    <section className="py-32 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-16">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+    <section id="categories" className="py-28 bg-slate-50">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
           <div>
-            <p className="text-[11px] uppercase tracking-ultra text-neutral-400 mb-4">Medicine Database</p>
-            <h2 className="text-[clamp(28px,3.5vw,42px)] font-light uppercase tracking-wide leading-tight">
-              Wide Range of
-              <br />
-              <span className="text-neutral-400">Medicines Available</span>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-sky-600 mb-3">
+              Medicine Categories
+            </p>
+            <h2 className="text-[clamp(28px,3.5vw,40px)] font-extrabold text-slate-900 leading-tight tracking-tight">
+              Browse by Category
             </h2>
+            <p className="text-[14px] text-slate-500 mt-2 font-normal max-w-md">
+              Hundreds of medicines across all major categories, available from
+              nearby pharmacies in real-time.
+            </p>
           </div>
-          <p className="text-[12px] text-neutral-500 max-w-xs font-light leading-relaxed">
-            Our platform supports hundreds of medicines across all major categories,
-            with real-time availability from nearby pharmacies.
-          </p>
+          <Link
+            href="/register"
+            className="shrink-0 inline-flex items-center gap-2 text-[13px] font-semibold text-sky-600 hover:text-sky-700 transition-colors"
+          >
+            View All <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
-      </div>
 
-      {/* Scrolling cards */}
-      <div className="relative">
-        <motion.div
-          className="flex gap-5 px-6 lg:px-12"
-          animate={{ x: [0, -600] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        >
-          {[...medicines, ...medicines].map((med, i) => (
-            <div
-              key={`${med.name}-${i}`}
-              className={`flex-shrink-0 w-64 border ${med.color} p-6 hover:shadow-lg transition-shadow duration-500`}
+        {/* Category Grid — 4 columns on desktop, 2 on tablet, 1 on mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {categories.map((cat, i) => (
+            <motion.div
+              key={cat.name}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5, delay: (i % 4) * 0.08 }}
+              whileHover={{ scale: 1.02, translateY: -4 }}
+              className={`relative bg-gradient-to-br ${cat.gradient} rounded-2xl overflow-hidden cursor-default select-none group`}
+              style={{
+                boxShadow: `0 12px 32px -8px ${cat.glow}`,
+                aspectRatio: '4/3',
+              }}
             >
-              {/* Medicine visual */}
-              <div className="flex items-center gap-3 mb-5">
-                <div className={`w-12 h-12 ${med.accent} rounded-full opacity-20`} />
-                <div className={`w-8 h-8 ${med.accent} rounded-full opacity-10 -ml-6`} />
-              </div>
+              {/* Background texture overlay */}
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle at 80% 20%, rgba(255,255,255,0.4) 0%, transparent 50%)',
+                }}
+              />
 
-              <p className="text-[9px] uppercase tracking-widest text-neutral-500 mb-2">{med.category}</p>
-              <h3 className="text-[15px] font-light mb-1">{med.name}</h3>
-              <p className="text-[12px] text-neutral-500">{med.dosage}</p>
-
-              {/* Mock availability */}
-              <div className="mt-5 pt-4 border-t border-neutral-200">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-neutral-400 uppercase tracking-widest">Available at</span>
-                  <span className="text-[12px] font-light">{3 + (i % 5)} pharmacies</span>
+              {/* Content */}
+              <div className="relative z-10 h-full flex flex-col justify-between p-5">
+                <div className="flex items-start justify-between">
+                  <span className="text-3xl">{cat.icon}</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-white/70 bg-white/15 rounded-full px-2.5 py-1">
+                    {cat.tag}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-white font-bold text-[15px] leading-tight">
+                    {cat.name}
+                  </p>
+                  <p className="text-white/70 text-[11px] font-medium mt-1 leading-snug">
+                    {cat.desc}
+                  </p>
+                  <p className="text-white/50 text-[10px] font-semibold mt-2 uppercase tracking-widest">
+                    {cat.count}
+                  </p>
                 </div>
               </div>
-            </div>
-          ))}
-        </motion.div>
 
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+              {/* Hover shimmer */}
+              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -2,9 +2,9 @@
 
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import HeroSection from '@/components/landing/HeroSection';
+import MedicineShowcase from '@/components/landing/MedicineShowcase';
 import FeaturesSection from '@/components/landing/FeaturesSection';
 import HowItWorksSection from '@/components/landing/HowItWorksSection';
-import MedicineShowcase from '@/components/landing/MedicineShowcase';
 import AboutSection from '@/components/landing/AboutSection';
 import CTASection from '@/components/landing/CTASection';
 import Footer from '@/components/landing/Footer';
@@ -14,9 +14,9 @@ export default function Home() {
     <main>
       <LandingNavbar />
       <HeroSection />
+      <MedicineShowcase />
       <FeaturesSection />
       <HowItWorksSection />
-      <MedicineShowcase />
       <AboutSection />
       <CTASection />
       <Footer />
