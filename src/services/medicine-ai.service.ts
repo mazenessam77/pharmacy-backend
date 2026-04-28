@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { env } from '../config/env';
 
 export interface AIAlternative {
@@ -57,16 +57,32 @@ Output STRICT JSON matching this schema (no markdown, no commentary):
   "disclaimer": "string (a short safety disclaimer)"
 }`;
 
-let client: Anthropic | null = null;
+// ── Gemini client ──────────────────────────────────────────────
+let geminiModel: any = null;
 
-function getClient(): Anthropic {
+function getGeminiModel() {
+  if (!env.GEMINI_API_KEY) {
+    return null;
+  }
+  if (!geminiModel) {
+    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    geminiModel = genAI.getGenerativeModel({ model: env.GEMINI_MODEL });
+  }
+  return geminiModel;
+}
+
+// ── Anthropic client (fallback) ────────────────────────────────
+let anthropicClient: any = null;
+
+async function getAnthropicClient() {
   if (!env.ANTHROPIC_API_KEY) {
-    throw new Error('ANTHROPIC_API_KEY is not configured');
+    return null;
   }
-  if (!client) {
-    client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+  if (!anthropicClient) {
+    const { default: Anthropic } = await import('@anthropic-ai/sdk');
+    anthropicClient = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   }
-  return client;
+  return anthropicClient;
 }
 
 function buildUserPrompt(input: RecommendationInput): string {
@@ -91,12 +107,32 @@ function extractJson(text: string): any {
   return JSON.parse(candidate);
 }
 
-export const generateAlternativeRecommendation = async (
-  input: RecommendationInput
-): Promise<AIRecommendationResult> => {
-  const anthropic = getClient();
+// ── Generate via Gemini (primary — free) ───────────────────────
+async function generateWithGemini(userPrompt: string): Promise<{ text: string; model: string }> {
+  const model = getGeminiModel();
+  if (!model) throw new Error('GEMINI_API_KEY is not configured');
 
-  const message = await anthropic.messages.create({
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: [{ text: `${SYSTEM_PROMPT}\n\n${userPrompt}` }] }],
+    generationConfig: {
+      maxOutputTokens: 1500,
+      temperature: 0.3,
+    },
+  });
+
+  const response = result.response;
+  const text = response.text();
+  if (!text) throw new Error('Gemini response had no text content');
+
+  return { text, model: env.GEMINI_MODEL };
+}
+
+// ── Generate via Anthropic (fallback — paid) ───────────────────
+async function generateWithAnthropic(userPrompt: string): Promise<{ text: string; model: string }> {
+  const client = await getAnthropicClient();
+  if (!client) throw new Error('ANTHROPIC_API_KEY is not configured');
+
+  const message = await client.messages.create({
     model: env.ANTHROPIC_MODEL,
     max_tokens: 1500,
     system: [
@@ -106,12 +142,37 @@ export const generateAlternativeRecommendation = async (
         cache_control: { type: 'ephemeral' },
       },
     ],
-    messages: [{ role: 'user', content: buildUserPrompt(input) }],
+    messages: [{ role: 'user', content: userPrompt }],
   });
 
-  const textBlock = message.content.find((b) => b.type === 'text');
+  const textBlock = message.content.find((b: any) => b.type === 'text');
   if (!textBlock || textBlock.type !== 'text') {
     throw new Error('AI response had no text content');
+  }
+
+  return { text: textBlock.text, model: env.ANTHROPIC_MODEL };
+}
+
+// ── Main function: tries Gemini first, then Anthropic ──────────
+export const generateAlternativeRecommendation = async (
+  input: RecommendationInput
+): Promise<AIRecommendationResult> => {
+  const userPrompt = buildUserPrompt(input);
+
+  let aiResponse: { text: string; model: string };
+
+  // Try Gemini first (free), fall back to Anthropic
+  if (env.GEMINI_API_KEY) {
+    try {
+      aiResponse = await generateWithGemini(userPrompt);
+    } catch (geminiErr) {
+      console.warn('Gemini failed, trying Anthropic fallback:', (geminiErr as Error).message);
+      aiResponse = await generateWithAnthropic(userPrompt);
+    }
+  } else if (env.ANTHROPIC_API_KEY) {
+    aiResponse = await generateWithAnthropic(userPrompt);
+  } else {
+    throw new Error('No AI provider configured. Set GEMINI_API_KEY or ANTHROPIC_API_KEY.');
   }
 
   let parsed: {
@@ -120,7 +181,7 @@ export const generateAlternativeRecommendation = async (
     disclaimer?: string;
   };
   try {
-    parsed = extractJson(textBlock.text);
+    parsed = extractJson(aiResponse.text);
   } catch (err) {
     throw new Error(`Failed to parse AI response as JSON: ${(err as Error).message}`);
   }
@@ -132,6 +193,6 @@ export const generateAlternativeRecommendation = async (
       parsed.disclaimer ||
       'These suggestions are AI-generated and must be reviewed by a licensed pharmacist or physician before use.',
     generatedAt: new Date(),
-    model: env.ANTHROPIC_MODEL,
+    model: aiResponse.model,
   };
 };
