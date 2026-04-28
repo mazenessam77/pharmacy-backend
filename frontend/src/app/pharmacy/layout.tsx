@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
-import { LayoutDashboard, ShoppingBag, Package, MessageCircle, Settings } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, MessageCircle, Settings, AlertTriangle } from 'lucide-react';
 import { useNotificationStore } from '@/store/notificationStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
 
@@ -12,6 +12,7 @@ const links: SidebarLink[] = [
   { href: '/pharmacy/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/pharmacy/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/pharmacy/inventory', label: 'Inventory', icon: Package },
+  { href: '/pharmacy/side-effects', label: 'Side Effects', icon: AlertTriangle },
   { href: '/pharmacy/chat', label: 'Messages', icon: MessageCircle },
   { href: '/pharmacy/settings', label: 'Settings', icon: Settings },
 ];

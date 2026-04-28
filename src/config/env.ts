@@ -33,4 +33,7 @@ export const env = {
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
 
   GOOGLE_VISION_API_KEY: process.env.GOOGLE_VISION_API_KEY || '',
+
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || '',
+  ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
 };

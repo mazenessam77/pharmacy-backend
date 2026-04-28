@@ -21,6 +21,7 @@ import messageRoutes from './routes/message.routes';
 import reviewRoutes from './routes/review.routes';
 import notificationRoutes from './routes/notification.routes';
 import adminRoutes from './routes/admin.routes';
+import sideEffectRoutes from './routes/sideEffect.routes';
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/side-effects', sideEffectRoutes);
 
 // Error handling
 app.use(notFoundHandler);

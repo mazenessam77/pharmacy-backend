@@ -3,7 +3,7 @@
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
-import { LayoutDashboard, Users, Building2, ShoppingBag, Pill } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, ShoppingBag, Pill, AlertTriangle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNotificationStore } from '@/store/notificationStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
@@ -14,6 +14,7 @@ const links: SidebarLink[] = [
   { href: '/admin/pharmacies', label: 'Pharmacies', icon: Building2 },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/admin/medicines', label: 'Medicines', icon: Pill },
+  { href: '/admin/side-effects', label: 'Side Effects', icon: AlertTriangle },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

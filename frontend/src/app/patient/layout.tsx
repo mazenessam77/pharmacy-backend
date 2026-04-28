@@ -4,12 +4,13 @@ import { useState } from 'react';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
-import { LayoutDashboard, ShoppingBag, PlusCircle, User } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, PlusCircle, User, AlertTriangle } from 'lucide-react';
 
 const links: SidebarLink[] = [
   { href: '/patient/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/patient/orders', label: 'My Orders', icon: ShoppingBag },
   { href: '/patient/orders/new', label: 'New Request', icon: PlusCircle },
+  { href: '/patient/side-effects', label: 'Side Effects', icon: AlertTriangle },
   { href: '/patient/profile', label: 'Profile', icon: User },
 ];
 

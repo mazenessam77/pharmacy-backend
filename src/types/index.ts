@@ -173,6 +173,36 @@ export interface INotification {
   createdAt: Date;
 }
 
+export interface ISideEffectReport {
+  _id: Types.ObjectId;
+  patientId: Types.ObjectId;
+  medicineName: string;
+  medicineId?: Types.ObjectId;
+  condition?: string;
+  sideEffects: string[];
+  severity: 'mild' | 'moderate' | 'severe';
+  notes?: string;
+  aiRecommendation?: {
+    alternatives: {
+      name: string;
+      genericName?: string;
+      reason: string;
+      avoidedSideEffect: string;
+      requiresPrescription: boolean;
+    }[];
+    summary: string;
+    disclaimer: string;
+    generatedAt: Date;
+    model: string;
+  };
+  status: 'pending_ai' | 'pending_review' | 'approved' | 'rejected';
+  reviewedBy?: Types.ObjectId;
+  doctorNotes?: string;
+  reviewedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface PaginationResult {
   page: number;
   limit: number;

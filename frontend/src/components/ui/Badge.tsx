@@ -2,7 +2,7 @@
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'danger';
+  variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
   className?: string;
 }
 
@@ -11,6 +11,7 @@ const variants = {
   success: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400',
   warning: 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400',
   danger:  'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400',
+  info:    'bg-sky-100 dark:bg-sky-950/50 text-sky-700 dark:text-sky-400',
 };
 
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
