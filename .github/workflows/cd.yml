@@ -71,7 +71,8 @@ jobs:
               2>/dev/null || true
 
             # Rebuild only the app containers (not mongodb/redis/nginx which don't change)
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml build backend frontend
+            # --no-cache to ensure new dependencies (e.g. added npm packages) are installed
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache backend frontend
 
             # Restart app containers
             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d backend frontend
