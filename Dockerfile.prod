@@ -19,6 +19,14 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
+# DocumentDB TLS CA bundle. MONGODB_URI sets
+# tlsCAFile=/app/certs/global-bundle.pem, required to connect to Amazon
+# DocumentDB over TLS. Harmless for local / self-hosted MongoDB.
+RUN apk add --no-cache ca-certificates curl \
+    && mkdir -p /app/certs \
+    && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+       -o /app/certs/global-bundle.pem
+
 EXPOSE 5000
 
 # Run as non-root user

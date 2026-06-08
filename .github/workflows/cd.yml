@@ -1,8 +1,8 @@
-name: CD
+name: CD (legacy EC2 — manual only)
 
+# Superseded by deploy-ecs.yml. Manual-only so it does NOT double-deploy
+# alongside the ECS pipeline on push to main. Kept for EC2 deploys / rollback.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

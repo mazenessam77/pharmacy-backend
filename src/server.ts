@@ -2,6 +2,7 @@ import http from 'http';
 import app from './app';
 import { env } from './config/env';
 import { connectDB } from './config/db';
+import { connectRedis } from './config/redis';
 import { initFirebase } from './config/firebase';
 import { initSocket } from './socket';
 import { logger } from './utils/logger';
@@ -9,6 +10,9 @@ import { logger } from './utils/logger';
 const startServer = async (): Promise<void> => {
   // Connect to MongoDB
   await connectDB();
+
+  // Connect to Redis (optional cache layer; non-fatal if unreachable)
+  await connectRedis();
 
   // Initialize Firebase
   initFirebase();
