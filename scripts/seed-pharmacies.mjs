@@ -3,7 +3,7 @@
  * Usage: node scripts/seed-pharmacies.mjs
  */
 
-const BASE = 'https://mymedcine.com/api';
+const BASE = 'https://mymedcine.duckdns.org/api';
 
 const GOVERNORATES = [
   'Alexandria','Aswan','Assiut','Beheira','Beni Suef',

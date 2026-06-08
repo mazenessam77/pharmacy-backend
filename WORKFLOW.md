@@ -36,7 +36,7 @@ flowchart TB
 
     subgraph EXTERNAL["🔌  External Services"]
         GOOGLE["Google OAuth 2.0"]
-        CLOUDFLARE["Cloudflare\nmymedcine.com (proxied)"]
+        DUCKDNS["DuckDNS\nmymedcine.duckdns.org"]
         LETS["Let's Encrypt\nSSL Certificate"]
         GITHUB["GitHub Actions\nCI / CD Pipeline"]
         CLOUDINARY["Cloudinary\nImage Storage"]
@@ -50,7 +50,7 @@ flowchart TB
     BACK <--> SOCKET
     WEB <-->|"WebSocket"| SOCKET
     BACK -->|"ID Token verify"| GOOGLE
-    CLOUDFLARE -->|"DNS + proxy → origin"| NGINX
+    DUCKDNS -->|"DNS → 13.135.1.250"| NGINX
     LETS -->|"TLS cert"| NGINX
     GITHUB -->|"SSH deploy"| CDN
     BACK -->|"Upload / Fetch"| CLOUDINARY
@@ -294,7 +294,7 @@ flowchart TD
     subgraph DEPLOY["Deploy to EC2 via SSH"]
         D1[Pull latest code] --> D2[Build Docker images\non server]
         D2 --> D3{SSL cert\nexists?}
-        D3 -->|No — first deploy| D4[Stop nginx\nRun certbot --standalone\nfor mymedcine.com]
+        D3 -->|No — first deploy| D4[Stop nginx\nRun certbot --standalone\nfor mymedcine.duckdns.org]
         D3 -->|Yes| D5[Attempt cert renewal]
         D4 --> D6
         D5 --> D6
