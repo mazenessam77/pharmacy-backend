@@ -1,4 +1,4 @@
-# ============================================================
+
 # network.tf — VPC, IGW, Public Subnet, Route Table
 #
 # Phase 1 cost decision: PUBLIC-ONLY architecture.
@@ -6,7 +6,7 @@
 # All containers talk to each other on the Docker bridge
 # network (pharma-network) and are NOT exposed to the internet
 # individually — only Nginx on 80/443 is public.
-# ============================================================
+
 
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
@@ -33,9 +33,9 @@ resource "aws_internet_gateway" "main" {
 # ─── Single Public Subnet ─────────────────────────────────────
 
 resource "aws_subnet" "public" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnet_cidr
-  availability_zone       = var.availability_zone
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.public_subnet_cidr
+  availability_zone = var.availability_zone
   # EC2 instances launched here will auto-get a public IP
   # (we also attach an EIP in main.tf for a stable address)
   map_public_ip_on_launch = true

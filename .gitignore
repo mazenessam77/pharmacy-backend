@@ -1,10 +1,15 @@
 node_modules/
 dist/
 .env
+.env.prod
+.env.*.local
 *.log
 coverage/
 .DS_Store
 uploads/
+
+# Secrets / local artifacts
+package-lock 2.json
 
 # Terraform
 terraform/.terraform/
@@ -13,3 +18,11 @@ terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
 terraform/terraform.tfvars
 terraform/*.tfplan
+
+# Terraform — ecs-fargate module (commit .terraform.lock.hcl, ignore the rest)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform/ecs-fargate/terraform.tfvars
+.terraform.tfstate.lock.info

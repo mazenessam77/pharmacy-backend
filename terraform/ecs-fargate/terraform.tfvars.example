@@ -1,0 +1,32 @@
+# Copy to terraform.tfvars and adjust. Only `certificate_arn` is required.
+
+# ─── Core ─────────────────────────────────────────────────────
+aws_region  = "us-east-1"
+project     = "pharmalink"
+environment = "production"
+
+# ─── TLS (REQUIRED) ───────────────────────────────────────────
+# Issue an ACM cert for your domain (DNS-validated via Cloudflare),
+# wait for status = ISSUED, then paste its ARN here.
+certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/REPLACE-ME"
+
+# ─── Container images ─────────────────────────────────────────
+# Replace the nginx placeholders with your ECR image URIs.
+container_images = {
+  auth     = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pharmalink-auth:latest"
+  orders   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pharmalink-orders:latest"
+  pharmacy = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pharmalink-pharmacy:latest"
+  worker   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/pharmalink-worker:latest"
+}
+
+# ─── Sizing (optional overrides) ──────────────────────────────
+# task_cpu          = 256
+# task_memory       = 512
+# desired_count     = 2
+# db_instance_class = "db.t4g.small"
+# redis_node_type   = "cache.t4g.micro"
+# redis_num_nodes   = 2
+
+# ─── Throwaway environments only ──────────────────────────────
+# enable_deletion_protection = false
+# rds_skip_final_snapshot    = true

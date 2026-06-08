@@ -49,7 +49,7 @@ data "aws_ami" "ubuntu" {
   owners      = ["099720109477"] # Canonical (official Ubuntu publisher)
 
   filter {
-    name   = "name"
+    name = "name"
     # ubuntu-noble = 24.04 LTS | change to ubuntu-jammy for 22.04
     values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
@@ -99,8 +99,8 @@ resource "aws_instance" "app" {
   # templatefile() substitutes ${app_dir} and ${github_repo_url}
   # variables into the shell script before passing it to EC2.
   user_data = templatefile("${path.module}/user_data.sh", {
-    app_dir           = var.app_dir
-    github_repo_url   = var.github_repo_url
+    app_dir         = var.app_dir
+    github_repo_url = var.github_repo_url
   })
 
   # Replace instance if user_data changes (requires terraform apply)

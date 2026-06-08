@@ -24,7 +24,7 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
-# ── Config ─────────────────────────────────────────────────────────
+
 BUCKET = "pharma-mongo-backups-541405370428"
 REGION = "eu-west-2"
 CONTAINER = "pharma-mongodb"
@@ -33,7 +33,7 @@ ENV_FILE = "/opt/pharma-app/.env"
 WORK_DIR = "/tmp/pharma-backup"
 LOG_FILE = "/var/log/pharma-backup.log"
 
-# ── Logging ────────────────────────────────────────────────────────
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -67,7 +67,7 @@ def main() -> int:
 
         password = read_mongo_password()
 
-        # 1) Dump inside the container, then copy out
+        
         run([
             "docker", "exec", CONTAINER, "mongodump",
             "--username", "admin",
@@ -80,14 +80,14 @@ def main() -> int:
         run(["docker", "cp", f"{CONTAINER}:/tmp/dump/.", str(work_path)])
         run(["docker", "exec", CONTAINER, "rm", "-rf", "/tmp/dump"])
 
-        # 2) Compress
+ 
         log.info("Compressing → %s", archive)
         with tarfile.open(archive, "w:gz") as tar:
             tar.add(work_path, arcname=DB_NAME)
         size_mb = archive.stat().st_size / 1024 / 1024
         log.info("Archive size: %.2f MB", size_mb)
 
-        # 3) Upload (server-side encrypted, IA storage class for cost)
+
         s3_key = f"{timestamp[:10]}/pharma-mongo-{timestamp}.tar.gz"
         log.info("Uploading → s3://%s/%s", BUCKET, s3_key)
         s3 = boto3.client("s3", region_name=REGION)
@@ -111,7 +111,7 @@ def main() -> int:
         log.exception("Unexpected error")
         return 1
     finally:
-        # Always clean up local artifacts
+
         shutil.rmtree(work_path, ignore_errors=True)
         archive.unlink(missing_ok=True)
         log.info("=== Backup end ===\n")
