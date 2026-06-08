@@ -53,18 +53,14 @@ jobs:
             mkdir -p nginx/certbot/www
 
             # ── SSL: Issue cert if it doesn't exist yet ───────────────
-            # NOTE: Cloudflare proxies mymedcine.com (orange cloud). The HTTP-01
-            # challenge on port 80 is proxied through CF and can fail on first
-            # issuance — if so, temporarily set the DNS record to "DNS only"
-            # (grey cloud) until the cert is obtained, then re-enable proxy.
-            if [ ! -f /etc/letsencrypt/live/mymedcine.com/fullchain.pem ]; then
+            if [ ! -f /etc/letsencrypt/live/mymedcine.duckdns.org/fullchain.pem ]; then
               echo "No cert found — obtaining Let's Encrypt cert..."
               docker stop pharma-nginx 2>/dev/null || true
               sudo certbot certonly --standalone \
-                -d mymedcine.com \
+                -d mymedcine.duckdns.org \
                 --agree-tos \
                 --non-interactive \
-                -m admin@mymedcine.com
+                -m admin@mymedcine.duckdns.org
               echo "Cert obtained successfully"
             fi
 
@@ -126,7 +122,7 @@ jobs:
 
           for i in {1..12}; do
             STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
-              https://mymedcine.com/api/health || echo "000")
+              https://mymedcine.duckdns.org/api/health || echo "000")
 
             if [ "$STATUS" = "200" ]; then
               echo "✓ Production healthy (HTTP $STATUS)"

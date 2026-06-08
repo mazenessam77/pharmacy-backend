@@ -2,9 +2,9 @@ name: Deploy (ECS Fargate)
 
 # Build → push to ECR → force a new ECS deployment.
 #
-# ⚠️ This deploys the SAME app as the legacy `cd.yml` (EC2-over-SSH). Run only
-# ONE of them on push to main, or you'll double-deploy. When you cut over to
-# ECS, disable/delete cd.yml (or make it workflow_dispatch-only).
+# Manual-only (workflow_dispatch) for now: the app runs on the legacy EC2 +
+# DuckDNS stack (cd.yml), and the ECS infra isn't deployed yet. Re-enable the
+# `push` trigger once terraform/ecs-fargate is applied and a real domain is live.
 #
 # Prerequisites (one-time):
 #   - terraform/ecs-fargate applied (cluster + services + ECR exist)
@@ -13,8 +13,6 @@ name: Deploy (ECS Fargate)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read

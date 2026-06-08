@@ -24,7 +24,7 @@ services:
     ports: []
     environment:
       NODE_ENV: production
-      FRONTEND_URL: https://mymedcine.com
+      FRONTEND_URL: https://mymedcine.duckdns.org
       GOOGLE_CLIENT_ID: 350366296907-uusg9qh2kh53r5kacjtp2kr7r0h4t7np.apps.googleusercontent.com
     volumes: []
     deploy:
@@ -38,8 +38,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        NEXT_PUBLIC_API_URL: https://mymedcine.com/api
-        NEXT_PUBLIC_SOCKET_URL: https://mymedcine.com
+        NEXT_PUBLIC_API_URL: https://mymedcine.duckdns.org/api
+        NEXT_PUBLIC_SOCKET_URL: https://mymedcine.duckdns.org
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: 350366296907-uusg9qh2kh53r5kacjtp2kr7r0h4t7np.apps.googleusercontent.com
     ports: []
     volumes: []
