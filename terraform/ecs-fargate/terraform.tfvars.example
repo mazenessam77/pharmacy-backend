@@ -1,0 +1,26 @@
+# Copy to terraform.tfvars and adjust. Only `certificate_arn` is required.
+
+aws_region  = "us-east-1"
+project     = "pharmalink"
+environment = "production"
+domain      = "mymedcine.com"
+
+# ─── TLS (REQUIRED) ───────────────────────────────────────────
+# Issue an ACM cert for your domain (DNS-validated via Cloudflare),
+# wait for status = ISSUED, then paste its ARN here.
+certificate_arn = "arn:aws:acm:us-east-1:498341975421:certificate/REPLACE-ME"
+
+# ─── Container images ─────────────────────────────────────────
+# Replace the nginx placeholders with your ECR image URIs.
+container_images = {
+  backend  = "498341975421.dkr.ecr.us-east-1.amazonaws.com/pharmalink-backend:latest"
+  frontend = "498341975421.dkr.ecr.us-east-1.amazonaws.com/pharmalink-frontend:latest"
+}
+
+# ─── Sizing (optional overrides) ──────────────────────────────
+# backend_cpu          = 512
+# backend_memory       = 1024
+# desired_count        = 2
+# docdb_instance_class = "db.t3.medium"
+# docdb_instance_count = 2
+# redis_num_nodes      = 2
