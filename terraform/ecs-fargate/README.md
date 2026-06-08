@@ -1,82 +1,100 @@
 # PharmaLink — ECS Fargate Infrastructure (Terraform)
 
-Production-grade Terraform for the refactored **microservices** architecture:
-Cloudflare edge → ALB → ECS Fargate services → database-per-service RDS, with
-ElastiCache, DynamoDB and SQS. See the diagram in
-[`../../docs/architecture/`](../../docs/architecture/).
+Runs the **actual** PharmaLink app on AWS Fargate behind Cloudflare:
 
-> This is a **separate root module** from the existing single-EC2 config in
-> `terraform/`. It does not touch or replace the current deployment.
+- **backend** — the Express monolith (handles `/api/*` + `/socket.io/*`)
+- **frontend** — the Next.js app (everything else)
+- **DocumentDB** — MongoDB-compatible database (the app uses Mongoose)
+- **ElastiCache Redis** — cache
+- **ALB** — only reachable from Cloudflare ranges; path-routes to the services
+
+> Separate root module from the single-EC2 config in `terraform/`. It does not
+> touch the current deployment.
 
 ## What it creates
 
 | Layer | Resources |
 |-------|-----------|
-| **Network** | VPC `10.0.0.0/16`, 2 public + 2 private subnets across `us-east-1a/1b`, IGW, **2 NAT gateways** (one per AZ), per-AZ private route tables, S3 + DynamoDB gateway endpoints |
-| **Edge / Ingress** | ALB in public subnets; SG allows **HTTPS (443) from Cloudflare ranges only**; path-based routing (`/api/v1/auth*`, `/api/v1/orders*`, `/api/v1/pharmacies*`) |
-| **Compute** | ECS cluster `pharmalink-production` (Fargate); services `auth`, `orders`, `pharmacy` + `worker`; CloudWatch log groups; CPU & SQS-backlog autoscaling |
-| **Database-per-service** | `auth_db` (PostgreSQL), `orders_db` (PostgreSQL), `pharmacy_db` (MySQL) — all Multi-AZ, encrypted, private; each reachable only from its owning service |
-| **Decoupling / state** | SQS `pharmalink-work-queue` + DLQ; DynamoDB sessions table (PAY_PER_REQUEST); ElastiCache Redis (encrypted, auth token) |
-| **Config** | SSM Parameter Store: DB credentials (SecureString) + endpoints + queue/table config |
-| **IAM** | One execution role + four least-privilege task roles |
+| Network | VPC `10.0.0.0/16`, 2 public + 2 private subnets (Multi-AZ), IGW, NAT (1 or per-AZ via `single_nat_gateway`), S3 + DynamoDB gateway endpoints |
+| Edge | ALB; SG allows **HTTPS 443 from Cloudflare only**; `/api*`+`/socket.io*` → backend, default → frontend |
+| Compute | ECS cluster `pharmalink-production` (Fargate); `backend` + `frontend` services; CPU autoscaling; CloudWatch logs |
+| Database | Amazon **DocumentDB** cluster (Mongo-compatible), private, encrypted |
+| Cache | ElastiCache **Redis** (encrypted + auth token) |
+| Config | SSM Parameter Store: `MONGODB_URI`, `REDIS_URL`, JWT secrets (generated), Groq/Cloudinary (placeholders) |
+| Registry | ECR repos `pharmalink-backend`, `pharmalink-frontend` |
+| IAM | execution role (pull + logs + read SSM) + minimal task role |
 
-## Prerequisites (one-time, manual)
+## ⚠️ Required app-side changes (so it actually connects)
 
-1. **ACM certificate** for your domain, **DNS-validated**:
-   ```bash
-   aws acm request-certificate --domain-name mymedcine.com \
-     --validation-method DNS --region us-east-1
+DocumentDB and encrypted ElastiCache differ from the local docker-compose Mongo/Redis:
+
+1. **DocumentDB TLS CA** — the backend image must include Amazon's CA bundle and
+   the app must use it. In `Dockerfile.prod`:
+   ```dockerfile
+   RUN mkdir -p /app/certs && \
+       curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+       -o /app/certs/global-bundle.pem
    ```
-   Add the returned CNAME validation record in **Cloudflare DNS**, wait until the
-   cert status is **ISSUED**, then set `certificate_arn` in `terraform.tfvars`.
-   (ALB listeners require an already-issued cert.)
+   The injected `MONGODB_URI` already sets `tls=true&tlsCAFile=/app/certs/global-bundle.pem&retryWrites=false`
+   (DocumentDB does not support `retryWrites=true`).
+2. **Redis over TLS** — `REDIS_URL` is `rediss://…` (TLS). `ioredis` enables TLS
+   automatically for the `rediss://` scheme, so no code change is needed if you
+   construct the client from `process.env.REDIS_URL`.
 
-2. **Container images** in ECR for each service; set `container_images`. The
-   defaults are public `nginx` placeholders so `plan` works — they will not pass
-   the `/health` check until you push real images.
+## Prerequisites
 
-## Apply
+1. **ACM certificate** for the domain, DNS-validated (add the CNAME in Cloudflare),
+   status **ISSUED** → set `certificate_arn`.
+2. **ECR images** for backend + frontend (see runbook step 3).
+
+## Runbook
 
 ```bash
 cd terraform/ecs-fargate
-cp terraform.tfvars.example terraform.tfvars   # then edit certificate_arn + images
+cp terraform.tfvars.example terraform.tfvars     # set certificate_arn (+ images later)
+
+# 1) Create ECR + the rest of the infra
 terraform init
-terraform plan
+terraform apply                                  # or: -var-file=dev.tfvars
+
+# 2) Set the external secrets Terraform left as placeholders
+PREFIX=$(terraform output -raw ssm_parameter_prefix)
+aws ssm put-parameter --overwrite --type SecureString --name "$PREFIX/GROQ_API_KEY"        --value 'gsk_...'
+aws ssm put-parameter --overwrite --type SecureString --name "$PREFIX/CLOUDINARY_CLOUD_NAME" --value '...'   # if used
+# (CLOUDINARY_API_KEY / _API_SECRET likewise)
+
+# 3) Build + push images, then point the services at them
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin \
+  "$(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com"
+terraform output ecr_repository_urls             # -> backend / frontend repo URLs
+
+docker build -f Dockerfile.prod -t <backend_repo>:latest .
+docker push <backend_repo>:latest
+docker build -f frontend/Dockerfile.prod \
+  --build-arg NEXT_PUBLIC_API_URL=https://mymedcine.com/api \
+  --build-arg NEXT_PUBLIC_SOCKET_URL=https://mymedcine.com \
+  --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=<client-id> \
+  -t <frontend_repo>:latest ./frontend
+docker push <frontend_repo>:latest
+
+# set container_images in terraform.tfvars to the pushed URLs, then:
 terraform apply
+
+# 4) Point Cloudflare at the ALB
+terraform output alb_dns_name
+#   CNAME mymedcine.com -> <alb_dns_name>, Proxied (orange), SSL = Full (strict)
+
+# 5) Google OAuth: add https://mymedcine.com to Authorized JavaScript origins
 ```
-
-## After apply — wire Cloudflare
-
-1. `terraform output alb_dns_name`.
-2. In Cloudflare DNS, create a **CNAME** `mymedcine.com → <alb_dns_name>`,
-   **Proxied (orange cloud)**.
-3. Set **SSL/TLS mode → Full (strict)**.
-4. Because the ALB SG only admits Cloudflare ranges, the origin can't be reached
-   directly — all traffic must pass through the Cloudflare WAF.
-
-## Security notes
-
-- **No public 0.0.0.0/0 on 443** — only Cloudflare's published ranges (fetched
-  live at plan time from `cloudflare.com/ips-v4`/`-v6`; override with
-  `cloudflare_ipv4_cidrs` / `cloudflare_ipv6_cidrs`).
-- RDS/Redis are in private subnets, encrypted at rest, never publicly accessible.
-- Secrets live in SSM SecureString and are injected via the ECS task `secrets`
-  block; passwords are generated (`random_password`), never hardcoded.
-- Each database's SG admits only its owning service (the worker also reaches
-  `pharmacy_db` to write results).
 
 ## Cost awareness
 
-The expensive always-on pieces: **2 NAT gateways** (~$32/mo each + data),
-**3 Multi-AZ RDS** instances, the **ALB**, and the **Redis** replication group.
-For non-prod, consider one NAT gateway, `db_multi_az = false`, and
-`redis_num_nodes = 1`.
+Always-on: NAT gateway(s), **DocumentDB** instance(s) (min `db.t3.medium`), the
+ALB, and Redis. `dev.tfvars` trims to 1 NAT + 1 DocumentDB instance + 1 Redis node
++ 1 task per service.
 
-## Notes / extension points
+## Notes
 
-- Interface VPC endpoints (ECR API/DKR, CloudWatch Logs, SQS, SSM) can be added
-  to drop the NAT dependency for AWS API traffic — left out to keep cost down.
-- `enable_execute_command` (ECS Exec) is intentionally off; enabling it requires
-  adding `ssmmessages:*` to the task roles.
-- Worker uses `FARGATE` launch type; switch to `FARGATE_SPOT` (already a cluster
-  capacity provider) to cut async-tier cost.
+- `enable_deletion_protection` guards the ALB + DocumentDB; set `false` (and
+  `docdb_skip_final_snapshot = true`) for throwaway envs.
+- App secrets live in SSM, not in CI — see `GITHUB_SECRETS.md`.

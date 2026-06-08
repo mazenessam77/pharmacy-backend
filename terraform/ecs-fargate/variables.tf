@@ -16,9 +16,15 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "Deployment environment (production, staging, ...)."
+  description = "Deployment environment (production, dev, ...)."
   type        = string
   default     = "production"
+}
+
+variable "domain" {
+  description = "Public domain served via Cloudflare (used for FRONTEND_URL etc.)."
+  type        = string
+  default     = "mymedcine.com"
 }
 
 variable "tags" {
@@ -41,7 +47,7 @@ variable "availability_zones" {
 
   validation {
     condition     = length(var.availability_zones) >= 2
-    error_message = "Provide at least two AZs for Multi-AZ high availability."
+    error_message = "Provide at least two AZs (ALB and DocumentDB require it)."
   }
 }
 
@@ -52,7 +58,7 @@ variable "public_subnet_cidrs" {
 }
 
 variable "private_subnet_cidrs" {
-  description = "Private subnet CIDRs (ECS tasks / RDS / Redis), one per AZ."
+  description = "Private subnet CIDRs (ECS tasks / DocumentDB / Redis), one per AZ."
   type        = list(string)
   default     = ["10.0.10.0/24", "10.0.11.0/24"]
 }
@@ -65,24 +71,20 @@ variable "single_nat_gateway" {
 
 # ─── Cloudflare allowlist override (optional) ─────────────────
 variable "cloudflare_ipv4_cidrs" {
-  description = "Override Cloudflare IPv4 ranges. Empty = fetch live from cloudflare.com/ips-v4."
+  description = "Override Cloudflare IPv4 ranges. Empty = fetch live."
   type        = list(string)
   default     = []
 }
 
 variable "cloudflare_ipv6_cidrs" {
-  description = "Override Cloudflare IPv6 ranges. Empty = fetch live from cloudflare.com/ips-v6."
+  description = "Override Cloudflare IPv6 ranges. Empty = fetch live."
   type        = list(string)
   default     = []
 }
 
 # ─── ALB / TLS ────────────────────────────────────────────────
 variable "certificate_arn" {
-  description = <<-EOT
-    ARN of an ISSUED ACM certificate for your domain, used on the ALB
-    HTTPS listener. Create/validate it separately (DNS validation via
-    Cloudflare) — see README. Must be ISSUED before apply.
-  EOT
+  description = "ARN of an ISSUED ACM cert for the domain (ALB HTTPS listener)."
   type        = string
 }
 
@@ -92,71 +94,60 @@ variable "alb_ssl_policy" {
   default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 }
 
-variable "health_check_path" {
-  description = "Container health-check path used by the ALB target groups."
-  type        = string
-  default     = "/health"
-}
-
 variable "enable_deletion_protection" {
-  description = "Deletion protection for the ALB and RDS instances."
+  description = "Deletion protection for the ALB and DocumentDB."
   type        = bool
   default     = true
 }
 
 # ─── ECS / Fargate ────────────────────────────────────────────
 variable "container_images" {
-  description = <<-EOT
-    Container image URI per task (auth/orders/pharmacy/worker).
-    Replace the placeholders with your ECR image URIs before going live.
-  EOT
+  description = "Container image URI per service (backend/frontend). Replace placeholders with ECR URIs."
   type        = map(string)
   default = {
-    auth     = "public.ecr.aws/docker/library/nginx:stable"
-    orders   = "public.ecr.aws/docker/library/nginx:stable"
-    pharmacy = "public.ecr.aws/docker/library/nginx:stable"
-    worker   = "public.ecr.aws/docker/library/nginx:stable"
+    backend  = "public.ecr.aws/docker/library/nginx:stable"
+    frontend = "public.ecr.aws/docker/library/nginx:stable"
   }
 }
 
-variable "container_port" {
-  description = "Port the web service containers listen on."
+variable "backend_container_port" {
+  description = "Port the backend (Express) container listens on."
   type        = number
   default     = 5000
 }
 
-variable "task_cpu" {
-  description = "Fargate CPU units for web services (256 = 0.25 vCPU)."
+variable "frontend_container_port" {
+  description = "Port the frontend (Next.js) container listens on."
   type        = number
-  default     = 256
+  default     = 3000
 }
 
-variable "task_memory" {
-  description = "Fargate memory (MiB) for web services."
-  type        = number
-  default     = 512
-}
-
-variable "worker_cpu" {
-  description = "Fargate CPU units for the async worker."
+variable "backend_cpu" {
+  description = "Fargate CPU units for the backend (256 = 0.25 vCPU)."
   type        = number
   default     = 512
 }
 
-variable "worker_memory" {
-  description = "Fargate memory (MiB) for the async worker."
+variable "backend_memory" {
+  description = "Fargate memory (MiB) for the backend (OCR is memory-heavy)."
   type        = number
   default     = 1024
 }
 
-variable "desired_count" {
-  description = "Desired task count per web service."
+variable "frontend_cpu" {
+  description = "Fargate CPU units for the frontend."
   type        = number
-  default     = 2
+  default     = 256
 }
 
-variable "worker_desired_count" {
-  description = "Desired task count for the worker."
+variable "frontend_memory" {
+  description = "Fargate memory (MiB) for the frontend."
+  type        = number
+  default     = 512
+}
+
+variable "desired_count" {
+  description = "Desired task count per service."
   type        = number
   default     = 2
 }
@@ -179,81 +170,64 @@ variable "autoscaling_cpu_target" {
   default     = 60
 }
 
-variable "worker_backlog_target" {
-  description = "Target SQS messages-visible the worker autoscaler holds the queue at."
-  type        = number
-  default     = 100
-}
-
 variable "log_retention_days" {
   description = "CloudWatch Logs retention for container logs."
   type        = number
   default     = 30
 }
 
-# ─── RDS (database-per-service) ───────────────────────────────
-variable "postgres_version" {
-  description = "Major engine version for the PostgreSQL databases."
+# ─── App config (non-secret) ──────────────────────────────────
+variable "google_client_id" {
+  description = "Google OAuth client ID (public; injected as backend env)."
   type        = string
-  default     = "16"
+  default     = "350366296907-uusg9qh2kh53r5kacjtp2kr7r0h4t7np.apps.googleusercontent.com"
 }
 
-variable "mysql_version" {
-  description = "Major engine version for the MySQL database."
+variable "groq_model" {
+  description = "Groq model id for the AI feature."
   type        = string
-  default     = "8.0"
+  default     = "llama-3.3-70b-versatile"
 }
 
-variable "db_instance_class" {
-  description = "Instance class for all RDS instances."
+# ─── DocumentDB (MongoDB-compatible) ──────────────────────────
+variable "docdb_instance_class" {
+  description = "DocumentDB instance class (minimum db.t3.medium)."
   type        = string
-  default     = "db.t4g.micro"
+  default     = "db.t3.medium"
 }
 
-variable "db_allocated_storage" {
-  description = "Initial RDS storage (GiB)."
+variable "docdb_instance_count" {
+  description = "Number of DocumentDB instances (>=2 for HA across AZs)."
   type        = number
-  default     = 20
+  default     = 2
 }
 
-variable "db_max_allocated_storage" {
-  description = "Max RDS storage (GiB) for storage autoscaling."
-  type        = number
-  default     = 100
+variable "docdb_engine_version" {
+  description = "DocumentDB engine version."
+  type        = string
+  default     = "5.0.0"
 }
 
-variable "db_master_username" {
-  description = "Master username for all RDS instances."
+variable "docdb_master_username" {
+  description = "DocumentDB master username."
   type        = string
   default     = "pharmaadmin"
 }
 
-variable "db_name" {
-  description = "Initial database name created on each RDS instance."
+variable "mongo_db_name" {
+  description = "Application database name."
   type        = string
-  default     = "pharmalink"
+  default     = "pharma_db"
 }
 
-variable "db_multi_az" {
-  description = "Enable RDS Multi-AZ standby for each database."
-  type        = bool
-  default     = true
-}
-
-variable "db_backup_retention" {
-  description = "Automated backup retention (days) for RDS."
+variable "docdb_backup_retention" {
+  description = "DocumentDB automated backup retention (days)."
   type        = number
   default     = 7
 }
 
-variable "rds_skip_final_snapshot" {
-  description = "Skip final snapshot on RDS destroy (set true only for throwaway envs)."
-  type        = bool
-  default     = false
-}
-
-variable "rds_apply_immediately" {
-  description = "Apply RDS changes immediately instead of in the maintenance window."
+variable "docdb_skip_final_snapshot" {
+  description = "Skip final snapshot on DocumentDB destroy (true only for throwaway envs)."
   type        = bool
   default     = false
 }
@@ -275,17 +249,4 @@ variable "redis_num_nodes" {
   description = "Number of cache nodes (>=2 enables automatic failover / Multi-AZ)."
   type        = number
   default     = 2
-}
-
-# ─── SQS ──────────────────────────────────────────────────────
-variable "sqs_visibility_timeout" {
-  description = "Visibility timeout (seconds) for the work queue."
-  type        = number
-  default     = 60
-}
-
-variable "sqs_max_receive_count" {
-  description = "Receives before a message is moved to the DLQ."
-  type        = number
-  default     = 5
 }

@@ -1,9 +1,13 @@
 # ============================================================
 # main.tf — providers, data sources, shared locals
 #
-# Target architecture for PharmaLink: ECS Fargate microservices
-# behind an ALB, with Cloudflare (proxied) as the only public edge.
-# See README.md for the full picture and apply instructions.
+# PharmaLink on ECS Fargate, adapted to the ACTUAL app:
+#   - backend  : the Express monolith (all /api + socket.io)
+#   - frontend : the Next.js app (everything else)
+#   - MongoDB  : Amazon DocumentDB (Mongo-compatible)
+#   - Redis    : Amazon ElastiCache
+#   - edge     : Cloudflare (proxied) -> ALB
+# (No RDS/SQS/DynamoDB — the app doesn't use them.)
 # ============================================================
 
 terraform {
@@ -24,15 +28,7 @@ terraform {
     }
   }
 
-  # ── Remote state (recommended) ─────────────────────────────
-  # Create the bucket + lock table first, then uncomment + init.
-  # backend "s3" {
-  #   bucket         = "pharmalink-tfstate-<unique-suffix>"
-  #   key            = "ecs-fargate/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   encrypt        = true
-  #   dynamodb_table = "pharmalink-tflock"
-  # }
+  # backend "s3" { ... }   # recommended for shared/remote state
 }
 
 provider "aws" {
@@ -49,9 +45,6 @@ provider "aws" {
 }
 
 # ─── Live Cloudflare edge ranges (fetched at plan time) ───────
-# Pulling these dynamically keeps the ALB allowlist current.
-# Override with var.cloudflare_ipv4_cidrs / _ipv6_cidrs for
-# air-gapped/offline plans.
 data "http" "cloudflare_ipv4" {
   url = "https://www.cloudflare.com/ips-v4"
 }
@@ -64,9 +57,8 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  name = "${var.project}-${var.environment}" # e.g. pharmalink-production
+  name = "${var.project}-${var.environment}"
 
-  # AZ -> subnet CIDR maps (index-aligned with the *_subnet_cidrs vars)
   public_subnets = {
     for idx, az in var.availability_zones : az => var.public_subnet_cidrs[idx]
   }
@@ -74,54 +66,27 @@ locals {
     for idx, az in var.availability_zones : az => var.private_subnet_cidrs[idx]
   }
 
-  # Cloudflare allowlist (override wins, else live fetch)
   cloudflare_ipv4 = length(var.cloudflare_ipv4_cidrs) > 0 ? var.cloudflare_ipv4_cidrs : split("\n", trimspace(data.http.cloudflare_ipv4.response_body))
   cloudflare_ipv6 = length(var.cloudflare_ipv6_cidrs) > 0 ? var.cloudflare_ipv6_cidrs : split("\n", trimspace(data.http.cloudflare_ipv6.response_body))
 
-  # ── Web microservices fronted by the ALB (path-based routing) ──
+  # ── The two Fargate services that make up the app ──
+  # backend is an ALB listener RULE (path-matched); frontend is the
+  # default action (catch-all), mirroring the current nginx routing.
   services = {
-    auth = {
-      path_patterns = ["/api/v1/auth", "/api/v1/auth/*"]
-      priority      = 10
+    backend = {
+      container_port    = var.backend_container_port
+      health_check_path = "/health"
+      is_default        = false
+      path_patterns     = ["/api", "/api/*", "/socket.io", "/socket.io/*"]
+      priority          = 10
     }
-    orders = {
-      path_patterns = ["/api/v1/orders", "/api/v1/orders/*"]
-      priority      = 20
+    frontend = {
+      container_port    = var.frontend_container_port
+      health_check_path = "/"
+      is_default        = true
+      path_patterns     = []
+      priority          = 50
     }
-    pharmacy = {
-      path_patterns = ["/api/v1/pharmacies", "/api/v1/pharmacies/*"]
-      priority      = 30
-    }
-  }
-
-  # ── Database-per-service (isolated RDS instances) ──
-  databases = {
-    auth = {
-      engine         = "postgres"
-      engine_version = var.postgres_version
-      port           = 5432
-    }
-    orders = {
-      engine         = "postgres"
-      engine_version = var.postgres_version
-      port           = 5432
-    }
-    pharmacy = {
-      engine         = "mysql"
-      engine_version = var.mysql_version
-      port           = 3306
-    }
-  }
-
-  # All Fargate task groups (web services + async worker)
-  task_names = concat(keys(local.services), ["worker"])
-
-  # Which DB each task connects to (worker processes pharmacy workloads)
-  task_db = {
-    auth     = "auth"
-    orders   = "orders"
-    pharmacy = "pharmacy"
-    worker   = "pharmacy"
   }
 
   ssm_prefix = "/${local.name}"

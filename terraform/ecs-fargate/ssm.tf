@@ -1,85 +1,85 @@
 # ============================================================
-# ssm.tf — SSM Parameter Store: DB credentials + core config
+# ssm.tf — SSM Parameter Store: connection strings + secrets
 #
-# Secrets (passwords, auth token) are SecureString and injected
-# into containers via the ECS task definition `secrets` block.
-# Endpoints/config are plain String parameters for app discovery.
+# Connection strings (Mongo/Redis) and JWT secrets are generated
+# here. External secrets (Groq, Cloudinary) are created as managed
+# placeholders — set their real values in the SSM console; Terraform
+# won't overwrite them (ignore_changes on value).
 # ============================================================
 
-# ─── Per-database credentials ─────────────────────────────────
-resource "aws_ssm_parameter" "db_host" {
-  for_each = local.databases
-  name     = "${local.ssm_prefix}/db/${each.key}/host"
-  type     = "String"
-  value    = aws_db_instance.this[each.key].address
-  tags     = { Service = each.key }
+locals {
+  # DocumentDB connection string. tlsCAFile must exist in the backend
+  # image (Amazon global-bundle.pem); retryWrites=false is required.
+  mongodb_uri = "mongodb://${var.docdb_master_username}:${random_password.docdb.result}@${aws_docdb_cluster.main.endpoint}:27017/${var.mongo_db_name}?tls=true&tlsCAFile=/app/certs/global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+
+  # ioredis enables TLS automatically for the rediss:// scheme.
+  redis_url = "rediss://:${random_password.redis.result}@${aws_elasticache_replication_group.redis.primary_endpoint_address}:6379"
 }
 
-resource "aws_ssm_parameter" "db_port" {
-  for_each = local.databases
-  name     = "${local.ssm_prefix}/db/${each.key}/port"
-  type     = "String"
-  value    = tostring(each.value.port)
-  tags     = { Service = each.key }
+# ─── Generated JWT signing secrets ────────────────────────────
+resource "random_password" "jwt_access" {
+  length  = 48
+  special = false
 }
 
-resource "aws_ssm_parameter" "db_name" {
-  for_each = local.databases
-  name     = "${local.ssm_prefix}/db/${each.key}/name"
-  type     = "String"
-  value    = var.db_name
-  tags     = { Service = each.key }
+resource "random_password" "jwt_refresh" {
+  length  = 48
+  special = false
 }
 
-resource "aws_ssm_parameter" "db_username" {
-  for_each = local.databases
-  name     = "${local.ssm_prefix}/db/${each.key}/username"
-  type     = "String"
-  value    = var.db_master_username
-  tags     = { Service = each.key }
-}
-
-resource "aws_ssm_parameter" "db_password" {
-  for_each = local.databases
-  name     = "${local.ssm_prefix}/db/${each.key}/password"
-  type     = "SecureString"
-  value    = random_password.db[each.key].result
-  tags     = { Service = each.key }
-}
-
-# ─── Core configuration ───────────────────────────────────────
-resource "aws_ssm_parameter" "redis_host" {
-  name  = "${local.ssm_prefix}/redis/host"
-  type  = "String"
-  value = aws_elasticache_replication_group.redis.primary_endpoint_address
-}
-
-resource "aws_ssm_parameter" "redis_port" {
-  name  = "${local.ssm_prefix}/redis/port"
-  type  = "String"
-  value = "6379"
-}
-
-resource "aws_ssm_parameter" "redis_auth_token" {
-  name  = "${local.ssm_prefix}/redis/auth_token"
+# ─── Connection strings + JWT (managed by Terraform) ──────────
+resource "aws_ssm_parameter" "mongodb_uri" {
+  name  = "${local.ssm_prefix}/MONGODB_URI"
   type  = "SecureString"
-  value = random_password.redis.result
+  value = local.mongodb_uri
 }
 
-resource "aws_ssm_parameter" "sqs_queue_url" {
-  name  = "${local.ssm_prefix}/sqs/queue_url"
-  type  = "String"
-  value = aws_sqs_queue.work.url
+resource "aws_ssm_parameter" "redis_url" {
+  name  = "${local.ssm_prefix}/REDIS_URL"
+  type  = "SecureString"
+  value = local.redis_url
 }
 
-resource "aws_ssm_parameter" "sqs_dlq_url" {
-  name  = "${local.ssm_prefix}/sqs/dlq_url"
-  type  = "String"
-  value = aws_sqs_queue.dlq.url
+resource "aws_ssm_parameter" "jwt_access" {
+  name  = "${local.ssm_prefix}/JWT_ACCESS_SECRET"
+  type  = "SecureString"
+  value = random_password.jwt_access.result
 }
 
-resource "aws_ssm_parameter" "dynamodb_sessions_table" {
-  name  = "${local.ssm_prefix}/dynamodb/sessions_table"
-  type  = "String"
-  value = aws_dynamodb_table.sessions.name
+resource "aws_ssm_parameter" "jwt_refresh" {
+  name  = "${local.ssm_prefix}/JWT_REFRESH_SECRET"
+  type  = "SecureString"
+  value = random_password.jwt_refresh.result
+}
+
+# ─── External secrets (placeholders — set real values in SSM) ─
+resource "aws_ssm_parameter" "groq_api_key" {
+  name  = "${local.ssm_prefix}/GROQ_API_KEY"
+  type  = "SecureString"
+  value = "CHANGEME"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "cloudinary_cloud_name" {
+  name  = "${local.ssm_prefix}/CLOUDINARY_CLOUD_NAME"
+  type  = "SecureString"
+  value = "CHANGEME"
+  lifecycle { ignore_changes = [value] }
+}
+
+resource "aws_ssm_parameter" "cloudinary_api_key" {
+  name  = "${local.ssm_prefix}/CLOUDINARY_API_KEY"
+  type  = "SecureString"
+  value = "CHANGEME"
+  lifecycle { ignore_changes = [value] }
+}
+
+resource "aws_ssm_parameter" "cloudinary_api_secret" {
+  name  = "${local.ssm_prefix}/CLOUDINARY_API_SECRET"
+  type  = "SecureString"
+  value = "CHANGEME"
+  lifecycle { ignore_changes = [value] }
 }

@@ -1,8 +1,8 @@
 # ============================================================
 # elasticache.tf — shared Redis cache (private subnets)
 #
-# Replication group with encryption in transit + at rest and an
-# auth token. >=2 nodes enables automatic failover (Multi-AZ).
+# Encryption in transit + at rest with an auth token. The token
+# is URL-safe so it embeds in REDIS_URL (rediss://:token@host).
 # ============================================================
 
 resource "aws_elasticache_subnet_group" "main" {
@@ -11,11 +11,11 @@ resource "aws_elasticache_subnet_group" "main" {
   subnet_ids  = [for s in aws_subnet.private : s.id]
 }
 
-# AUTH token — Redis requires 16-128 chars; keep the special set safe.
+# AUTH token — 16-128 chars; URL-safe set so it works inside REDIS_URL.
 resource "random_password" "redis" {
-  length           = 32
+  length           = 48
   special          = true
-  override_special = "!&#$^<>-"
+  override_special = "-_~"
 }
 
 resource "aws_elasticache_replication_group" "redis" {

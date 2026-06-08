@@ -1,11 +1,15 @@
 # ============================================================
-# alb.tf — Application Load Balancer + path-based routing
+# alb.tf — Application Load Balancer + routing
 #
-# Cloudflare (proxied) ─443─▶ ALB ─▶ target group per service:
-#   /api/v1/auth*        ▶ auth
-#   /api/v1/orders*      ▶ orders
-#   /api/v1/pharmacies*  ▶ pharmacy
+# Mirrors the current nginx behaviour:
+#   /api/*, /socket.io/*  -> backend  (listener rule)
+#   everything else       -> frontend (default action)
 # ============================================================
+
+locals {
+  default_service = [for k, v in local.services : k if v.is_default][0]
+  rule_services   = { for k, v in local.services : k => v if !v.is_default }
+}
 
 resource "aws_lb" "main" {
   name               = "${local.name}-alb"
@@ -21,13 +25,13 @@ resource "aws_lb" "main" {
   tags = { Name = "${local.name}-alb" }
 }
 
-# One IP target group per web service (Fargate awsvpc => target_type "ip")
+# One IP target group per service (Fargate awsvpc => target_type "ip").
 resource "aws_lb_target_group" "service" {
   for_each = local.services
 
-  # NB: ALB target-group names max 32 chars — keep prefix short.
+  # ALB target-group names max 32 chars.
   name        = "${local.name}-${each.key}"
-  port        = var.container_port
+  port        = each.value.container_port
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
@@ -36,7 +40,7 @@ resource "aws_lb_target_group" "service" {
 
   health_check {
     enabled             = true
-    path                = var.health_check_path
+    path                = each.value.health_check_path
     protocol            = "HTTP"
     matcher             = "200-399"
     interval            = 30
@@ -45,10 +49,9 @@ resource "aws_lb_target_group" "service" {
     unhealthy_threshold = 3
   }
 
-  tags = { Name = "${local.name}-${each.key}-tg" }
+  tags = { Name = "${local.name}-${each.key}" }
 }
 
-# HTTPS listener — terminates the Cloudflare origin connection.
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.main.arn
   port              = 443
@@ -56,21 +59,16 @@ resource "aws_lb_listener" "https" {
   ssl_policy        = var.alb_ssl_policy
   certificate_arn   = var.certificate_arn
 
-  # Unmatched paths get a clean 404 instead of hitting a service.
+  # Catch-all -> frontend.
   default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "application/json"
-      message_body = "{\"error\":\"not_found\",\"message\":\"No route for this path\"}"
-      status_code  = "404"
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.service[local.default_service].arn
   }
 }
 
-# Path-based routing rules
+# Path-matched rules (currently just the backend).
 resource "aws_lb_listener_rule" "service" {
-  for_each = local.services
+  for_each = local.rule_services
 
   listener_arn = aws_lb_listener.https.arn
   priority     = each.value.priority

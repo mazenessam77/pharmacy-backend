@@ -1,15 +1,15 @@
 # ============================================================
-# ecr.tf — container registries for the PharmaLink services
+# ecr.tf — container registries
 #
-# One repository per task: pharmalink-{auth,orders,pharmacy,worker}.
+# One repository per service: pharmalink-backend, pharmalink-frontend.
 # Push images here, then set var.container_images to the repo URLs
 # (see `terraform output ecr_repository_urls`).
 # ============================================================
 
 resource "aws_ecr_repository" "this" {
-  for_each = toset(local.task_names)
+  for_each = local.services
 
-  name                 = "${var.project}-${each.value}"
+  name                 = "${var.project}-${each.key}"
   image_tag_mutability = "MUTABLE"
   force_delete         = !var.enable_deletion_protection
 
@@ -21,10 +21,9 @@ resource "aws_ecr_repository" "this" {
     encryption_type = "AES256"
   }
 
-  tags = { Service = each.value }
+  tags = { Service = each.key }
 }
 
-# Keep storage lean: expire untagged layers, cap tagged image history.
 resource "aws_ecr_lifecycle_policy" "this" {
   for_each   = aws_ecr_repository.this
   repository = each.value.name
