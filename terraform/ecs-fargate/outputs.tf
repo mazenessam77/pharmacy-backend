@@ -12,20 +12,31 @@ output "private_subnet_ids" {
   value       = [for s in aws_subnet.private : s.id]
 }
 
-# ─── Edge / ALB ───────────────────────────────────────────────
+# ─── DNS / Route 53 ───────────────────────────────────────────
+output "route53_name_servers" {
+  description = "Set THESE 4 NS records at your domain registrar for mymedcine.com."
+  value       = aws_route53_zone.main.name_servers
+}
+
+output "route53_zone_id" {
+  description = "Route 53 hosted zone id."
+  value       = aws_route53_zone.main.zone_id
+}
+
+output "acm_certificate_arn" {
+  description = "ACM certificate ARN (auto-validated via Route 53)."
+  value       = aws_acm_certificate.main.arn
+}
+
+output "site_url" {
+  description = "Public URL once the registrar NS are updated."
+  value       = "https://${var.domain}"
+}
+
+# ─── ALB ──────────────────────────────────────────────────────
 output "alb_dns_name" {
-  description = "Point your Cloudflare CNAME (proxied) at this."
+  description = "ALB DNS name (Route 53 apex/www alias targets point here)."
   value       = aws_lb.main.dns_name
-}
-
-output "cloudflare_origin_target" {
-  description = "DNS: CNAME <domain> -> this host, proxied, SSL = Full (strict)."
-  value       = "CNAME ${var.domain} -> ${aws_lb.main.dns_name} (Cloudflare proxied)"
-}
-
-output "cloudflare_allowlist_ipv4" {
-  description = "Cloudflare IPv4 ranges allowed to reach the ALB."
-  value       = local.cloudflare_ipv4
 }
 
 # ─── Compute ──────────────────────────────────────────────────

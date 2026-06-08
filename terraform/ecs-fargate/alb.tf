@@ -57,7 +57,7 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = var.alb_ssl_policy
-  certificate_arn   = var.certificate_arn
+  certificate_arn   = aws_acm_certificate_validation.main.certificate_arn
 
   # Catch-all -> frontend.
   default_action {

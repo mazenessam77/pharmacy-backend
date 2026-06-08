@@ -22,7 +22,7 @@ variable "environment" {
 }
 
 variable "domain" {
-  description = "Public domain served via Cloudflare (used for FRONTEND_URL etc.)."
+  description = "Public apex domain (Route 53 hosted zone + ACM cert + FRONTEND_URL)."
   type        = string
   default     = "mymedcine.com"
 }
@@ -69,24 +69,9 @@ variable "single_nat_gateway" {
   default     = false
 }
 
-# ─── Cloudflare allowlist override (optional) ─────────────────
-variable "cloudflare_ipv4_cidrs" {
-  description = "Override Cloudflare IPv4 ranges. Empty = fetch live."
-  type        = list(string)
-  default     = []
-}
-
-variable "cloudflare_ipv6_cidrs" {
-  description = "Override Cloudflare IPv6 ranges. Empty = fetch live."
-  type        = list(string)
-  default     = []
-}
-
 # ─── ALB / TLS ────────────────────────────────────────────────
-variable "certificate_arn" {
-  description = "ARN of an ISSUED ACM cert for the domain (ALB HTTPS listener)."
-  type        = string
-}
+# The ACM certificate is created and DNS-validated automatically via
+# Route 53 (see acm.tf) — no certificate_arn input needed.
 
 variable "alb_ssl_policy" {
   description = "ALB HTTPS listener TLS security policy."

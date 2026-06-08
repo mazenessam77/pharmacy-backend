@@ -1,14 +1,10 @@
-# Copy to terraform.tfvars and adjust. Only `certificate_arn` is required.
+# Copy to terraform.tfvars and adjust. All values have defaults; the ACM cert
+# is created and Route 53-validated automatically (no certificate_arn needed).
 
 aws_region  = "us-east-1"
 project     = "pharmalink"
 environment = "production"
 domain      = "mymedcine.com"
-
-# ─── TLS (REQUIRED) ───────────────────────────────────────────
-# Issue an ACM cert for your domain (DNS-validated via Cloudflare),
-# wait for status = ISSUED, then paste its ARN here.
-certificate_arn = "arn:aws:acm:us-east-1:498341975421:certificate/REPLACE-ME"
 
 # ─── Container images ─────────────────────────────────────────
 # Replace the nginx placeholders with your ECR image URIs.

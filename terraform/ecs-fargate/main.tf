@@ -6,7 +6,8 @@
 #   - frontend : the Next.js app (everything else)
 #   - MongoDB  : Amazon DocumentDB (Mongo-compatible)
 #   - Redis    : Amazon ElastiCache
-#   - edge     : Cloudflare (proxied) -> ALB
+#   - DNS/edge : AWS Route 53 (hosted zone + alias) -> ALB,
+#                ACM cert auto-validated via Route 53 DNS records
 # (No RDS/SQS/DynamoDB — the app doesn't use them.)
 # ============================================================
 
@@ -21,10 +22,6 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = "~> 3.6"
-    }
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 3.4"
     }
   }
 
@@ -44,15 +41,6 @@ provider "aws" {
   }
 }
 
-# ─── Live Cloudflare edge ranges (fetched at plan time) ───────
-data "http" "cloudflare_ipv4" {
-  url = "https://www.cloudflare.com/ips-v4"
-}
-
-data "http" "cloudflare_ipv6" {
-  url = "https://www.cloudflare.com/ips-v6"
-}
-
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
@@ -65,9 +53,6 @@ locals {
   private_subnets = {
     for idx, az in var.availability_zones : az => var.private_subnet_cidrs[idx]
   }
-
-  cloudflare_ipv4 = length(var.cloudflare_ipv4_cidrs) > 0 ? var.cloudflare_ipv4_cidrs : split("\n", trimspace(data.http.cloudflare_ipv4.response_body))
-  cloudflare_ipv6 = length(var.cloudflare_ipv6_cidrs) > 0 ? var.cloudflare_ipv6_cidrs : split("\n", trimspace(data.http.cloudflare_ipv6.response_body))
 
   # ── The two Fargate services that make up the app ──
   # backend is an ALB listener RULE (path-matched); frontend is the

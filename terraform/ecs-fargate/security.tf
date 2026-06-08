@@ -1,24 +1,27 @@
 # ============================================================
 # security.tf — security groups
 #
-#   Cloudflare ─443─▶ ALB ─▶ backend:5000 / frontend:3000
+#   Internet ─443─▶ ALB ─▶ backend:5000 / frontend:3000
 #   backend ─27017─▶ DocumentDB
 #   backend ─6379──▶ Redis
 # ============================================================
 
-# ─── ALB: HTTPS from Cloudflare edge ranges ONLY ──────────────
+# ─── ALB: public HTTPS ────────────────────────────────────────
+# With Route 53 (no Cloudflare proxy in front), clients reach the ALB
+# directly, so 443 is open to the internet. Attach AWS WAF to the ALB
+# if you want edge filtering / rate limiting.
 resource "aws_security_group" "alb" {
   name        = "${local.name}-alb-sg"
-  description = "ALB ingress restricted to Cloudflare edge (HTTPS only)"
+  description = "ALB public HTTPS ingress"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description      = "HTTPS from Cloudflare"
+    description      = "HTTPS from anywhere"
     from_port        = 443
     to_port          = 443
     protocol         = "tcp"
-    cidr_blocks      = local.cloudflare_ipv4
-    ipv6_cidr_blocks = local.cloudflare_ipv6
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 
   egress {

@@ -30,8 +30,7 @@ redis_num_nodes = 1
 # Easy teardown
 enable_deletion_protection = false
 
-# REQUIRED: issued ACM cert ARN for the dev hostname
-certificate_arn = "arn:aws:acm:us-east-1:498341975421:certificate/REPLACE-ME"
+# TLS: the ACM cert is created + Route 53-validated automatically — no input needed.
 
 # After pushing images (terraform output ecr_repository_urls):
 # container_images = {
