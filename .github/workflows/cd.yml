@@ -56,6 +56,7 @@ jobs:
           # heavy logic in scripts/deploy.sh is run with `bash` below.
           SCRIPT="$(cat <<'EOS'
           set -eu
+          export HOME=/root
           export DEBIAN_FRONTEND=noninteractive
           cd /opt/pharma-app
           git config --global --add safe.directory /opt/pharma-app
