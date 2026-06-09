@@ -20,8 +20,7 @@ export const saveMedication = asyncHandler(async (req: Request, res: Response) =
   const { medicineId, name, notes, reminderFrequency } = req.body;
 
   // Resolve the medicine by id (medicine card) OR by name (saving from a past
-  // order, whose items are stored as free-text names). Name match is
-  // case-insensitive via collation.
+  // order, whose items are stored as free-text names typed by the patient).
   // Coerce user input to string primitives before it reaches a query object:
   // a string can never carry a NoSQL operator ({ $ne: null }, etc.), so this
   // closes off NoSQL injection regardless of what the client actually sends.
@@ -29,7 +28,20 @@ export const saveMedication = asyncHandler(async (req: Request, res: Response) =
   if (medicineId) {
     medicine = await Medicine.findById(String(medicineId));
   } else if (name) {
-    medicine = await Medicine.findOne({ name: String(name) }).collation({ locale: 'en', strength: 2 });
+    const term = String(name).trim();
+    // 1) Exact, case-insensitive match (collation) — highest precision.
+    medicine = await Medicine.findOne({ name: term }).collation({ locale: 'en', strength: 2 });
+    // 2) Fallback: a catalog entry that *starts with* the typed name, so an
+    //    order's free-text "Panadol" resolves to catalog "Panadol 500mg".
+    //    Escape the user input before it becomes a regex (regex injection / ReDoS),
+    //    then take the first alphabetically for a deterministic pick.
+    if (!medicine) {
+      const safe = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      medicine = await Medicine.findOne({
+        name: { $regex: new RegExp(`^${safe}`, 'i') },
+        isActive: true,
+      }).sort({ name: 1 });
+    }
   }
 
   if (!medicine) {
