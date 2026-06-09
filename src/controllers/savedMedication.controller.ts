@@ -17,16 +17,24 @@ const MEDICINE_FIELDS = 'name genericName category requiresPrescription descript
  */
 export const saveMedication = asyncHandler(async (req: Request, res: Response) => {
   const patientId = req.user!._id;
-  const { medicineId, notes, reminderFrequency } = req.body;
+  const { medicineId, name, notes, reminderFrequency } = req.body;
 
-  // The medicine must exist (and we surface a clean 404 instead of a cast error).
-  const medicine = await Medicine.findById(medicineId);
+  // Resolve the medicine by id (medicine card) OR by name (saving from a past
+  // order, whose items are stored as free-text names). Name match is
+  // case-insensitive via collation.
+  let medicine = null;
+  if (medicineId) {
+    medicine = await Medicine.findById(medicineId);
+  } else if (name) {
+    medicine = await Medicine.findOne({ name }).collation({ locale: 'en', strength: 2 });
+  }
+
   if (!medicine) {
-    throw new AppError('Medicine not found.', 404, ERROR_CODES.MEDICINE_NOT_FOUND);
+    throw new AppError('This medicine is not in our catalog yet.', 404, ERROR_CODES.MEDICINE_NOT_FOUND);
   }
 
   try {
-    const saved = await SavedMedication.create({ patientId, medicineId, notes, reminderFrequency });
+    const saved = await SavedMedication.create({ patientId, medicineId: medicine._id, notes, reminderFrequency });
     await saved.populate('medicineId', MEDICINE_FIELDS);
     res.status(201).json({ success: true, data: saved });
   } catch (err: any) {

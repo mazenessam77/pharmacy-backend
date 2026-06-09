@@ -12,12 +12,15 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 import { statusLabel, statusVariant, formatDateTime } from '@/lib/helpers';
 import { OrderResponse, Pharmacy } from '@/types';
 import toast from 'react-hot-toast';
+import SaveOrderMedicineButton from '@/components/shared/SaveOrderMedicineButton';
+import { useSavedMedicationStore } from '@/store/savedMedicationStore';
 import { MessageCircle, X, Check, Star, Pill, Truck, Calendar, StickyNote, Building2, Tag } from 'lucide-react';
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { currentOrder, fetchOrder, fetchResponses, responses, acceptOffer, cancelOrder, isLoading } = useOrderStore();
+  const fetchSaved = useSavedMedicationStore((s) => s.fetch);
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
 
@@ -27,6 +30,11 @@ export default function OrderDetailPage() {
       fetchResponses(id);
     }
   }, [id, fetchOrder, fetchResponses]);
+
+  // Load saved meds so the per-medicine heart shows the right state
+  useEffect(() => {
+    fetchSaved();
+  }, [fetchSaved]);
 
   const handleCancel = async () => {
     try {
@@ -89,6 +97,7 @@ export default function OrderDetailPage() {
                   <span className="w-1.5 h-1.5 bg-sky-400 rounded-full shrink-0" />
                   <span className="font-medium">{m.name}</span>
                   <span className="text-neutral-400">×{m.quantity}</span>
+                  <SaveOrderMedicineButton name={m.name} />
                 </li>
               ))}
             </ul>
