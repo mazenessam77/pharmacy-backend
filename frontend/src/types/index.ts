@@ -93,6 +93,21 @@ export interface SavedMedication {
   updatedAt: string;
 }
 
+// ── Saved Baskets (reusable medicine groups for one-click requests) ──
+export interface SavedBasketItem {
+  medicine: Medicine; // joined via $lookup by the API
+  quantity: number;
+}
+
+export interface SavedBasket {
+  _id: string;
+  patientId: string;
+  name: string;
+  items: SavedBasketItem[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ── Order ──
 export type OrderStatus =
   | 'pending'

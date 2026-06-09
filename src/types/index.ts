@@ -150,6 +150,20 @@ export interface ISavedMedication {
   updatedAt: Date;
 }
 
+export interface ISavedBasketItem {
+  medicineId: Types.ObjectId;
+  quantity: number;
+}
+
+export interface ISavedBasket {
+  _id: Types.ObjectId;
+  patientId: Types.ObjectId;
+  name: string;
+  items: ISavedBasketItem[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IInventory {
   _id: Types.ObjectId;
   pharmacyId: Types.ObjectId;

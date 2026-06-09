@@ -16,6 +16,7 @@ import orderResponseRoutes from './routes/orderResponse.routes';
 import prescriptionRoutes from './routes/prescription.routes';
 import medicineRoutes from './routes/medicine.routes';
 import savedMedicationRoutes from './routes/savedMedication.routes';
+import savedBasketRoutes from './routes/savedBasket.routes';
 import pharmacyRoutes from './routes/pharmacy.routes';
 import inventoryRoutes from './routes/inventory.routes';
 import messageRoutes from './routes/message.routes';
@@ -63,6 +64,7 @@ app.use('/api/orders/:orderId/responses', orderResponseRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/medications', savedMedicationRoutes); // patient "saved medications" feature
+app.use('/api/baskets', savedBasketRoutes); // patient "saved baskets" feature
 app.use('/api/pharmacies', pharmacyRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/messages', messageRoutes);
