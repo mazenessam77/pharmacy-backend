@@ -51,9 +51,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Bootstrap executed on the box (as root): pull latest, run versioned deploy.
+          # Bootstrap executed on the box (as root). NOTE: SSM AWS-RunShellScript
+          # runs this via /bin/sh (dash), so keep it POSIX — no `pipefail`. The
+          # heavy logic in scripts/deploy.sh is run with `bash` below.
           SCRIPT="$(cat <<'EOS'
-          set -euo pipefail
+          set -eu
           export DEBIAN_FRONTEND=noninteractive
           cd /opt/pharma-app
           git config --global --add safe.directory /opt/pharma-app
