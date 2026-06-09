@@ -140,6 +140,16 @@ export interface IMedicine {
   createdAt: Date;
 }
 
+export interface ISavedMedication {
+  _id: Types.ObjectId;
+  patientId: Types.ObjectId;
+  medicineId: Types.ObjectId;
+  notes?: string;
+  reminderFrequency: 'none' | 'daily' | 'weekly' | 'monthly';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IInventory {
   _id: Types.ObjectId;
   pharmacyId: Types.ObjectId;

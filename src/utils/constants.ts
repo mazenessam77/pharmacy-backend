@@ -20,6 +20,9 @@ export const ORDER_STATUSES = [
 
 export const CANCELLABLE_STATUSES = ['pending', 'offered', 'confirmed'];
 
+// Reminder cadence for a patient's saved/favourite medications
+export const REMINDER_FREQUENCIES = ['none', 'daily', 'weekly', 'monthly'] as const;
+
 export const PHARMACY_UPDATABLE_STATUSES: Record<string, string[]> = {
   confirmed: ['preparing'],
   preparing: ['out_for_delivery'],
@@ -48,6 +51,8 @@ export const ERROR_CODES = {
   RESPONSE_NOT_FOUND: 'RESPONSE_NOT_FOUND',
   INVENTORY_NOT_FOUND: 'INVENTORY_NOT_FOUND',
   MEDICINE_NOT_FOUND: 'MEDICINE_NOT_FOUND',
+  SAVED_MEDICATION_NOT_FOUND: 'SAVED_MEDICATION_NOT_FOUND',
+  SAVED_MEDICATION_EXISTS: 'SAVED_MEDICATION_EXISTS',
   NOTIFICATION_NOT_FOUND: 'NOTIFICATION_NOT_FOUND',
   FORBIDDEN: 'FORBIDDEN',
   SIDE_EFFECT_REPORT_NOT_FOUND: 'SIDE_EFFECT_REPORT_NOT_FOUND',
