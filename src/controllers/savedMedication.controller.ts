@@ -17,16 +17,27 @@ const MEDICINE_FIELDS = 'name genericName category requiresPrescription descript
  */
 export const saveMedication = asyncHandler(async (req: Request, res: Response) => {
   const patientId = req.user!._id;
-  const { medicineId, notes, reminderFrequency } = req.body;
+  const { medicineId, name, notes, reminderFrequency } = req.body;
 
-  // The medicine must exist (and we surface a clean 404 instead of a cast error).
-  const medicine = await Medicine.findById(medicineId);
+  // Resolve the medicine by id (medicine card) OR by name (saving from a past
+  // order, whose items are stored as free-text names). Name match is
+  // case-insensitive via collation.
+  // Coerce user input to string primitives before it reaches a query object:
+  // a string can never carry a NoSQL operator ({ $ne: null }, etc.), so this
+  // closes off NoSQL injection regardless of what the client actually sends.
+  let medicine = null;
+  if (medicineId) {
+    medicine = await Medicine.findById(String(medicineId));
+  } else if (name) {
+    medicine = await Medicine.findOne({ name: String(name) }).collation({ locale: 'en', strength: 2 });
+  }
+
   if (!medicine) {
-    throw new AppError('Medicine not found.', 404, ERROR_CODES.MEDICINE_NOT_FOUND);
+    throw new AppError('This medicine is not in our catalog yet.', 404, ERROR_CODES.MEDICINE_NOT_FOUND);
   }
 
   try {
-    const saved = await SavedMedication.create({ patientId, medicineId, notes, reminderFrequency });
+    const saved = await SavedMedication.create({ patientId, medicineId: medicine._id, notes, reminderFrequency });
     await saved.populate('medicineId', MEDICINE_FIELDS);
     res.status(201).json({ success: true, data: saved });
   } catch (err: any) {
@@ -74,12 +85,14 @@ export const getSavedMedications = asyncHandler(async (req: Request, res: Respon
  */
 export const updateSavedMedication = asyncHandler(async (req: Request, res: Response) => {
   const { notes, reminderFrequency } = req.body;
+  // String-coerce values before they reach the update/filter documents so no
+  // user-supplied object can smuggle in NoSQL operators.
   const update: Record<string, unknown> = {};
-  if (notes !== undefined) update.notes = notes;
-  if (reminderFrequency !== undefined) update.reminderFrequency = reminderFrequency;
+  if (notes !== undefined) update.notes = String(notes);
+  if (reminderFrequency !== undefined) update.reminderFrequency = String(reminderFrequency);
 
   const saved = await SavedMedication.findOneAndUpdate(
-    { _id: req.params.id, patientId: req.user!._id }, // ownership: only the owner's doc matches
+    { _id: String(req.params.id), patientId: req.user!._id }, // ownership: only the owner's doc matches
     update,
     { new: true, runValidators: true }
   ).populate('medicineId', MEDICINE_FIELDS);
@@ -98,7 +111,7 @@ export const updateSavedMedication = asyncHandler(async (req: Request, res: Resp
  */
 export const deleteSavedMedication = asyncHandler(async (req: Request, res: Response) => {
   const saved = await SavedMedication.findOneAndDelete({
-    _id: req.params.id,
+    _id: String(req.params.id),
     patientId: req.user!._id,
   });
 

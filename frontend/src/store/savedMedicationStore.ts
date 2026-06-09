@@ -12,6 +12,8 @@ interface SavedMedicationState {
   isSaved: (medicineId: string) => boolean;
   /** Optimistic save/unsave from a medicine card (heart toggle). */
   toggle: (medicine: Medicine) => Promise<void>;
+  /** Save by free-text name (e.g. from a past order). Resolved server-side. */
+  saveByName: (name: string) => Promise<void>;
   /** Remove by SavedMedication id (used on the dashboard). */
   removeById: (savedId: string) => Promise<void>;
   /** Update notes / reminder on a saved item. */
@@ -79,6 +81,12 @@ export const useSavedMedicationStore = create<SavedMedicationState>((set, get) =
     } finally {
       withBusy(set, get, medicine._id, false);
     }
+  },
+
+  saveByName: async (name) => {
+    const res = await savedMedicationService.save({ name });
+    const rec = res.data.data;
+    set((s) => (s.items.some((i) => i._id === rec._id) ? {} : { items: [rec, ...s.items] }));
   },
 
   removeById: async (savedId) => {
