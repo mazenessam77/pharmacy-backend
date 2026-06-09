@@ -80,6 +80,19 @@ export interface Medicine {
   isActive: boolean;
 }
 
+// ── Saved Medications (favourites / quick reorder) ──
+export type ReminderFrequency = 'none' | 'daily' | 'weekly' | 'monthly';
+
+export interface SavedMedication {
+  _id: string;
+  patientId: string;
+  medicineId: Medicine; // populated by the API
+  notes?: string;
+  reminderFrequency: ReminderFrequency;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ── Order ──
 export type OrderStatus =
   | 'pending'
