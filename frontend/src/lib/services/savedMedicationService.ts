@@ -11,7 +11,7 @@ export const savedMedicationService = {
   getAll: (params?: { page?: number; limit?: number }) =>
     api.get<SavedListResponse>('/medications/saved', { params }),
 
-  save: (data: { medicineId: string; notes?: string; reminderFrequency?: ReminderFrequency }) =>
+  save: (data: { medicineId?: string; name?: string; notes?: string; reminderFrequency?: ReminderFrequency }) =>
     api.post<{ success: boolean; data: SavedMedication }>('/medications/saved', data),
 
   update: (id: string, data: { notes?: string; reminderFrequency?: ReminderFrequency }) =>
