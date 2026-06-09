@@ -1,7 +1,22 @@
 name: CD — Deploy to Production (pharmcy.site)
 
-# Auto-deploys the Docker Compose stack to the EC2 box over SSH on push to
-# main (and manual dispatch). Serves https://pharmcy.site.
+# Deploys the Docker Compose stack to the EC2 box on push to main (and manual
+# dispatch) via AWS SSM Run Command — no inbound SSH (port 22) required.
+#
+# ── One-time setup required (see PR description / ops notes) ──────────────
+#   AWS:
+#     • Attach an instance profile with the AmazonSSMManagedInstanceCore policy
+#       to the EC2 instance, and confirm it registers:
+#         aws ssm describe-instance-information
+#     • Create a GitHub OIDC provider + an IAM role this workflow can assume,
+#       allowing ssm:SendCommand + ssm:GetCommandInvocation on the instance.
+#   GitHub repo secrets:
+#     • AWS_DEPLOY_ROLE_ARN  – the IAM role ARN to assume via OIDC
+#     • EC2_INSTANCE_ID      – e.g. i-0abc123...
+#   GitHub repo variable (optional, defaults to eu-west-2):
+#     • AWS_REGION
+#   The old SSH secrets (PRODUCTION_HOST / PRODUCTION_USER / PRODUCTION_SSH_KEY)
+#   are no longer used and can be deleted.
 on:
   push:
     branches: [main]
@@ -9,129 +24,96 @@ on:
 
 permissions:
   contents: read
-  security-events: write
+  id-token: write   # required for OIDC federation to AWS
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
 
 jobs:
-
-  # Deploy to EC2. CI already gates every PR before it reaches main, so we
-  # deploy main directly here — calling the reusable CI from CD caused a
-  # concurrency clash that cancelled the deploy. (CI still also runs on push.)
   deploy:
-    name: Deploy to Production (EC2)
+    name: Deploy to Production (EC2 via SSM)
     runs-on: ubuntu-latest
     environment:
       name: production
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-west-2' }}
+      INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
 
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          host: ${{ secrets.PRODUCTION_HOST }}
-          username: ${{ secrets.PRODUCTION_USER }}
-          key: ${{ secrets.PRODUCTION_SSH_KEY }}
-          command_timeout: 40m # the --no-cache build on the 2GB ARM box is slow
-          script: |
-            set -e
-            cd /opt/pharma-app
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
-            # Discard any local changes and pull latest code
-            git fetch origin main
-            git reset --hard origin/main
+      - name: Deploy via SSM Run Command
+        run: |
+          set -euo pipefail
 
-            # ── SSL: Install certbot if missing ──────────────────────
-            if ! command -v certbot &>/dev/null; then
-              sudo apt-get update -qq && sudo apt-get install -y certbot
-            fi
+          # Bootstrap executed on the box (as root): pull latest, run versioned deploy.
+          SCRIPT="$(cat <<'EOS'
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          cd /opt/pharma-app
+          git config --global --add safe.directory /opt/pharma-app
+          git fetch origin main
+          git reset --hard origin/main
+          chmod +x scripts/deploy.sh
+          bash scripts/deploy.sh
+          EOS
+          )"
 
-            mkdir -p nginx/certbot/www
+          CMD_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "CD deploy ${GITHUB_SHA::7}" \
+            --parameters "$(jq -n --arg c "$SCRIPT" '{commands: ($c | split("\n")), executionTimeout: ["3600"]}')" \
+            --query "Command.CommandId" --output text)
+          echo "SSM CommandId: $CMD_ID"
 
-            # ── SSL: Issue cert if it doesn't exist yet ───────────────
-            if [ ! -f /etc/letsencrypt/live/pharmcy.site/fullchain.pem ]; then
-              echo "No cert found — obtaining Let's Encrypt cert..."
-              docker stop pharma-nginx 2>/dev/null || true
-              sudo certbot certonly --standalone \
-                -d pharmcy.site \
-                --agree-tos \
-                --non-interactive \
-                -m shananmazen99@gmail.com
-              echo "Cert obtained successfully"
-            fi
+          # Poll until the command reaches a terminal state (~25 min ceiling).
+          for i in $(seq 1 150); do
+            STATUS=$(aws ssm get-command-invocation \
+              --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" \
+              --query Status --output text 2>/dev/null || echo "Pending")
+            echo "[$i] status=$STATUS"
+            case "$STATUS" in
+              Success)
+                break ;;
+              Failed|Cancelled|TimedOut)
+                echo "::group::deploy stderr"
+                aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query StandardErrorContent --output text || true
+                echo "::endgroup::"
+                echo "::error::SSM deploy ended with status: $STATUS"
+                exit 1 ;;
+            esac
+            if [ "$i" -eq 150 ]; then echo "::error::Timed out waiting for SSM command"; exit 1; fi
+            sleep 10
+          done
 
-            # ── SSL: Renew if within 30 days of expiry ────────────────
-            sudo certbot renew --quiet \
-              --pre-hook "docker stop pharma-nginx 2>/dev/null || true" \
-              --post-hook "docker start pharma-nginx 2>/dev/null || true" \
-              2>/dev/null || true
+          echo "::group::deploy stdout (tail)"
+          aws ssm get-command-invocation --command-id "$CMD_ID" --instance-id "$INSTANCE_ID" --query StandardOutputContent --output text || true
+          echo "::endgroup::"
 
-            # Rebuild only the app containers (not mongodb/redis/nginx which don't change)
-            # --no-cache to ensure new dependencies (e.g. added npm packages) are installed
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml build --no-cache backend frontend
-
-            # Restart app containers (--renew-anon-volumes prevents stale node_modules volume)
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --renew-anon-volumes backend frontend
-
-            # Wait for backend to be healthy BEFORE reloading nginx.
-            # Nginx reloads 1s after container start → marks upstream failed → 502.
-            # Polling /health inside the container avoids that race condition.
-            echo "Waiting for backend to be ready..."
-            for i in $(seq 1 24); do
-              if docker exec pharma-backend wget -qO- http://localhost:5000/health > /dev/null 2>&1; then
-                echo "Backend healthy after $((i * 5))s"
-                break
-              fi
-              if [ "$i" -eq 24 ]; then
-                echo "--- backend logs (last 60 lines) ---"
-                docker logs pharma-backend --tail=60
-                echo "Backend did not become healthy within 120s"
-                exit 1
-              fi
-              sleep 5
-            done
-
-            # Wait for frontend (Next.js takes a bit longer)
-            echo "Waiting for frontend to be ready..."
-            for i in $(seq 1 12); do
-              if docker exec pharma-frontend wget -qO- http://localhost:3000 > /dev/null 2>&1; then
-                echo "Frontend healthy after $((i * 5))s"
-                break
-              fi
-              sleep 5
-            done
-
-            # Now start/reload nginx — both upstreams are alive, no 502 window
-            # (nginx may have been stopped by certbot standalone; `up -d` handles both cases)
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d nginx
-
-            # Clean up dangling images
-            docker image prune -f
-
-
-      # 3. Health check — verify deployment
-     
       - name: Health check
         run: |
           echo "Waiting for nginx to propagate..."
           sleep 10
-
           for i in {1..12}; do
-            STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
-              https://pharmcy.site/api/health || echo "000")
-
+            STATUS=$(curl -sk -o /dev/null -w "%{http_code}" https://pharmcy.site/api/health || echo "000")
             if [ "$STATUS" = "200" ]; then
               echo "✓ Production healthy (HTTP $STATUS)"
               exit 0
             fi
-
             echo "Attempt $i/12 — HTTP $STATUS, retrying in 15s..."
             sleep 15
           done
-
-          echo "::error::Health check failed after 12 attempts. Check logs:"
-          echo "::error::  ssh ubuntu@${{ secrets.PRODUCTION_HOST }} 'cd /opt/pharma-app && docker compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail=50'"
+          echo "::error::Health check failed after 12 attempts."
           exit 1
 
-      - name: Notify on failure
+      - name: Rollback hint on failure
         if: failure()
         run: |
-          echo "::error::Deployment failed. To roll back:"
-          echo "::error::  ssh ubuntu@${{ secrets.PRODUCTION_HOST }} 'cd /opt/pharma-app && git checkout HEAD~1 && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build backend frontend'"
+          echo "::error::Deploy failed. Roll back via SSM Session Manager on the box:"
+          echo "::error::  cd /opt/pharma-app && git checkout HEAD~1 && bash scripts/deploy.sh"
