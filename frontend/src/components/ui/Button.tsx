@@ -9,22 +9,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
+// Monochrome / editorial: solid black or outlined, square, uppercase.
 const variants = {
-  primary:
-    'bg-black dark:bg-white text-white dark:text-black hover:bg-neutral-800 dark:hover:bg-neutral-100 active:scale-[0.97] btn-shine',
-  indigo:
-    'bg-sky-600 text-white hover:bg-sky-700 hover:shadow-lg hover:shadow-sky-300/40 dark:hover:shadow-sky-900/40 active:scale-[0.97] btn-shine',
-  danger:  'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97]',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.97]',
-  outline:
-    'border border-black dark:border-slate-500 text-black dark:text-zinc-200 hover:bg-black dark:hover:bg-zinc-800 hover:text-white active:scale-[0.97]',
-  ghost: 'text-black dark:text-zinc-200 hover:underline',
+  primary: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
+  indigo: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
+  danger: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
+  success: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
+  outline: 'border border-black text-black bg-white hover:bg-black hover:text-white active:scale-[0.99]',
+  ghost: 'text-black hover:underline underline-offset-4',
 };
 
 const sizes = {
-  sm: 'px-5 py-2 text-[12px] rounded-xl',
-  md: 'px-7 py-2.5 text-[13px] rounded-xl',
-  lg: 'px-8 py-3 text-[13px] rounded-xl',
+  sm: 'px-5 py-2 text-[11px] tracking-[0.12em]',
+  md: 'px-7 py-2.5 text-[11px] tracking-[0.15em]',
+  lg: 'px-8 py-3.5 text-[12px] tracking-[0.18em]',
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -32,7 +30,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       disabled={disabled || isLoading}
-      className={`inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 select-none disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 font-medium uppercase transition-all duration-200 select-none disabled:opacity-40 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}

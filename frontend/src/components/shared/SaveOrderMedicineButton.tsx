@@ -47,8 +47,8 @@ export default function SaveOrderMedicineButton({ name }: { name: string }) {
       disabled={busy}
       aria-pressed={saved}
       title={saved ? 'Remove from saved' : 'Save for quick reorder'}
-      className={`ml-auto inline-flex items-center justify-center w-7 h-7 rounded-full transition-all duration-200 active:scale-90 disabled:opacity-50 ${
-        saved ? 'text-rose-500' : 'text-neutral-300 dark:text-zinc-600 hover:text-rose-500'
+      className={`ml-auto inline-flex items-center justify-center w-7 h-7 rounded-none transition-all duration-200 active:scale-90 disabled:opacity-50 ${
+        saved ? 'text-neutral-900' : 'text-neutral-300  hover:text-neutral-900'
       }`}
     >
       {busy ? (

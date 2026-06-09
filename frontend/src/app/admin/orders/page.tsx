@@ -110,7 +110,7 @@ export default function AdminOrdersPage() {
               <div className="col-span-1 text-right">
                 <button
                   onClick={(e) => handleDelete(order._id, e)}
-                  className="text-neutral-400 hover:text-red-600 transition-colors"
+                  className="text-neutral-400 hover:text-neutral-900 transition-colors"
                   title="Delete order"
                 >
                   <Trash2 className="w-4 h-4" />

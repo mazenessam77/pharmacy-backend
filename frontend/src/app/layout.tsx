@@ -1,15 +1,7 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import Providers from '@/components/shared/Providers';
 import './globals.css';
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  weight: ['300', '400', '500', '600', '700', '800'],
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'PharmaLink',
@@ -18,11 +10,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={jakarta.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');if(t!=='light')document.documentElement.classList.add('dark');})();` }} />
-      </head>
-      <body className="dark:bg-black">
+    <html lang="en">
+      <body className="bg-white text-black">
         <Providers>
           {children}
           <Toaster
@@ -30,13 +19,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             toastOptions={{
               duration: 3000,
               style: {
-                background: '#fff',
-                color: '#0f172a',
-                borderRadius: '16px',
-                fontSize: '13px',
+                background: '#000',
+                color: '#fff',
+                borderRadius: '0',
+                fontSize: '12px',
                 fontWeight: 500,
-                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
-                border: '1px solid rgba(0,0,0,0.06)',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                boxShadow: 'none',
+                border: '1px solid #000',
               },
             }}
           />

@@ -4,105 +4,48 @@
 
 @layer base {
   * {
-    @apply border-neutral-200 dark:border-zinc-800;
+    @apply border-neutral-200;
   }
   html {
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-white text-black antialiased dark:bg-black dark:text-zinc-100;
-    font-family: var(--font-sans, 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue', sans-serif);
+    @apply bg-white text-black antialiased;
+    font-family: var(--font-sans, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+    -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    @apply bg-sky-600 text-white;
+    @apply bg-black text-white;
   }
-  /* Thin custom scrollbar */
+  /* Thin square scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-neutral-200 rounded-full dark:bg-zinc-700; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-neutral-300 dark:bg-zinc-600; }
-
-  /* ── Global dark-mode text contrast fixes ────────────────────────
-     Any element using a dark neutral/slate text class WITHOUT a dark:
-     counterpart will be overridden here to stay readable on black.   */
-  .dark .text-black,
-  .dark .text-neutral-900,
-  .dark .text-neutral-800,
-  .dark .text-neutral-700,
-  .dark .text-slate-900,
-  .dark .text-slate-800,
-  .dark .text-slate-700 { color: rgb(244 244 245); /* zinc-100 */ }
-
-  .dark .text-neutral-600,
-  .dark .text-slate-600 { color: rgb(212 212 216); /* zinc-300 */ }
-
-  .dark .text-neutral-500,
-  .dark .text-slate-500 { color: rgb(161 161 170); /* zinc-400 */ }
-
-  .dark .text-neutral-400,
-  .dark .text-slate-400 { color: rgb(113 113 122); /* zinc-500 */ }
+  ::-webkit-scrollbar-thumb { @apply bg-neutral-300; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-neutral-400; }
 }
 
 @layer utilities {
-  /* Mesh gradient helper — used on the patient hero banner */
+  /* Editorial black hero block (was a colour mesh gradient) */
   .mesh-gradient {
-    background:
-      radial-gradient(ellipse at 15% -10%, rgba(2, 132, 199, 0.80) 0px, transparent 52%),
-      radial-gradient(ellipse at 85%  0%,  rgba(13, 148, 136, 0.70) 0px, transparent 52%),
-      radial-gradient(ellipse at  0% 90%,  rgba(6, 182, 212, 0.30) 0px, transparent 40%),
-      radial-gradient(ellipse at 90% 85%,  rgba(16, 185, 129, 0.25) 0px, transparent 40%),
-      linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0d9488 100%);
+    background: #000000;
   }
 
-  /* Soft glass card */
+  /* Flat "card" — no glass blur, just white on a hairline border */
   .glass {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.45);
-  }
-  .dark .glass {
-    background: rgba(30, 41, 59, 0.80);
-    border-color: rgba(51, 65, 85, 0.6);
+    background: #ffffff;
+    border: 1px solid theme('colors.neutral.200');
   }
 
-  /* Floating card shadow */
-  .card-shadow {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  }
-  .dark .card-shadow {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.35), 0 4px 6px -4px rgba(0, 0, 0, 0.25);
-  }
+  /* Shadows removed for the flat Zara look — kept as no-ops so existing
+     class usages stay valid without re-touching every component. */
+  .card-shadow,
   .card-shadow-lg {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.07), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  }
-  .dark .card-shadow-lg {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
   }
 
-  /* Auth button shine sweep — light ray slides across on hover */
-  .btn-shine {
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-shine::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      105deg,
-      transparent 40%,
-      rgba(255, 255, 255, 0.13) 50%,
-      transparent 60%
-    );
-    transform: translateX(-100%);
-  }
-  .btn-shine:hover:not(:disabled)::after {
-    transform: translateX(100%);
-    transition: transform 0.45s ease;
-  }
+  /* Hover shine sweep neutralised (no coloured ray) */
+  .btn-shine { position: relative; overflow: hidden; }
 
-  /* Pharmacy section entrance */
   @keyframes fade-in-up {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -111,14 +54,8 @@
     animation: fade-in-up 0.25s ease-out both;
   }
 
-  /* Patient layout background — gradient in light, flat in dark */
+  /* Plain white app background (was a tinted gradient) */
   .patient-bg {
-    background:
-      radial-gradient(ellipse at 80% 0%, rgba(14,165,233,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse at 0% 100%, rgba(13,148,136,0.05) 0%, transparent 60%),
-      linear-gradient(180deg, #f0f9ff 0%, #f8fffe 50%, #fafffe 100%);
-  }
-  .dark .patient-bg {
-    background: #000000;
+    background: #ffffff;
   }
 }

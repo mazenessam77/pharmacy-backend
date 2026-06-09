@@ -84,17 +84,17 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Order Info */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-6 mb-4">
+      <div className="bg-white rounded-none border border-neutral-200 p-6 mb-4">
         <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-4 h-4 text-sky-500" />
+              <Pill className="w-4 h-4 text-neutral-900" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Medicines</p>
             </div>
             <ul className="space-y-1.5">
               {currentOrder.medicines.map((m, i) => (
                 <li key={i} className="flex items-center gap-2 text-[13px]">
-                  <span className="w-1.5 h-1.5 bg-sky-400 rounded-full shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-neutral-700 rounded-none shrink-0" />
                   <span className="font-medium">{m.name}</span>
                   <span className="text-neutral-400">×{m.quantity}</span>
                   <SaveOrderMedicineButton name={m.name} />
@@ -105,14 +105,14 @@ export default function OrderDetailPage() {
           <div className="space-y-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Truck className="w-3.5 h-3.5 text-cyan-500" />
+                <Truck className="w-3.5 h-3.5 text-neutral-900" />
                 <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Delivery</p>
               </div>
               <p className="text-[14px] capitalize pl-5 text-neutral-700">{currentOrder.deliveryType}</p>
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                <Calendar className="w-3.5 h-3.5 text-neutral-900" />
                 <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Date</p>
               </div>
               <p className="text-[13px] pl-5 text-neutral-700">{formatDateTime(currentOrder.createdAt)}</p>
@@ -122,7 +122,7 @@ export default function OrderDetailPage() {
         {currentOrder.notes && (
           <div className="mt-5 pt-5 border-t border-neutral-100">
             <div className="flex items-center gap-2 mb-2">
-              <StickyNote className="w-3.5 h-3.5 text-amber-500" />
+              <StickyNote className="w-3.5 h-3.5 text-neutral-900" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Notes</p>
             </div>
             <p className="text-[13px] text-neutral-600 pl-5">{currentOrder.notes}</p>
@@ -132,16 +132,16 @@ export default function OrderDetailPage() {
 
       {/* Accepted Pharmacy */}
       {pharmacyInfo && (
-        <div className="bg-white rounded-2xl border border-emerald-200 bg-emerald-50/30 p-6 mb-4">
+        <div className="bg-white rounded-none border border-neutral-200 bg-neutral-100/30 p-6 mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <Building2 className="w-4 h-4 text-emerald-600" />
-            <p className="text-[11px] uppercase tracking-widest text-emerald-700 font-medium">Assigned Pharmacy</p>
+            <Building2 className="w-4 h-4 text-neutral-900" />
+            <p className="text-[11px] uppercase tracking-widest text-neutral-900 font-medium">Assigned Pharmacy</p>
           </div>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[15px] font-semibold text-neutral-800">{pharmacyInfo.pharmacyName}</p>
               <div className="flex items-center gap-1 mt-1">
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <Star className="w-3.5 h-3.5 text-neutral-500 fill-neutral-900" />
                 <span className="text-[12px] text-neutral-500">{pharmacyInfo.rating?.toFixed(1)}</span>
               </div>
             </div>
@@ -159,7 +159,7 @@ export default function OrderDetailPage() {
       {responses.length > 0 && currentOrder.status !== 'cancelled' && (
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-4">
-            <Tag className="w-4 h-4 text-sky-500" />
+            <Tag className="w-4 h-4 text-neutral-900" />
             <p className="text-[13px] font-semibold text-neutral-800">
               Pharmacy Offers ({responses.length})
             </p>
@@ -171,8 +171,8 @@ export default function OrderDetailPage() {
               return (
                 <div
                   key={resp._id}
-                  className={`bg-white rounded-2xl border p-5 ${
-                    isAccepted ? 'border-emerald-200 bg-emerald-50/20' : 'border-neutral-200'
+                  className={`bg-white rounded-none border p-5 ${
+                    isAccepted ? 'border-neutral-200 bg-neutral-100/20' : 'border-neutral-200'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -189,7 +189,7 @@ export default function OrderDetailPage() {
                     </Badge>
                   </div>
 
-                  <div className="space-y-1.5 mb-4 bg-slate-50 rounded-xl p-3">
+                  <div className="space-y-1.5 mb-4 bg-neutral-50 rounded-none p-3">
                     {resp.availableMeds.map((med, i) => (
                       <div key={i} className="flex justify-between text-[13px]">
                         <span className={med.inStock ? 'text-neutral-700' : 'text-neutral-400'}>
@@ -217,7 +217,7 @@ export default function OrderDetailPage() {
                   <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
                     <div className="text-[13px] text-neutral-600">
                       Total:{' '}
-                      <span className="text-sky-700 font-semibold">{resp.totalPrice} EGP</span>
+                      <span className="text-neutral-900 font-semibold">{resp.totalPrice} EGP</span>
                       {resp.deliveryFee > 0 && (
                         <span className="text-neutral-400 text-[12px]"> + {resp.deliveryFee} EGP delivery</span>
                       )}
@@ -242,7 +242,7 @@ export default function OrderDetailPage() {
       {/* Cancel Action */}
       {canCancel && (
         <div className="pt-2">
-          <Button variant="outline" onClick={() => setCancelModal(true)} className="border-red-200 text-red-600 hover:bg-red-600 hover:border-red-600 hover:text-white">
+          <Button variant="outline" onClick={() => setCancelModal(true)} className="border-neutral-200 text-neutral-900 hover:bg-black hover:border-neutral-200 hover:text-white">
             <X className="w-3.5 h-3.5" />
             Cancel Order
           </Button>

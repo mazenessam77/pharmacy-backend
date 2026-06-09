@@ -139,19 +139,19 @@ export default function NewOrderPage() {
     <div className="max-w-2xl w-full">
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-1">Patient</p>
-        <h1 className="text-2xl font-semibold text-neutral-800 dark:text-zinc-100">Request Medicines</h1>
-        <p className="text-[13px] text-neutral-500 dark:text-zinc-400 mt-1">Fill in the details and pharmacies will send you offers.</p>
+        <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
+        <h1 className="text-2xl font-semibold text-neutral-800">Request Medicines</h1>
+        <p className="text-[13px] text-neutral-500 mt-1">Fill in the details and pharmacies will send you offers.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* Medicines */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
-              <Pill className="w-4 h-4 text-sky-600" />
+            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
+              <Pill className="w-4 h-4 text-neutral-900" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Medicines</p>
+            <p className="text-[13px] font-semibold text-neutral-800">Medicines</p>
           </div>
           <div className="space-y-3">
             {medicines.map((med, i) => (
@@ -181,7 +181,7 @@ export default function NewOrderPage() {
                   <button
                     type="button"
                     onClick={() => removeMedicine(i)}
-                    className="pb-3 text-red-300 hover:text-red-500 transition-colors"
+                    className="pb-3 text-neutral-500 hover:text-neutral-900 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -192,32 +192,32 @@ export default function NewOrderPage() {
           <button
             type="button"
             onClick={addMedicine}
-            className="mt-4 text-[12px] text-sky-600 hover:text-sky-800 transition-colors inline-flex items-center gap-1.5 font-medium"
+            className="mt-4 text-[12px] text-neutral-900 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-medium"
           >
             <Plus className="w-3.5 h-3.5" /> Add Medicine
           </button>
         </div>
 
         {/* Prescription Upload */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
-              <FileImage className="w-4 h-4 text-teal-600" />
+            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
+              <FileImage className="w-4 h-4 text-neutral-900" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Prescription <span className="text-neutral-400 dark:text-zinc-500 font-normal">(Optional)</span></p>
+            <p className="text-[13px] font-semibold text-neutral-800">Prescription <span className="text-neutral-400 font-normal">(Optional)</span></p>
           </div>
           {prescriptionId ? (
-            <div className="flex items-center gap-2 text-emerald-600">
+            <div className="flex items-center gap-2 text-neutral-900">
               <CheckCircle2 className="w-4 h-4" />
               <span className="text-[13px] font-medium">Prescription uploaded successfully</span>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-neutral-200 dark:border-zinc-700 rounded-xl p-5 text-center hover:border-sky-300 dark:hover:border-sky-700 transition-colors">
+            <div className="border-2 border-dashed border-neutral-200 rounded-none p-5 text-center hover:border-neutral-200 transition-colors">
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => setPrescriptionFile(e.target.files?.[0] || null)}
-                className="text-[12px] text-neutral-500 dark:text-zinc-400 w-full"
+                className="text-[12px] text-neutral-500 w-full"
               />
               {prescriptionFile && (
                 <Button
@@ -237,26 +237,26 @@ export default function NewOrderPage() {
         </div>
 
         {/* Governorate */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
+              <MapPin className="w-4 h-4 text-neutral-900" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Governorate</p>
+            <p className="text-[13px] font-semibold text-neutral-800">Governorate</p>
           </div>
           <select
             value={governorate}
             onChange={(e) => setGovernorate(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-zinc-800/50 border border-neutral-200 dark:border-zinc-700 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-700 focus:border-sky-400 dark:focus:border-sky-600 dark:bg-zinc-800/50 dark:text-zinc-100 transition-all"
+            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-neutral-300 focus:border-neutral-200 transition-all"
           >
             {EGYPTIAN_GOVERNORATES.map((g) => (
               <option key={g} value={g}>{g}</option>
             ))}
           </select>
-          <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-2">All pharmacies in this governorate will see your order</p>
+          <p className="text-[11px] text-neutral-400 mt-2">All pharmacies in this governorate will see your order</p>
 
           {/* Current location */}
-          <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-zinc-800">
+          <div className="mt-4 pt-4 border-t border-neutral-100">
 
             {/* Button */}
             {!location && (
@@ -264,7 +264,7 @@ export default function NewOrderPage() {
                 type="button"
                 onClick={handleGetLocation}
                 disabled={locating}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 text-[12px] font-semibold hover:bg-blue-100 active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-none border border-neutral-200 bg-neutral-100 text-neutral-900 text-[12px] font-semibold hover:bg-neutral-100 active:scale-[0.98] disabled:opacity-60 transition-all duration-200"
               >
                 <LocateFixed className={`w-3.5 h-3.5 ${locating ? 'animate-spin' : ''}`} />
                 {locating ? 'Detecting location...' : 'Use Current Location'}
@@ -273,43 +273,43 @@ export default function NewOrderPage() {
 
             {/* Loading state */}
             {locating && (
-              <p className="text-[11px] text-blue-500 mt-2">
+              <p className="text-[11px] text-neutral-900 mt-2">
                 Requesting location permission from your browser...
               </p>
             )}
 
             {/* Error state */}
             {locationError && (
-              <div className="mt-2 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2.5">
-                <MapPin className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
-                <p className="text-[12px] text-red-600">{locationError}</p>
+              <div className="mt-2 flex items-start gap-2 bg-neutral-100 border border-neutral-200 rounded-none px-3 py-2.5">
+                <MapPin className="w-3.5 h-3.5 text-neutral-500 shrink-0 mt-0.5" />
+                <p className="text-[12px] text-neutral-900">{locationError}</p>
               </div>
             )}
 
             {/* Success — structured location object */}
             {location && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3">
+              <div className="bg-neutral-100 border border-neutral-200 rounded-none px-4 py-3">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 text-emerald-700">
+                  <div className="flex items-center gap-2 text-neutral-900">
                     <LocateFixed className="w-3.5 h-3.5" />
                     <span className="text-[12px] font-semibold">Location Detected</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => { setLocation(null); setLocationError(null); }}
-                    className="text-[11px] text-neutral-400 dark:text-zinc-500 hover:text-red-500 transition-colors"
+                    className="text-[11px] text-neutral-400 hover:text-neutral-900 transition-colors"
                   >
                     Remove
                   </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white rounded-lg px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-0.5">Latitude</p>
-                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-zinc-100">{location.lat.toFixed(6)}</p>
+                  <div className="bg-white rounded-none px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">Latitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800">{location.lat.toFixed(6)}</p>
                   </div>
-                  <div className="bg-white rounded-lg px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-0.5">Longitude</p>
-                    <p className="text-[13px] font-mono font-semibold text-neutral-800 dark:text-zinc-100">{location.lng.toFixed(6)}</p>
+                  <div className="bg-white rounded-none px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-0.5">Longitude</p>
+                    <p className="text-[13px] font-mono font-semibold text-neutral-800">{location.lng.toFixed(6)}</p>
                   </div>
                 </div>
               </div>
@@ -319,12 +319,12 @@ export default function NewOrderPage() {
         </div>
 
         {/* Delivery Type */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center">
-              <Truck className="w-4 h-4 text-cyan-600" />
+            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
+              <Truck className="w-4 h-4 text-neutral-900" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Delivery Method</p>
+            <p className="text-[13px] font-semibold text-neutral-800">Delivery Method</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {(['delivery', 'pickup'] as const).map((type) => (
@@ -332,10 +332,10 @@ export default function NewOrderPage() {
                 key={type}
                 type="button"
                 onClick={() => setDeliveryType(type)}
-                className={`py-3 rounded-xl text-[12px] font-medium uppercase tracking-wide transition-all duration-200 ${
+                className={`py-3 rounded-none text-[12px] font-medium uppercase tracking-wide transition-all duration-200 ${
                   deliveryType === type
-                    ? 'bg-sky-600 text-white shadow-sm shadow-sky-200'
-                    : 'bg-slate-50 text-neutral-500 dark:text-zinc-400 hover:bg-sky-50 hover:text-sky-600 border border-neutral-200'
+                    ? 'bg-black text-white  '
+                    : 'bg-neutral-50 text-neutral-500  hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200'
                 }`}
               >
                 {type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
@@ -345,34 +345,34 @@ export default function NewOrderPage() {
         </div>
 
         {/* Payment Method */}
-        <div id="payment-section" className={`bg-white dark:bg-zinc-900 rounded-2xl border p-6 transition-colors duration-200 ${paymentMethod === null ? 'border-neutral-200 dark:border-zinc-800' : 'border-emerald-200 dark:border-emerald-800'}`}>
+        <div id="payment-section" className={`bg-white  rounded-none border p-6 transition-colors duration-200 ${paymentMethod === null ? 'border-neutral-200 ' : 'border-neutral-200 '}`}>
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors duration-200 ${paymentMethod ? 'bg-emerald-100' : 'bg-neutral-100'}`}>
-                <Banknote className={`w-4 h-4 transition-colors duration-200 ${paymentMethod ? 'text-emerald-600' : 'text-neutral-400 dark:text-zinc-500'}`} />
+              <div className={`w-8 h-8 rounded-none flex items-center justify-center transition-colors duration-200 ${paymentMethod ? 'bg-neutral-100' : 'bg-neutral-100'}`}>
+                <Banknote className={`w-4 h-4 transition-colors duration-200 ${paymentMethod ? 'text-neutral-900' : 'text-neutral-400 '}`} />
               </div>
-              <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Payment Method</p>
+              <p className="text-[13px] font-semibold text-neutral-800">Payment Method</p>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-red-400">Required</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Required</span>
           </div>
-          <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
+          <p className="text-[11px] text-neutral-400 mb-4 ml-10">Choose how you'll pay the pharmacy</p>
 
           <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
             {/* Cash */}
             <button
               type="button"
               onClick={() => setPaymentMethod('cash')}
-              className={`relative group flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+              className={`relative group flex flex-col items-start gap-3 p-4 rounded-none border-2 transition-all duration-200 text-left ${
                 paymentMethod === 'cash'
-                  ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100'
-                  : 'border-neutral-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/40'
+                  ? 'border-neutral-200 bg-neutral-100  '
+                  : 'border-neutral-200 bg-neutral-50 hover:border-neutral-200 hover:bg-neutral-100/40'
               }`}
             >
               {/* Selected check */}
-              <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+              <div className={`absolute top-3 right-3 w-5 h-5 rounded-none border-2 flex items-center justify-center transition-all duration-200 ${
                 paymentMethod === 'cash'
-                  ? 'bg-emerald-500 border-emerald-500'
-                  : 'border-neutral-300 bg-white group-hover:border-emerald-300'
+                  ? 'bg-black border-neutral-200'
+                  : 'border-neutral-300 bg-white group-hover:border-neutral-200'
               }`}>
                 {paymentMethod === 'cash' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -381,15 +381,15 @@ export default function NewOrderPage() {
                 )}
               </div>
 
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
-                paymentMethod === 'cash' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
+              <div className={`w-10 h-10 rounded-none flex items-center justify-center transition-colors duration-200 ${
+                paymentMethod === 'cash' ? 'bg-black' : 'bg-neutral-200 group-hover:bg-neutral-100'
               }`}>
-                <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500 dark:text-zinc-400 group-hover:text-emerald-600'}`} />
+                <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500  group-hover:text-neutral-900'}`} />
               </div>
 
               <div>
-                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-emerald-700' : 'text-neutral-700'}`}>Cash</p>
-                <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-0.5 leading-snug">Pay in cash when you receive your order</p>
+                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-neutral-900' : 'text-neutral-700'}`}>Cash</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5 leading-snug">Pay in cash when you receive your order</p>
               </div>
             </button>
 
@@ -397,17 +397,17 @@ export default function NewOrderPage() {
             <button
               type="button"
               onClick={() => setPaymentMethod('instapay')}
-              className={`relative group flex flex-col items-start gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+              className={`relative group flex flex-col items-start gap-3 p-4 rounded-none border-2 transition-all duration-200 text-left ${
                 paymentMethod === 'instapay'
-                  ? 'border-emerald-500 bg-emerald-50 shadow-md shadow-emerald-100'
-                  : 'border-neutral-200 bg-slate-50 hover:border-emerald-300 hover:bg-emerald-50/40'
+                  ? 'border-neutral-200 bg-neutral-100  '
+                  : 'border-neutral-200 bg-neutral-50 hover:border-neutral-200 hover:bg-neutral-100/40'
               }`}
             >
               {/* Selected check */}
-              <div className={`absolute top-3 right-3 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+              <div className={`absolute top-3 right-3 w-5 h-5 rounded-none border-2 flex items-center justify-center transition-all duration-200 ${
                 paymentMethod === 'instapay'
-                  ? 'bg-emerald-500 border-emerald-500'
-                  : 'border-neutral-300 bg-white group-hover:border-emerald-300'
+                  ? 'bg-black border-neutral-200'
+                  : 'border-neutral-300 bg-white group-hover:border-neutral-200'
               }`}>
                 {paymentMethod === 'instapay' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -416,35 +416,35 @@ export default function NewOrderPage() {
                 )}
               </div>
 
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-200 ${
-                paymentMethod === 'instapay' ? 'bg-emerald-500' : 'bg-neutral-200 group-hover:bg-emerald-100'
+              <div className={`w-10 h-10 rounded-none flex items-center justify-center transition-colors duration-200 ${
+                paymentMethod === 'instapay' ? 'bg-black' : 'bg-neutral-200 group-hover:bg-neutral-100'
               }`}>
-                <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500 dark:text-zinc-400 group-hover:text-emerald-600'}`} />
+                <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500  group-hover:text-neutral-900'}`} />
               </div>
 
               <div>
-                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-emerald-700' : 'text-neutral-700'}`}>InstaPay</p>
-                <p className="text-[11px] text-neutral-400 dark:text-zinc-500 mt-0.5 leading-snug">Pay instantly via your mobile wallet</p>
+                <p className={`text-[13px] font-bold transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-neutral-900' : 'text-neutral-700'}`}>InstaPay</p>
+                <p className="text-[11px] text-neutral-400 mt-0.5 leading-snug">Pay instantly via your mobile wallet</p>
               </div>
             </button>
           </div>
 
           {/* InstaPay note */}
           {paymentMethod === 'instapay' && (
-            <div className="mt-4 flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5 animate-fade-in-up">
-              <Smartphone className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
-              <p className="text-[11px] text-blue-600">Payment instructions will be sent after you confirm a pharmacy offer.</p>
+            <div className="mt-4 flex items-start gap-2 bg-neutral-100 border border-neutral-200 rounded-none px-3 py-2.5 animate-fade-in-up">
+              <Smartphone className="w-3.5 h-3.5 text-neutral-900 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-neutral-900">Payment instructions will be sent after you confirm a pharmacy offer.</p>
             </div>
           )}
         </div>
 
         {/* Notes */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-4 sm:p-6">
+        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-              <StickyNote className="w-4 h-4 text-amber-600" />
+            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
+              <StickyNote className="w-4 h-4 text-neutral-900" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800 dark:text-zinc-100">Notes <span className="text-neutral-400 dark:text-zinc-500 font-normal">(Optional)</span></p>
+            <p className="text-[13px] font-semibold text-neutral-800">Notes <span className="text-neutral-400 font-normal">(Optional)</span></p>
           </div>
           <Textarea
             placeholder="Any special instructions for the pharmacy..."
@@ -456,7 +456,7 @@ export default function NewOrderPage() {
 
         {/* Submit */}
         {!paymentMethod && (
-          <p className="text-center text-[11px] text-amber-500 font-medium flex items-center justify-center gap-1.5 animate-fade-in-up">
+          <p className="text-center text-[11px] text-neutral-900 font-medium flex items-center justify-center gap-1.5 animate-fade-in-up">
             <Banknote className="w-3.5 h-3.5" />
             Select a payment method above to continue
           </p>
@@ -466,7 +466,7 @@ export default function NewOrderPage() {
           variant="indigo"
           isLoading={isLoading}
           disabled={!paymentMethod}
-          className="w-full rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
           size="lg"
         >
           Submit Medicine Request

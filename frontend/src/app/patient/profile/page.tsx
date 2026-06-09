@@ -40,21 +40,21 @@ export default function PatientProfilePage() {
       </div>
 
       {/* Avatar banner */}
-      <div className="bg-gradient-to-br from-sky-600 to-teal-500 rounded-2xl p-6 mb-6 text-white flex items-center gap-5 shadow-lg shadow-sky-100">
-        <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold shrink-0">
+      <div className="rounded-none p-6 mb-6 text-white flex items-center gap-5">
+        <div className="w-16 h-16 bg-white/20 rounded-none flex items-center justify-center text-2xl font-bold shrink-0">
           {initials}
         </div>
         <div>
           <p className="text-lg font-semibold">{user?.name || 'Patient'}</p>
-          <p className="text-sky-200 text-[13px]">{user?.email}</p>
-          <span className="inline-block mt-1.5 px-2.5 py-0.5 bg-white/20 rounded-full text-[10px] uppercase tracking-widest">
+          <p className="text-neutral-400 text-[13px]">{user?.email}</p>
+          <span className="inline-block mt-1.5 px-2.5 py-0.5 bg-white/20 rounded-none text-[10px] uppercase tracking-widest">
             Patient
           </span>
         </div>
       </div>
 
       {/* Form card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 p-6">
+      <div className="bg-white rounded-none border border-neutral-200 p-6">
         <form onSubmit={handleSubmit} className="space-y-5">
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
           <Input label="Email" value={user?.email || ''} disabled className="text-neutral-400" />
@@ -62,7 +62,7 @@ export default function PatientProfilePage() {
           <Input label="Address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street, City" />
 
           <div className="pt-2">
-            <Button type="submit" variant="indigo" isLoading={saving} size="lg" className="w-full rounded-xl">
+            <Button type="submit" variant="indigo" isLoading={saving} size="lg" className="w-full rounded-none">
               Save Changes
             </Button>
           </div>

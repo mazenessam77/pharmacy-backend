@@ -53,10 +53,10 @@ export default function SaveMedicationButton({
         onClick={handleClick}
         disabled={busy}
         aria-pressed={saved}
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[12px] font-semibold transition-all duration-200 active:scale-95 disabled:opacity-50 ${
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-none text-[12px] font-semibold transition-all duration-200 active:scale-95 disabled:opacity-50 ${
           saved
-            ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300'
-            : 'bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 dark:bg-zinc-800 dark:text-zinc-300'
+            ? 'bg-neutral-100 text-neutral-900  '
+            : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900  '
         } ${className}`}
       >
         {heart}
@@ -73,10 +73,10 @@ export default function SaveMedicationButton({
       aria-pressed={saved}
       aria-label={saved ? 'Remove from saved medications' : 'Save medication'}
       title={saved ? 'Remove from saved' : 'Save medication'}
-      className={`inline-flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 active:scale-90 disabled:opacity-50 ${
+      className={`inline-flex items-center justify-center w-9 h-9 rounded-none transition-all duration-200 active:scale-90 disabled:opacity-50 ${
         saved
-          ? 'bg-rose-50 text-rose-500 dark:bg-rose-950/40 dark:text-rose-300'
-          : 'bg-neutral-100 text-neutral-400 hover:text-rose-500 hover:bg-rose-50 dark:bg-zinc-800 dark:text-zinc-500'
+          ? 'bg-neutral-100 text-neutral-900  '
+          : 'bg-neutral-100 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100  '
       } ${className}`}
     >
       {heart}

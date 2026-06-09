@@ -77,9 +77,9 @@ export default function LoginPage() {
 
       {/* Inline error banner */}
       {loginError && (
-        <div className="flex items-start gap-3 border-l-2 border-red-500 bg-red-50 pl-4 py-2.5 mb-6">
-          <AlertCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-red-600 font-medium">{loginError}</p>
+        <div className="flex items-start gap-3 border-l-2 border-neutral-200 bg-neutral-100 pl-4 py-2.5 mb-6">
+          <AlertCircle className="w-3.5 h-3.5 text-neutral-900 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-neutral-900 font-medium">{loginError}</p>
         </div>
       )}
 

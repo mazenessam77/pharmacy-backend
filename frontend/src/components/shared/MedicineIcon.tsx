@@ -229,7 +229,7 @@ export default function MedicineIcon({ name, size = 'md' }: MedicineIconProps) {
 
   return (
     <div
-      className="rounded-2xl flex items-center justify-center shrink-0 select-none"
+      className="rounded-none flex items-center justify-center shrink-0 select-none"
       style={{
         width: container, height: container,
         backgroundColor: rule.bg,
