@@ -1,8 +1,10 @@
-name: CD (legacy EC2 — manual only)
+name: CD — Deploy to Production (pharmcy.site)
 
-# Superseded by deploy-ecs.yml. Manual-only so it does NOT double-deploy
-# alongside the ECS pipeline on push to main. Kept for EC2 deploys / rollback.
+# Auto-deploys the Docker Compose stack to the EC2 box over SSH on push to
+# main (and manual dispatch). Serves https://pharmcy.site.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -37,6 +39,7 @@ jobs:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USER }}
           key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          command_timeout: 40m # the --no-cache build on the 2GB ARM box is slow
           script: |
             set -e
             cd /opt/pharma-app
@@ -53,14 +56,14 @@ jobs:
             mkdir -p nginx/certbot/www
 
             # ── SSL: Issue cert if it doesn't exist yet ───────────────
-            if [ ! -f /etc/letsencrypt/live/mymedcine.duckdns.org/fullchain.pem ]; then
+            if [ ! -f /etc/letsencrypt/live/pharmcy.site/fullchain.pem ]; then
               echo "No cert found — obtaining Let's Encrypt cert..."
               docker stop pharma-nginx 2>/dev/null || true
               sudo certbot certonly --standalone \
-                -d mymedcine.duckdns.org \
+                -d pharmcy.site \
                 --agree-tos \
                 --non-interactive \
-                -m admin@mymedcine.duckdns.org
+                -m shananmazen99@gmail.com
               echo "Cert obtained successfully"
             fi
 
@@ -122,7 +125,7 @@ jobs:
 
           for i in {1..12}; do
             STATUS=$(curl -sk -o /dev/null -w "%{http_code}" \
-              https://mymedcine.duckdns.org/api/health || echo "000")
+              https://pharmcy.site/api/health || echo "000")
 
             if [ "$STATUS" = "200" ]; then
               echo "✓ Production healthy (HTTP $STATUS)"
