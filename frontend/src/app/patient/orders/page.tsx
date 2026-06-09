@@ -44,8 +44,8 @@ export default function PatientOrdersPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-neutral-400 dark:text-zinc-500 mb-1">Patient</p>
-          <h1 className="text-2xl font-semibold text-neutral-800 dark:text-zinc-100">My Orders</h1>
+          <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
+          <h1 className="text-2xl font-semibold text-neutral-800">My Orders</h1>
         </div>
         <Link href="/patient/orders/new">
           <Button variant="indigo" size="sm">
@@ -61,10 +61,10 @@ export default function PatientOrdersPage() {
           <button
             key={f.value}
             onClick={() => setStatusFilter(f.value)}
-            className={`px-4 py-1.5 text-[11px] rounded-full font-medium transition-all duration-200 ${
+            className={`px-4 py-1.5 text-[11px] rounded-none font-medium transition-all duration-200 ${
               statusFilter === f.value
-                ? 'bg-sky-600 text-white shadow-sm shadow-sky-200 dark:shadow-sky-900'
-                : 'bg-white dark:bg-zinc-900 text-neutral-500 dark:text-zinc-400 border border-neutral-200 dark:border-zinc-800 hover:border-sky-300 dark:hover:border-sky-700 hover:text-sky-600 dark:hover:text-sky-400'
+                ? 'bg-black text-white   '
+                : 'bg-white  text-neutral-500  border border-neutral-200  hover:border-neutral-200  hover:text-neutral-900 '
             }`}
           >
             {f.label}
@@ -76,11 +76,11 @@ export default function PatientOrdersPage() {
       {isLoading ? (
         <ListSkeleton count={5} />
       ) : orders.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-neutral-200 dark:border-zinc-800 py-16 text-center">
-          <div className="w-14 h-14 bg-sky-50 dark:bg-sky-950/40 rounded-full flex items-center justify-center mx-auto mb-3">
-            <ShoppingBag className="w-7 h-7 text-sky-300 dark:text-sky-500" />
+        <div className="bg-white rounded-none border border-neutral-200 py-16 text-center">
+          <div className="w-14 h-14 bg-neutral-100 rounded-none flex items-center justify-center mx-auto mb-3">
+            <ShoppingBag className="w-7 h-7 text-neutral-500" />
           </div>
-          <p className="text-[13px] text-neutral-500 dark:text-zinc-400 mb-4">No orders found</p>
+          <p className="text-[13px] text-neutral-500 mb-4">No orders found</p>
           <Link href="/patient/orders/new">
             <Button variant="indigo" size="sm">Create Your First Order</Button>
           </Link>
@@ -94,31 +94,31 @@ export default function PatientOrdersPage() {
               <Link
                 key={order._id}
                 href={`/patient/orders/${order._id}`}
-                className={`flex items-center gap-4 bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-xl p-4 hover:shadow-md hover:shadow-neutral-100 dark:hover:shadow-black/20 transition-all duration-200 group`}
+                className={`flex items-center gap-4 bg-white  border border-neutral-200  border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-none p-4 hover: hover:shadow-neutral-100  transition-all duration-200 group`}
               >
                 <MedicineIcon name={firstName} size="md" />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] text-neutral-400 dark:text-zinc-500 uppercase tracking-widest">
+                    <p className="text-[10px] text-neutral-400 uppercase tracking-widest">
                       #{order._id.slice(-8)}
                     </p>
                     <Badge variant={statusVariant(order.status)}>
                       {statusLabel(order.status)}
                     </Badge>
                   </div>
-                  <p className="text-[13px] font-medium text-neutral-800 dark:text-zinc-100 truncate">
+                  <p className="text-[13px] font-medium text-neutral-800 truncate">
                     {order.medicines.map((m) => `${m.name} ×${m.quantity}`).join(', ')}
                   </p>
                   <div className="flex items-center justify-between mt-1">
-                    <p className="text-[11px] text-neutral-400 dark:text-zinc-500">
+                    <p className="text-[11px] text-neutral-400">
                       {order.deliveryType === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
                     </p>
-                    <p className="text-[11px] text-neutral-400 dark:text-zinc-500">{formatDate(order.createdAt)}</p>
+                    <p className="text-[11px] text-neutral-400">{formatDate(order.createdAt)}</p>
                   </div>
                 </div>
                 <ChevronRight
-                  className="w-4 h-4 text-neutral-300 dark:text-zinc-500 shrink-0 transition-colors"
+                  className="w-4 h-4 text-neutral-300 shrink-0 transition-colors"
                   style={{ color: undefined }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = accent)}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '')}
@@ -136,10 +136,10 @@ export default function PatientOrdersPage() {
             <button
               key={i}
               onClick={() => fetchOrders({ page: i + 1, status: statusFilter || undefined })}
-              className={`w-9 h-9 text-[12px] rounded-lg font-medium transition-colors ${
+              className={`w-9 h-9 text-[12px] rounded-none font-medium transition-colors ${
                 pagination.page === i + 1
-                  ? 'bg-sky-600 text-white shadow-sm'
-                  : 'bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 text-neutral-600 dark:text-zinc-400 hover:border-sky-300 dark:hover:border-sky-700'
+                  ? 'bg-black text-white '
+                  : 'bg-white  border border-neutral-200  text-neutral-600  hover:border-neutral-200 '
               }`}
             >
               {i + 1}

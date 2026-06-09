@@ -32,15 +32,15 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[12px] font-medium transition-all duration-200 ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-none text-[12px] font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-sky-600 text-white shadow-lg shadow-sky-200/60 dark:shadow-sky-950/60'
-                  : 'text-slate-500 dark:text-zinc-400 hover:bg-white/80 dark:hover:bg-zinc-800/60 hover:text-sky-700 dark:hover:text-sky-300 hover:shadow-sm'
+                  ? 'bg-black text-white   '
+                  : 'text-neutral-500  hover:bg-white/80  hover:text-neutral-900  hover:'
               }`}
             >
               <link.icon className="w-4 h-4 shrink-0" />
               {link.label}
-              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/70" />}
+              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-none bg-white/70" />}
             </Link>
           );
         }
@@ -52,8 +52,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
             onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2.5 text-[11px] uppercase tracking-widest transition-all duration-200 ${
               isActive
-                ? 'bg-black dark:bg-sky-600 text-white'
-                : 'text-neutral-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-zinc-800'
+                ? 'bg-black  text-white'
+                : 'text-neutral-500  hover:text-black  hover:bg-neutral-50 '
             }`}
           >
             <link.icon className="w-4 h-4 shrink-0" />
@@ -70,8 +70,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
       <aside
         className={`hidden md:block w-60 min-h-[calc(100vh-3.5rem)] py-6 px-3 shrink-0 transition-colors duration-200 ${
           isIndigo
-            ? 'glass border-r border-white/40 dark:border-zinc-800/60'
-            : 'bg-white dark:bg-zinc-950 border-r border-neutral-200 dark:border-zinc-800'
+            ? 'glass border-r border-white/40 '
+            : 'bg-white  border-r border-neutral-200 '
         }`}
       >
         {navContent}
@@ -87,20 +87,20 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
 
       {/* ── Mobile drawer ─────────────────────────────────────────── */}
       <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-72 z-50 flex flex-col py-6 px-3 shadow-2xl transition-transform duration-300 ease-out ${
+        className={`md:hidden fixed top-0 left-0 h-full w-72 z-50 flex flex-col py-6 px-3  transition-transform duration-300 ease-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } ${
           isIndigo
-            ? 'bg-white dark:bg-zinc-950 border-r border-sky-100 dark:border-zinc-800'
-            : 'bg-white dark:bg-zinc-950 border-r border-neutral-200 dark:border-zinc-800'
+            ? 'bg-white  border-r border-neutral-200 '
+            : 'bg-white  border-r border-neutral-200 '
         }`}
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between mb-6 px-1.5">
-          <span className="text-[13px] font-bold text-slate-800 dark:text-zinc-100 tracking-tight">PharmaLink</span>
+          <span className="text-[13px] font-bold text-neutral-800 tracking-tight">PharmaLink</span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-neutral-400 dark:text-zinc-500 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-1.5 rounded-none text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

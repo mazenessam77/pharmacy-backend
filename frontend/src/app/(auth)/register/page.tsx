@@ -97,7 +97,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Role Selector — sliding pill */}
-      <div className="relative flex bg-neutral-100 rounded-xl overflow-hidden mb-8">
+      <div className="relative flex bg-neutral-100 rounded-none overflow-hidden mb-8">
         {/* sliding black indicator */}
         <div
           className={`absolute inset-y-0 w-1/2 bg-black transition-transform duration-300 ease-out ${
@@ -210,7 +210,7 @@ export default function RegisterPage() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-black scale-x-0 peer-focus:scale-x-100 transition-transform duration-300 origin-left" />
               </div>
               {(errors as any).governorate && (
-                <p className="mt-1.5 text-[11px] text-red-500 font-medium">
+                <p className="mt-1.5 text-[11px] text-neutral-900 font-medium">
                   {(errors as any).governorate.message}
                 </p>
               )}

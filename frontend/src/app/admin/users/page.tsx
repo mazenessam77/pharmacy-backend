@@ -133,7 +133,7 @@ export default function AdminUsersPage() {
                     </button>
                     <button
                       onClick={() => handleDelete(u._id, u.name)}
-                      className="text-neutral-400 hover:text-red-600 transition-colors"
+                      className="text-neutral-400 hover:text-neutral-900 transition-colors"
                       title="Delete user"
                     >
                       <Trash2 className="w-4 h-4" />

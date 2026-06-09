@@ -179,7 +179,7 @@ export default function AdminPharmaciesPage() {
               <div className="col-span-2 text-right">
                 <button
                   onClick={() => handleDelete(pharmacy._id, pharmacy.pharmacyName)}
-                  className="text-neutral-400 hover:text-red-600 transition-colors"
+                  className="text-neutral-400 hover:text-neutral-900 transition-colors"
                   title="Delete pharmacy"
                 >
                   <Trash2 className="w-4 h-4" />
