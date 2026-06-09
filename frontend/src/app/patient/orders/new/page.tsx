@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOrderStore } from '@/store/orderStore';
+import { useRequestDraftStore } from '@/store/requestDraftStore';
 import { prescriptionService } from '@/lib/services/prescriptionService';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -31,6 +32,18 @@ export default function NewOrderPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  // If we arrived here from "Order Basket", pre-fill the medicine rows from the
+  // draft (consumed once). The patient can then tweak quantities / remove rows
+  // before submitting — no order is created until they hit submit.
+  const consumeDraft = useRequestDraftStore((s) => s.consume);
+  useEffect(() => {
+    const draft = consumeDraft();
+    if (draft && draft.length > 0) {
+      setMedicines(draft.map((d) => ({ name: d.name, quantity: d.quantity || 1 })));
+      toast.success('Basket loaded — review and submit your request');
+    }
+  }, [consumeDraft]);
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
