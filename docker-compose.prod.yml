@@ -2,7 +2,11 @@ version: '3.8'
 
 services:
   mongodb:
-    ports: []
+    # Published ONLY on the EC2 private VPC interface (never 0.0.0.0) so the
+    # prescription-processor Lambda can reach it over the VPC. Ingress on
+    # 27017 is gated by the security group (source = the Lambda's SG only).
+    ports:
+      - "10.0.1.222:27017:27017"
     deploy:
       resources:
         limits:
