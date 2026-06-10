@@ -109,8 +109,12 @@ export interface IPrescription {
   // Async pipeline (presigned S3 upload → SQS → Lambda). Absent on legacy
   // Cloudinary-uploaded prescriptions.
   s3Key?: string;
-  status?: 'UPLOADED' | 'PROCESSED';
+  status?: 'UPLOADED' | 'QUEUED' | 'PROCESSING' | 'PROCESSED' | 'FAILED' | 'REVIEW_REQUIRED';
+  queuedAt?: Date;
+  processingStartedAt?: Date;
   processedAt?: Date;
+  failedAt?: Date;
+  errorDetails?: string;
   processingNotes?: string;
   createdAt: Date;
 }

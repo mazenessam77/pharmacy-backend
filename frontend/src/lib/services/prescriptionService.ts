@@ -1,5 +1,6 @@
 import axios from 'axios';
 import api from '@/lib/api';
+import { Prescription, PaginatedResponse } from '@/types';
 
 export const prescriptionService = {
   /**
@@ -37,10 +38,14 @@ export const prescriptionService = {
   },
 
   getAll: (params?: { page?: number; limit?: number }) =>
-    api.get('/prescriptions', { params }),
+    api.get<PaginatedResponse<Prescription>>('/prescriptions', { params }),
 
   getById: (id: string) =>
-    api.get(`/prescriptions/${id}`),
+    api.get<{ success: boolean; data: Prescription }>(`/prescriptions/${id}`),
+
+  /** Re-queue a FAILED prescription (same S3 object, no re-upload). */
+  resubmit: (id: string) =>
+    api.post<{ success: boolean; data: { prescription: Prescription } }>(`/prescriptions/${id}/resubmit`),
 
   verify: (id: string, extractedMeds?: { name: string; confidence: number }[]) =>
     api.put(`/prescriptions/${id}/verify`, { extractedMeds }),
