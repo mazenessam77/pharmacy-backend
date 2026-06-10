@@ -1,0 +1,20 @@
+{
+  "name": "prescription-processor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SQS-triggered Lambda that marks uploaded prescriptions as PROCESSED in MongoDB",
+  "main": "dist/handler.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "package": "npm run build && cd dist && zip -r ../function.zip . && cd .. && zip -r function.zip node_modules"
+  },
+  "dependencies": {
+    "mongodb": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.140",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.0"
+  }
+}
