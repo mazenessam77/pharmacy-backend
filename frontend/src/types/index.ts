@@ -185,6 +185,11 @@ export interface Prescription {
   extractedMeds?: { name: string; confidence: number }[];
   isVerified: boolean;
   doctorName?: string;
+  // Async pipeline (S3 upload → background processing)
+  s3Key?: string;
+  status?: 'UPLOADED' | 'PROCESSED';
+  processedAt?: string;
+  processingNotes?: string;
   createdAt: string;
   updatedAt: string;
 }

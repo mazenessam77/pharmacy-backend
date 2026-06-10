@@ -4,8 +4,91 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { uploadToCloudinary } from '../services/upload.service';
 import { processPrescriptionImage, processImageFromUrl } from '../services/ocr.service';
+import {
+  presignPrescriptionUpload,
+  prescriptionObjectExists,
+  presignPrescriptionView,
+  enqueuePrescriptionProcessing,
+} from '../services/rxPipeline.service';
 import { getPagination } from '../utils/helpers';
 import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+
+/**
+ * POST /api/prescriptions/presign
+ * Step 1 of the async upload: hand the browser a short-lived S3 PUT URL.
+ * The key is server-generated under prescriptions/<patientId>/ — the client
+ * never chooses where it writes.
+ */
+export const presignUpload = asyncHandler(async (req: Request, res: Response) => {
+  const { contentType } = req.body;
+  const { uploadUrl, s3Key } = await presignPrescriptionUpload(
+    String(req.user!._id),
+    String(contentType)
+  );
+  res.json({ success: true, data: { uploadUrl, s3Key } });
+});
+
+/**
+ * POST /api/prescriptions/complete
+ * Step 2: after the browser PUT succeeds, create the Prescription document
+ * (status UPLOADED) and enqueue the processing job for the Lambda consumer.
+ */
+export const completeUpload = asyncHandler(async (req: Request, res: Response) => {
+  const patientId = String(req.user!._id);
+  const s3Key = String(req.body.s3Key);
+  const notes = req.body.notes === undefined ? undefined : String(req.body.notes);
+
+  // Ownership: a patient can only register keys under their own prefix.
+  if (!s3Key.startsWith(`prescriptions/${patientId}/`)) {
+    throw new AppError('Invalid s3Key.', 403, ERROR_CODES.FORBIDDEN);
+  }
+
+  // The object must actually exist (the browser really finished its PUT).
+  if (!(await prescriptionObjectExists(s3Key))) {
+    throw new AppError('Upload not found — PUT the file first.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
+  }
+
+  const prescription = await Prescription.create({
+    patientId: req.user!._id,
+    imageUrl: `s3://${s3Key}`, // private object; viewing goes through /:id/image
+    s3Key,
+    status: 'UPLOADED',
+    extractedText: '',
+    extractedMeds: [],
+  });
+
+  try {
+    await enqueuePrescriptionProcessing({ patientId, s3Key, notes });
+  } catch (err) {
+    // Without the queue message the doc would sit UPLOADED forever — undo and
+    // let the client retry the whole complete step.
+    await Prescription.deleteOne({ _id: prescription._id });
+    throw new AppError('Could not queue prescription for processing — please retry.', 503, ERROR_CODES.VALIDATION_ERROR);
+  }
+
+  res.status(201).json({ success: true, data: { prescription } });
+});
+
+/**
+ * GET /api/prescriptions/:id/image
+ * Redirect to a short-lived presigned GET for the private S3 object
+ * (legacy Cloudinary prescriptions redirect to their stored URL).
+ */
+export const getPrescriptionImage = asyncHandler(async (req: Request, res: Response) => {
+  const prescription = await Prescription.findOne({
+    _id: String(req.params.id),
+    patientId: req.user!._id,
+  });
+
+  if (!prescription) {
+    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
+  }
+
+  const url = prescription.s3Key
+    ? await presignPrescriptionView(prescription.s3Key)
+    : prescription.imageUrl;
+  res.redirect(url);
+});
 
 export const uploadPrescription = asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) {

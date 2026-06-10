@@ -106,6 +106,12 @@ export interface IPrescription {
   }[];
   isVerified: boolean;
   doctorName?: string;
+  // Async pipeline (presigned S3 upload → SQS → Lambda). Absent on legacy
+  // Cloudinary-uploaded prescriptions.
+  s3Key?: string;
+  status?: 'UPLOADED' | 'PROCESSED';
+  processedAt?: Date;
+  processingNotes?: string;
   createdAt: Date;
 }
 

@@ -16,10 +16,18 @@ const prescriptionSchema = new Schema<PrescriptionDocument>(
     ],
     isVerified: { type: Boolean, default: false },
     doctorName: { type: String },
+    // Async pipeline fields (absent on legacy Cloudinary uploads).
+    s3Key: { type: String },
+    status: { type: String, enum: ['UPLOADED', 'PROCESSED'] },
+    processedAt: { type: Date },
+    processingNotes: { type: String, maxlength: 500 },
   },
   { timestamps: true }
 );
 
 prescriptionSchema.index({ patientId: 1, createdAt: -1 });
+// The Lambda consumer resolves documents by s3Key; sparse because legacy
+// (Cloudinary) prescriptions don't have one.
+prescriptionSchema.index({ s3Key: 1 }, { sparse: true });
 
 export const Prescription = mongoose.model<PrescriptionDocument>('Prescription', prescriptionSchema);
