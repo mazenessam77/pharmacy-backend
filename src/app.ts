@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
 
 import { env } from './config/env';
 import { generalLimiter } from './middleware/rateLimiter';
@@ -35,7 +34,8 @@ app.set('trust proxy', 1);
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+// NB: no cookie-parser on purpose — auth is header-only Bearer tokens, so no
+// ambient credentials exist and CSRF protection isn't required.
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(helmet());
 app.use(generalLimiter);

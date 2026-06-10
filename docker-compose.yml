@@ -60,6 +60,11 @@ services:
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       GROQ_API_KEY: ${GROQ_API_KEY}
       GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+      # Async prescription pipeline (S3 presigned uploads + SQS); creds come
+      # from the EC2 instance role in prod, empty in dev unless set in .env.
+      AWS_REGION: ${AWS_REGION:-eu-west-2}
+      PRESCRIPTIONS_BUCKET: ${PRESCRIPTIONS_BUCKET:-}
+      PRESCRIPTION_QUEUE_URL: ${PRESCRIPTION_QUEUE_URL:-}
     volumes:
       - /app/node_modules
     depends_on:

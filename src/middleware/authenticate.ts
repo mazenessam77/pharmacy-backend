@@ -6,12 +6,14 @@ import { ERROR_CODES } from '../utils/constants';
 
 export const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
+    // Header-only Bearer auth — deliberately NO cookie fallback. Cookie-based
+    // auth is an ambient credential and would require CSRF protection; nothing
+    // in the app ever set an auth cookie, so the old fallback was dead code
+    // that only widened the attack surface.
     let token: string | undefined;
 
     if (req.headers.authorization?.startsWith('Bearer ')) {
       token = req.headers.authorization.split(' ')[1];
-    } else if (req.cookies?.accessToken) {
-      token = req.cookies.accessToken;
     }
 
     if (!token) {
