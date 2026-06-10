@@ -18,8 +18,15 @@ const prescriptionSchema = new Schema<PrescriptionDocument>(
     doctorName: { type: String },
     // Async pipeline fields (absent on legacy Cloudinary uploads).
     s3Key: { type: String },
-    status: { type: String, enum: ['UPLOADED', 'PROCESSED'] },
+    status: {
+      type: String,
+      enum: ['UPLOADED', 'QUEUED', 'PROCESSING', 'PROCESSED', 'FAILED', 'REVIEW_REQUIRED'],
+    },
+    queuedAt: { type: Date },
+    processingStartedAt: { type: Date },
     processedAt: { type: Date },
+    failedAt: { type: Date },
+    errorDetails: { type: String, maxlength: 1000 },
     processingNotes: { type: String, maxlength: 500 },
   },
   { timestamps: true }

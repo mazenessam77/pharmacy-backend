@@ -187,12 +187,27 @@ export interface Prescription {
   doctorName?: string;
   // Async pipeline (S3 upload → background processing)
   s3Key?: string;
-  status?: 'UPLOADED' | 'PROCESSED';
+  status?: PrescriptionStatus;
+  queuedAt?: string;
+  processingStartedAt?: string;
   processedAt?: string;
+  failedAt?: string;
+  errorDetails?: string;
   processingNotes?: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export type PrescriptionStatus =
+  | 'UPLOADED'
+  | 'QUEUED'
+  | 'PROCESSING'
+  | 'PROCESSED'
+  | 'FAILED'
+  | 'REVIEW_REQUIRED';
+
+/** Statuses where the patient should keep polling (work still in flight). */
+export const PRESCRIPTION_ACTIVE_STATUSES: PrescriptionStatus[] = ['UPLOADED', 'QUEUED', 'PROCESSING'];
 
 // ── Message ──
 export type MessageType = 'text' | 'image' | 'alternative';

@@ -66,7 +66,50 @@ export const completeUpload = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Could not queue prescription for processing — please retry.', 503, ERROR_CODES.VALIDATION_ERROR);
   }
 
+  // Reflect that it's now waiting in the queue (the consumer moves it on to
+  // PROCESSING/PROCESSED). Best-effort — the doc is already created and queued.
+  prescription.status = 'QUEUED';
+  prescription.queuedAt = new Date();
+  await prescription.save();
+
   res.status(201).json({ success: true, data: { prescription } });
+});
+
+/**
+ * POST /api/prescriptions/:id/resubmit
+ * Re-queue a FAILED prescription for processing (same S3 object, no re-upload).
+ */
+export const resubmitPrescription = asyncHandler(async (req: Request, res: Response) => {
+  const prescription = await Prescription.findOne({
+    _id: String(req.params.id),
+    patientId: req.user!._id,
+  });
+
+  if (!prescription) {
+    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
+  }
+  if (!prescription.s3Key) {
+    throw new AppError('This prescription cannot be reprocessed.', 400, ERROR_CODES.VALIDATION_ERROR);
+  }
+  if (prescription.status !== 'FAILED') {
+    throw new AppError('Only failed prescriptions can be resubmitted.', 409, ERROR_CODES.VALIDATION_ERROR);
+  }
+
+  await enqueuePrescriptionProcessing({
+    patientId: String(req.user!._id),
+    s3Key: prescription.s3Key,
+    notes: prescription.processingNotes,
+  });
+
+  // Reset to a fresh processing cycle.
+  prescription.status = 'QUEUED';
+  prescription.queuedAt = new Date();
+  prescription.errorDetails = undefined;
+  prescription.failedAt = undefined;
+  prescription.processingStartedAt = undefined;
+  await prescription.save();
+
+  res.json({ success: true, data: { prescription } });
 });
 
 /**
@@ -161,7 +204,7 @@ export const getPrescriptions = asyncHandler(async (req: Request, res: Response)
 
 export const getPrescriptionById = asyncHandler(async (req: Request, res: Response) => {
   const prescription = await Prescription.findOne({
-    _id: req.params.id,
+    _id: String(req.params.id),
     patientId: req.user!._id,
   });
 
@@ -169,10 +212,15 @@ export const getPrescriptionById = asyncHandler(async (req: Request, res: Respon
     throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
   }
 
-  res.json({
-    success: true,
-    data: prescription,
-  });
+  // For S3-backed prescriptions, surface a short-lived presigned GET so the
+  // browser can render the original image directly (the stored imageUrl is a
+  // private s3:// reference). Legacy Cloudinary URLs pass through unchanged.
+  const data = prescription.toObject() as unknown as Record<string, unknown>;
+  if (prescription.s3Key) {
+    data.imageUrl = await presignPrescriptionView(prescription.s3Key);
+  }
+
+  res.json({ success: true, data });
 });
 
 export const verifyPrescription = asyncHandler(async (req: Request, res: Response) => {

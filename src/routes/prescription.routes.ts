@@ -21,6 +21,7 @@ router.post('/upload', uploadLimiter, upload.single('image'), prescriptionContro
 router.post('/scan', uploadLimiter, upload.single('image'), prescriptionController.scanPrescription);
 router.get('/', prescriptionController.getPrescriptions);
 router.get('/:id', prescriptionController.getPrescriptionById);
+router.post('/:id/resubmit', uploadLimiter, prescriptionController.resubmitPrescription);
 router.put('/:id/verify', prescriptionController.verifyPrescription);
 
 export default router;
