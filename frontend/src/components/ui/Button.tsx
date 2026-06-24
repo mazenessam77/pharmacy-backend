@@ -12,7 +12,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 // Monochrome / editorial: solid black or outlined, square, uppercase.
 const variants = {
   primary: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
-  indigo: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
+  indigo: 'bg-gradient-to-r from-blue-600 to-sky-500 text-white rounded-full hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.99]',
   danger: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
   success: 'bg-black text-white hover:bg-neutral-800 active:scale-[0.99]',
   outline: 'border border-black text-black bg-white hover:bg-black hover:text-white active:scale-[0.99]',

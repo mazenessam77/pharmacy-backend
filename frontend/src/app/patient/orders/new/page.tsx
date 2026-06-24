@@ -139,17 +139,17 @@ export default function NewOrderPage() {
     <div className="max-w-2xl w-full">
       {/* Header */}
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
-        <h1 className="text-2xl font-semibold text-neutral-800">Request Medicines</h1>
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Patient</p>
+        <h1 className="text-2xl font-black text-neutral-900">Request Medicines</h1>
         <p className="text-[13px] text-neutral-500 mt-1">Fill in the details and pharmacies will send you offers.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
         {/* Medicines */}
-        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
-              <Pill className="w-4 h-4 text-neutral-900" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+              <Pill className="w-4 h-4 text-white" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Medicines</p>
           </div>
@@ -192,17 +192,17 @@ export default function NewOrderPage() {
           <button
             type="button"
             onClick={addMedicine}
-            className="mt-4 text-[12px] text-neutral-900 hover:text-neutral-900 transition-colors inline-flex items-center gap-1.5 font-medium"
+            className="mt-4 text-[12px] text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1.5 font-bold"
           >
             <Plus className="w-3.5 h-3.5" /> Add Medicine
           </button>
         </div>
 
         {/* Prescription Upload */}
-        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
-              <FileImage className="w-4 h-4 text-neutral-900" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+              <FileImage className="w-4 h-4 text-white" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Prescription <span className="text-neutral-400 font-normal">(Optional)</span></p>
           </div>
@@ -237,17 +237,17 @@ export default function NewOrderPage() {
         </div>
 
         {/* Governorate */}
-        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
-              <MapPin className="w-4 h-4 text-neutral-900" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+              <MapPin className="w-4 h-4 text-white" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Governorate</p>
           </div>
           <select
             value={governorate}
             onChange={(e) => setGovernorate(e.target.value)}
-            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-neutral-300 focus:border-neutral-200 transition-all"
+            className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-[12px] text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-300 transition-all"
           >
             {EGYPTIAN_GOVERNORATES.map((g) => (
               <option key={g} value={g}>{g}</option>
@@ -319,10 +319,10 @@ export default function NewOrderPage() {
         </div>
 
         {/* Delivery Type */}
-        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
-              <Truck className="w-4 h-4 text-neutral-900" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+              <Truck className="w-4 h-4 text-white" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Delivery Method</p>
           </div>
@@ -332,10 +332,10 @@ export default function NewOrderPage() {
                 key={type}
                 type="button"
                 onClick={() => setDeliveryType(type)}
-                className={`py-3 rounded-none text-[12px] font-medium uppercase tracking-wide transition-all duration-200 ${
+                className={`py-3 rounded-[12px] text-[12px] font-semibold uppercase tracking-wide transition-all duration-200 ${
                   deliveryType === type
-                    ? 'bg-black text-white  '
-                    : 'bg-neutral-50 text-neutral-500  hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200'
+                    ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/30'
+                    : 'bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 border border-neutral-200'
                 }`}
               >
                 {type === 'delivery' ? '🚚 Delivery' : '🏪 Pickup'}
@@ -371,8 +371,8 @@ export default function NewOrderPage() {
               {/* Selected check */}
               <div className={`absolute top-3 right-3 w-5 h-5 rounded-none border-2 flex items-center justify-center transition-all duration-200 ${
                 paymentMethod === 'cash'
-                  ? 'bg-black border-neutral-200'
-                  : 'border-neutral-300 bg-white group-hover:border-neutral-200'
+                  ? 'bg-gradient-to-br from-blue-600 to-sky-500 border-transparent'
+                  : 'border-neutral-300 bg-white group-hover:border-blue-300'
               }`}>
                 {paymentMethod === 'cash' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -382,7 +382,7 @@ export default function NewOrderPage() {
               </div>
 
               <div className={`w-10 h-10 rounded-none flex items-center justify-center transition-colors duration-200 ${
-                paymentMethod === 'cash' ? 'bg-black' : 'bg-neutral-200 group-hover:bg-neutral-100'
+                paymentMethod === 'cash' ? 'bg-gradient-to-br from-blue-600 to-sky-500' : 'bg-neutral-200 group-hover:bg-neutral-100'
               }`}>
                 <Banknote className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'cash' ? 'text-white' : 'text-neutral-500  group-hover:text-neutral-900'}`} />
               </div>
@@ -406,8 +406,8 @@ export default function NewOrderPage() {
               {/* Selected check */}
               <div className={`absolute top-3 right-3 w-5 h-5 rounded-none border-2 flex items-center justify-center transition-all duration-200 ${
                 paymentMethod === 'instapay'
-                  ? 'bg-black border-neutral-200'
-                  : 'border-neutral-300 bg-white group-hover:border-neutral-200'
+                  ? 'bg-gradient-to-br from-blue-600 to-sky-500 border-transparent'
+                  : 'border-neutral-300 bg-white group-hover:border-blue-300'
               }`}>
                 {paymentMethod === 'instapay' && (
                   <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -417,7 +417,7 @@ export default function NewOrderPage() {
               </div>
 
               <div className={`w-10 h-10 rounded-none flex items-center justify-center transition-colors duration-200 ${
-                paymentMethod === 'instapay' ? 'bg-black' : 'bg-neutral-200 group-hover:bg-neutral-100'
+                paymentMethod === 'instapay' ? 'bg-gradient-to-br from-blue-600 to-sky-500' : 'bg-neutral-200 group-hover:bg-neutral-100'
               }`}>
                 <Smartphone className={`w-5 h-5 transition-colors duration-200 ${paymentMethod === 'instapay' ? 'text-white' : 'text-neutral-500  group-hover:text-neutral-900'}`} />
               </div>
@@ -439,10 +439,10 @@ export default function NewOrderPage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white rounded-none border border-neutral-200 p-4 sm:p-6">
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-neutral-100 rounded-none flex items-center justify-center">
-              <StickyNote className="w-4 h-4 text-neutral-900" />
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+              <StickyNote className="w-4 h-4 text-white" />
             </div>
             <p className="text-[13px] font-semibold text-neutral-800">Notes <span className="text-neutral-400 font-normal">(Optional)</span></p>
           </div>
@@ -466,7 +466,7 @@ export default function NewOrderPage() {
           variant="indigo"
           isLoading={isLoading}
           disabled={!paymentMethod}
-          className="w-full rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
           size="lg"
         >
           Submit Medicine Request

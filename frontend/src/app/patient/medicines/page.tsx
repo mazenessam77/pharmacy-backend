@@ -44,29 +44,22 @@ export default function PatientMedicinesPage() {
   return (
     <div className="max-w-5xl">
       {/* Hero */}
-      <div
-        className="rounded-none p-7 mb-7 text-white relative overflow-hidden"
-        style={{
-          background: '#000000',
-          boxShadow: 'none',
-        }}
-      >
-        <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-none blur-2xl pointer-events-none" />
+      <div className="rounded-[24px] p-7 mb-7 text-white relative overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 shadow-[0_30px_70px_-25px_rgba(13,148,136,0.55)]">
+        <div className="absolute inset-0 opacity-25 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 85% 15%, rgba(255,255,255,0.5) 0%, transparent 45%)' }} />
         <div className="relative flex items-start justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-none px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
+            <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
               <Sparkles className="w-3 h-3" />
               Medicine Catalog
             </div>
-            <h1 className="text-[26px] font-extrabold leading-tight">Browse Medicines</h1>
-            <p className="text-neutral-400/90 mt-1.5 text-[13px] font-medium max-w-md">
+            <h1 className="text-[26px] font-black leading-tight">Browse Medicines</h1>
+            <p className="text-white/80 mt-1.5 text-[13px] font-medium max-w-md">
               Tap the heart to save medicines you take often — then reorder them in one click.
             </p>
           </div>
           <Link
             href="/patient/saved"
-            className="shrink-0 flex items-center gap-2 bg-white text-neutral-900 font-bold text-[13px] px-5 py-3 rounded-none hover:bg-neutral-100 active:scale-95 transition-all duration-200"
-            style={{ boxShadow: 'none' }}
+            className="shrink-0 flex items-center gap-2 bg-white text-emerald-700 font-bold text-[13px] px-5 py-3 rounded-full hover:bg-neutral-100 active:scale-95 transition-all duration-200 shadow-lg"
           >
             <Heart className="w-4 h-4" />
             Saved
@@ -81,7 +74,7 @@ export default function PatientMedicinesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or generic name…"
-          className="w-full pl-11 pr-4 py-3.5 rounded-none bg-white border border-neutral-200 text-[14px] text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-300 focus:border-neutral-200 transition-all"
+          className="w-full pl-11 pr-4 py-3.5 rounded-[14px] bg-white border border-neutral-200 text-[14px] text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-300 transition-all shadow-sm"
         />
       </div>
 
@@ -91,9 +84,9 @@ export default function PatientMedicinesPage() {
           {[1, 2, 3, 4, 5, 6].map((i) => <CardSkeleton key={i} />)}
         </div>
       ) : medicines.length === 0 ? (
-        <div className="glass rounded-none card-shadow py-16 text-center">
-          <div className="w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-4 bg-neutral-100">
-            <Pill className="w-7 h-7 text-neutral-900" />
+        <div className="bg-white border border-neutral-100 rounded-[20px] shadow-md py-16 text-center">
+          <div className="w-16 h-16 rounded-[18px] flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-emerald-400 to-teal-600 shadow-md">
+            <Pill className="w-7 h-7 text-white" />
           </div>
           <p className="text-[13px] font-medium text-neutral-500">
             {search ? `No medicines match "${search}".` : 'No medicines available yet.'}
@@ -104,7 +97,7 @@ export default function PatientMedicinesPage() {
           {medicines.map((m) => (
             <div
               key={m._id}
-              className="glass rounded-none card-shadow p-5 flex flex-col gap-3 transition-all duration-200 hover:-translate-y-0.5"
+              className="bg-white border border-neutral-100 rounded-[20px] shadow-md p-5 flex flex-col gap-3 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
             >
               <div className="flex items-start justify-between gap-3">
                 <MedicineIcon name={m.name} size="lg" />
@@ -123,7 +116,7 @@ export default function PatientMedicinesPage() {
               )}
               <div className="flex flex-wrap items-center gap-2 mt-auto pt-1">
                 {m.category && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none bg-neutral-100 text-neutral-900">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
                     {m.category}
                   </span>
                 )}

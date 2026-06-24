@@ -42,28 +42,22 @@ export default function SavedPage() {
   return (
     <div className="max-w-4xl">
       {/* Hero */}
-      <div
-        className="rounded-none p-7 mb-6 text-white relative overflow-hidden"
-        style={{
-          background: '#000000',
-          boxShadow: 'none',
-        }}
-      >
-        <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-none blur-2xl pointer-events-none" />
+      <div className="rounded-[24px] p-7 mb-6 text-white relative overflow-hidden bg-gradient-to-br from-rose-500 via-pink-600 to-fuchsia-600 shadow-[0_30px_70px_-25px_rgba(219,39,119,0.55)]">
+        <div className="absolute inset-0 opacity-25 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 85% 15%, rgba(255,255,255,0.5) 0%, transparent 45%)' }} />
         <div className="relative">
-          <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-none px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
+          <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
             <Heart className="w-3 h-3 fill-current" />
             Quick Reorder
           </div>
-          <h1 className="text-[26px] font-extrabold leading-tight">Saved</h1>
-          <p className="text-neutral-400/90 mt-1.5 text-[13px] font-medium max-w-md">
+          <h1 className="text-[26px] font-black leading-tight">Saved</h1>
+          <p className="text-white/80 mt-1.5 text-[13px] font-medium max-w-md">
             Your favourite medicines and reusable baskets — reorder in one click.
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 bg-neutral-100 p-1 rounded-none w-fit">
+      <div className="flex items-center gap-1 mb-6 bg-neutral-100 p-1 rounded-full w-fit">
         <TabButton active={tab === 'medications'} onClick={() => setTab('medications')} icon={<Heart className="w-3.5 h-3.5" />}>
           Medications
         </TabButton>
@@ -92,10 +86,10 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-none text-[13px] font-bold transition-all duration-200 ${
+      className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all duration-200 ${
         active
-          ? 'bg-white  text-neutral-900 '
-          : 'text-neutral-500  hover:text-neutral-700 '
+          ? 'bg-white text-rose-600 shadow-sm'
+          : 'text-neutral-500 hover:text-neutral-700'
       }`}
     >
       {icon}
@@ -126,16 +120,16 @@ function MedicationsTab() {
 
   if (items.length === 0) {
     return (
-      <div className="glass rounded-none card-shadow py-16 text-center">
-        <div className="w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-4 bg-neutral-100">
-          <Heart className="w-7 h-7 text-neutral-500" />
+      <div className="glass rounded-[12px] card-shadow py-16 text-center">
+        <div className="w-16 h-16 rounded-[12px] flex items-center justify-center mx-auto mb-4 bg-neutral-100">
+          <Heart className="w-7 h-7 text-white" />
         </div>
         <p className="text-[13px] font-medium text-neutral-500 mb-4">
           You haven&apos;t saved any medications yet.
         </p>
         <Link
           href="/patient/medicines"
-          className="inline-flex items-center gap-2 bg-black text-white text-[12px] font-bold px-5 py-2.5 rounded-none hover:bg-black active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all duration-200"
         >
           <Pill className="w-3.5 h-3.5" />
           Browse Medicines
@@ -204,7 +198,7 @@ function SavedCard({ item }: { item: SavedMedication }) {
   };
 
   return (
-    <div className="glass rounded-none card-shadow p-5">
+    <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md p-5">
       <div className="flex items-start gap-4">
         <MedicineIcon name={med.name} size="lg" />
 
@@ -222,7 +216,7 @@ function SavedCard({ item }: { item: SavedMedication }) {
 
           <div className="flex flex-wrap items-center gap-2 mt-2">
             {med.category && (
-              <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-none bg-neutral-100 text-neutral-600">
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
                 {med.category}
               </span>
             )}
@@ -252,7 +246,7 @@ function SavedCard({ item }: { item: SavedMedication }) {
             type="button"
             onClick={saveNote}
             disabled={savingNote}
-            className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-neutral-900 hover:text-neutral-900 disabled:opacity-50 transition-colors"
+            className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-600 hover:text-rose-700 disabled:opacity-50 transition-colors"
           >
             {savingNote ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             Save note
@@ -268,7 +262,7 @@ function SavedCard({ item }: { item: SavedMedication }) {
           <select
             value={item.reminderFrequency}
             onChange={(e) => changeReminder(e.target.value as ReminderFrequency)}
-            className="ml-1 px-3 py-1.5 rounded-none bg-neutral-50 border border-neutral-200 text-[12px] font-medium text-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-300"
+            className="ml-1 px-3 py-1.5 rounded-[12px] bg-neutral-50 border border-neutral-200 text-[12px] font-medium text-neutral-700 focus:outline-none focus:ring-2 focus:ring-neutral-300"
           >
             {REMINDER_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -280,7 +274,7 @@ function SavedCard({ item }: { item: SavedMedication }) {
           type="button"
           onClick={reorder}
           disabled={reordering}
-          className="inline-flex items-center gap-2 bg-black text-white text-[12px] font-bold px-5 py-2.5 rounded-none hover:bg-black active:scale-95 disabled:opacity-60 transition-all duration-200"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 disabled:opacity-60 transition-all duration-200"
         >
           {reordering ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Repeat className="w-3.5 h-3.5" />}
           Reorder
@@ -316,7 +310,7 @@ function BasketsTab() {
         <p className="text-[13px] text-neutral-500">
           Group medicines you order together, then send the whole basket to a request in one click.
         </p>
-        <Button variant="indigo" size="sm" onClick={openCreate} className="shrink-0 rounded-none">
+        <Button variant="indigo" size="sm" onClick={openCreate} className="shrink-0 rounded-[12px]">
           <Plus className="w-4 h-4" />
           New Basket
         </Button>
@@ -325,14 +319,14 @@ function BasketsTab() {
       {loading && !loaded ? (
         <div className="space-y-4">{[1, 2].map((i) => <CardSkeleton key={i} />)}</div>
       ) : baskets.length === 0 ? (
-        <div className="glass rounded-none card-shadow py-16 text-center">
-          <div className="w-16 h-16 rounded-none flex items-center justify-center mx-auto mb-4 bg-neutral-100">
-            <ShoppingBasket className="w-7 h-7 text-neutral-500" />
+        <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md py-16 text-center">
+          <div className="w-16 h-16 rounded-[18px] flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-rose-400 to-pink-600 shadow-md">
+            <ShoppingBasket className="w-7 h-7 text-white" />
           </div>
           <p className="text-[13px] font-medium text-neutral-500 mb-4">
             No baskets yet. Create one to reorder your regular medicines instantly.
           </p>
-          <Button variant="indigo" size="sm" onClick={openCreate} className="rounded-none">
+          <Button variant="indigo" size="sm" onClick={openCreate} className="rounded-[12px]">
             <Plus className="w-3.5 h-3.5" />
             Create your first basket
           </Button>
@@ -390,11 +384,11 @@ function BasketCard({
   };
 
   return (
-    <div className="glass rounded-none card-shadow p-5">
+    <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md p-5">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-none bg-neutral-100 flex items-center justify-center shrink-0">
-            <ShoppingBasket className="w-5 h-5 text-neutral-900" />
+          <div className="w-11 h-11 rounded-[14px] bg-gradient-to-br from-rose-400 to-pink-600 shadow-sm flex items-center justify-center shrink-0">
+            <ShoppingBasket className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
             <p className="text-[15px] font-bold text-neutral-800 truncate">{basket.name}</p>
@@ -408,7 +402,7 @@ function BasketCard({
             type="button"
             onClick={onEdit}
             title="Edit basket"
-            className="w-8 h-8 rounded-none flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+            className="w-8 h-8 rounded-[12px] flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
           >
             <Pencil className="w-4 h-4" />
           </button>
@@ -417,7 +411,7 @@ function BasketCard({
             onClick={handleDelete}
             disabled={deleting}
             title="Delete basket"
-            className="w-8 h-8 rounded-none flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors disabled:opacity-50"
+            className="w-8 h-8 rounded-[12px] flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors disabled:opacity-50"
           >
             {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
           </button>
@@ -429,7 +423,7 @@ function BasketCard({
         {validItems.map((it, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-none bg-neutral-100 text-neutral-700"
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-[12px] bg-neutral-100 text-neutral-700"
           >
             <Pill className="w-3 h-3 text-neutral-900" />
             {it.medicine.name}
@@ -445,7 +439,7 @@ function BasketCard({
         <button
           type="button"
           onClick={orderBasket}
-          className="inline-flex items-center gap-2 bg-black text-white text-[12px] font-bold px-5 py-2.5 rounded-none hover:bg-black active:scale-95 transition-all duration-200"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-[12px] font-bold px-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-pink-500/30 active:scale-95 transition-all duration-200"
         >
           <ShoppingBasket className="w-3.5 h-3.5" />
           Order Basket
@@ -580,12 +574,12 @@ function BasketModal({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the catalog…"
-              className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-none text-[14px] focus:outline-none focus:ring-2 focus:ring-neutral-300 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-[12px] text-[14px] focus:outline-none focus:ring-2 focus:ring-neutral-300 transition-all"
             />
             {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-neutral-400" />}
           </div>
           {results.length > 0 && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-neutral-200 rounded-none max-h-56 overflow-auto">
+            <div className="absolute z-10 mt-1 w-full bg-white border border-neutral-200 rounded-[12px] max-h-56 overflow-auto">
               {results.map((med) => (
                 <button
                   key={med._id}
@@ -609,7 +603,7 @@ function BasketModal({
             items.map((it) => (
               <div
                 key={it.medicine._id}
-                className="flex items-center gap-3 bg-neutral-50 rounded-none px-3 py-2"
+                className="flex items-center gap-3 bg-neutral-50 rounded-[12px] px-3 py-2"
               >
                 <Pill className="w-4 h-4 text-neutral-900 shrink-0" />
                 <span className="flex-1 text-[13px] font-medium text-neutral-800 truncate">{it.medicine.name}</span>
@@ -617,7 +611,7 @@ function BasketModal({
                   <button
                     type="button"
                     onClick={() => setQty(it.medicine._id, -1)}
-                    className="w-7 h-7 rounded-none bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors"
+                    className="w-7 h-7 rounded-[12px] bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors"
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
@@ -625,7 +619,7 @@ function BasketModal({
                   <button
                     type="button"
                     onClick={() => setQty(it.medicine._id, 1)}
-                    className="w-7 h-7 rounded-none bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors"
+                    className="w-7 h-7 rounded-[12px] bg-white border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-neutral-900 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>
@@ -633,7 +627,7 @@ function BasketModal({
                 <button
                   type="button"
                   onClick={() => removeItem(it.medicine._id)}
-                  className="w-7 h-7 rounded-none flex items-center justify-center text-neutral-300 hover:text-neutral-900 transition-colors shrink-0"
+                  className="w-7 h-7 rounded-[12px] flex items-center justify-center text-neutral-300 hover:text-neutral-900 transition-colors shrink-0"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -643,10 +637,10 @@ function BasketModal({
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button variant="indigo" onClick={handleSave} isLoading={saving} className="flex-1 rounded-none">
+          <Button variant="indigo" onClick={handleSave} isLoading={saving} className="flex-1 rounded-[12px]">
             {existing ? 'Save Changes' : 'Create Basket'}
           </Button>
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-none">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-[12px]">
             Cancel
           </Button>
         </div>

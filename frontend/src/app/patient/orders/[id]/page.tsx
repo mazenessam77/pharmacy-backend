@@ -72,11 +72,11 @@ export default function OrderDetailPage() {
     <div className="max-w-3xl">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">
           Order #{currentOrder._id.slice(-8)}
         </p>
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-neutral-800">Order Details</h1>
+          <h1 className="text-2xl font-black text-neutral-900">Order Details</h1>
           <Badge variant={statusVariant(currentOrder.status)}>
             {statusLabel(currentOrder.status)}
           </Badge>
@@ -84,17 +84,17 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Order Info */}
-      <div className="bg-white rounded-none border border-neutral-200 p-6 mb-4">
+      <div className="bg-white rounded-[18px] border border-neutral-100 shadow-md p-6 mb-4">
         <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-4 h-4 text-neutral-900" />
+              <Pill className="w-4 h-4 text-blue-600" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Medicines</p>
             </div>
             <ul className="space-y-1.5">
               {currentOrder.medicines.map((m, i) => (
                 <li key={i} className="flex items-center gap-2 text-[13px]">
-                  <span className="w-1.5 h-1.5 bg-neutral-700 rounded-none shrink-0" />
+                  <span className="w-1.5 h-1.5 bg-gradient-to-br from-blue-500 to-sky-400 rounded-full shrink-0" />
                   <span className="font-medium">{m.name}</span>
                   <span className="text-neutral-400">×{m.quantity}</span>
                   <SaveOrderMedicineButton name={m.name} />
@@ -105,14 +105,14 @@ export default function OrderDetailPage() {
           <div className="space-y-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Truck className="w-3.5 h-3.5 text-neutral-900" />
+                <Truck className="w-3.5 h-3.5 text-blue-600" />
                 <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Delivery</p>
               </div>
               <p className="text-[14px] capitalize pl-5 text-neutral-700">{currentOrder.deliveryType}</p>
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Calendar className="w-3.5 h-3.5 text-neutral-900" />
+                <Calendar className="w-3.5 h-3.5 text-blue-600" />
                 <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Date</p>
               </div>
               <p className="text-[13px] pl-5 text-neutral-700">{formatDateTime(currentOrder.createdAt)}</p>
@@ -122,7 +122,7 @@ export default function OrderDetailPage() {
         {currentOrder.notes && (
           <div className="mt-5 pt-5 border-t border-neutral-100">
             <div className="flex items-center gap-2 mb-2">
-              <StickyNote className="w-3.5 h-3.5 text-neutral-900" />
+              <StickyNote className="w-3.5 h-3.5 text-blue-600" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-500 font-medium">Notes</p>
             </div>
             <p className="text-[13px] text-neutral-600 pl-5">{currentOrder.notes}</p>
@@ -132,16 +132,16 @@ export default function OrderDetailPage() {
 
       {/* Accepted Pharmacy */}
       {pharmacyInfo && (
-        <div className="bg-white rounded-none border border-neutral-200 bg-neutral-100/30 p-6 mb-4">
+        <div className="rounded-[18px] border border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 shadow-md p-6 mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <Building2 className="w-4 h-4 text-neutral-900" />
-            <p className="text-[11px] uppercase tracking-widest text-neutral-900 font-medium">Assigned Pharmacy</p>
+            <Building2 className="w-4 h-4 text-blue-600" />
+            <p className="text-[11px] uppercase tracking-widest text-blue-600 font-bold">Assigned Pharmacy</p>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[15px] font-semibold text-neutral-800">{pharmacyInfo.pharmacyName}</p>
+              <p className="text-[15px] font-bold text-neutral-900">{pharmacyInfo.pharmacyName}</p>
               <div className="flex items-center gap-1 mt-1">
-                <Star className="w-3.5 h-3.5 text-neutral-500 fill-neutral-900" />
+                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 <span className="text-[12px] text-neutral-500">{pharmacyInfo.rating?.toFixed(1)}</span>
               </div>
             </div>
@@ -159,8 +159,8 @@ export default function OrderDetailPage() {
       {responses.length > 0 && currentOrder.status !== 'cancelled' && (
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-4">
-            <Tag className="w-4 h-4 text-neutral-900" />
-            <p className="text-[13px] font-semibold text-neutral-800">
+            <Tag className="w-4 h-4 text-blue-600" />
+            <p className="text-[13px] font-bold text-neutral-900">
               Pharmacy Offers ({responses.length})
             </p>
           </div>
@@ -171,8 +171,8 @@ export default function OrderDetailPage() {
               return (
                 <div
                   key={resp._id}
-                  className={`bg-white rounded-none border p-5 ${
-                    isAccepted ? 'border-neutral-200 bg-neutral-100/20' : 'border-neutral-200'
+                  className={`bg-white rounded-[16px] border p-5 shadow-sm ${
+                    isAccepted ? 'border-emerald-200 bg-emerald-50/40' : 'border-neutral-100'
                   }`}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -189,7 +189,7 @@ export default function OrderDetailPage() {
                     </Badge>
                   </div>
 
-                  <div className="space-y-1.5 mb-4 bg-neutral-50 rounded-none p-3">
+                  <div className="space-y-1.5 mb-4 bg-neutral-50 rounded-[12px] p-3">
                     {resp.availableMeds.map((med, i) => (
                       <div key={i} className="flex justify-between text-[13px]">
                         <span className={med.inStock ? 'text-neutral-700' : 'text-neutral-400'}>

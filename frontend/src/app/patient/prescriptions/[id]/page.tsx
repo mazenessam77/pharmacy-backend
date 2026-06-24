@@ -108,8 +108,8 @@ export default function PrescriptionDetailPage() {
 
       <div className="flex items-center justify-between gap-3 mb-6">
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-neutral-400">Prescription #{p._id.slice(-6)}</p>
-          <h1 className="text-2xl font-semibold uppercase tracking-wide text-neutral-900">Results</h1>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-600">Prescription #{p._id.slice(-6)}</p>
+          <h1 className="text-2xl font-black tracking-tight text-neutral-900">Results</h1>
         </div>
         <Badge variant={meta.variant}>
           {meta.active && <Loader2 className="w-3 h-3 mr-1 inline animate-spin" />}
@@ -119,8 +119,8 @@ export default function PrescriptionDetailPage() {
 
       <div className="grid md:grid-cols-2 gap-5">
         {/* Original image */}
-        <div className="border border-neutral-200">
-          <div className="px-4 py-2.5 border-b border-neutral-200 flex items-center gap-2 text-[11px] uppercase tracking-widest text-neutral-500 font-medium">
+        <div className="rounded-[16px] border border-neutral-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-neutral-100 flex items-center gap-2 text-[11px] uppercase tracking-widest text-neutral-500 font-medium">
             <FileText className="w-3.5 h-3.5" /> Original
           </div>
           <div className="bg-neutral-50 aspect-[3/4] flex items-center justify-center overflow-hidden">
@@ -136,15 +136,15 @@ export default function PrescriptionDetailPage() {
         {/* Status + results */}
         <div className="space-y-5">
           {/* Tracker */}
-          <div className="border border-neutral-200 p-4">
+          <div className="rounded-[16px] border border-neutral-100 shadow-sm p-4">
             <div className="flex items-center justify-between mb-3">
               {STEPS.map((s, i) => {
                 const done = !failed && (activeIdx === -1 ? false : i <= activeIdx);
                 const isCurrent = s.key === p.status;
                 return (
                   <div key={s.key} className="flex flex-col items-center flex-1">
-                    <div className={`w-6 h-6 flex items-center justify-center text-[10px] font-bold border ${
-                      done ? 'bg-black text-white border-black' : 'bg-white text-neutral-400 border-neutral-300'
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border ${
+                      done ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white border-transparent shadow-sm' : 'bg-white text-neutral-400 border-neutral-300'
                     }`}>
                       {done && !isCurrent ? <Check className="w-3 h-3" /> : i + 1}
                     </div>
@@ -163,13 +163,13 @@ export default function PrescriptionDetailPage() {
 
           {/* Failed state */}
           {failed && (
-            <div className="border border-black p-4">
+            <div className="rounded-[16px] border border-rose-200 bg-rose-50 p-4 text-rose-700">
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4" />
                 <p className="text-[13px] font-bold uppercase tracking-wide">Processing failed</p>
               </div>
               <p className="text-[12px] text-neutral-600 mb-4">{p.errorDetails || 'Something went wrong while reading this prescription. You can submit it again.'}</p>
-              <Button variant="primary" size="sm" onClick={resubmit} isLoading={resubmitting}>
+              <Button variant="indigo" size="sm" onClick={resubmit} isLoading={resubmitting}>
                 <RefreshCw className="w-3.5 h-3.5" /> Re-submit
               </Button>
             </div>
@@ -183,8 +183,8 @@ export default function PrescriptionDetailPage() {
 
           {/* Processed → extracted medicines */}
           {p.status === 'PROCESSED' && (
-            <div className="border border-neutral-200">
-              <div className="px-4 py-2.5 border-b border-neutral-200 flex items-center gap-2 text-[11px] uppercase tracking-widest text-neutral-500 font-medium">
+            <div className="rounded-[16px] border border-neutral-100 shadow-sm overflow-hidden">
+              <div className="px-4 py-2.5 border-b border-neutral-100 flex items-center gap-2 text-[11px] uppercase tracking-widest text-neutral-500 font-medium">
                 <Pill className="w-3.5 h-3.5" /> Extracted Medicines
               </div>
               {meds.length === 0 ? (
@@ -206,7 +206,7 @@ export default function PrescriptionDetailPage() {
               )}
               {meds.length > 0 && (
                 <div className="p-4 border-t border-neutral-200">
-                  <Button variant="primary" onClick={addToCart} className="w-full">
+                  <Button variant="indigo" onClick={addToCart} className="w-full">
                     <ShoppingCart className="w-4 h-4" /> Add to Request
                   </Button>
                 </div>

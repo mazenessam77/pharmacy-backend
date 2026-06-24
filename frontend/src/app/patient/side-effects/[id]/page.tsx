@@ -48,9 +48,9 @@ interface Report {
 }
 
 const severityColors: Record<Report['severity'], string> = {
-  mild: 'bg-neutral-100 text-neutral-900  ',
-  moderate: 'bg-neutral-100 text-neutral-900  ',
-  severe: 'bg-neutral-100 text-neutral-900  ',
+  mild: 'bg-emerald-100 text-emerald-700',
+  moderate: 'bg-amber-100 text-amber-700',
+  severe: 'bg-rose-100 text-rose-700',
 };
 
 export default function SideEffectReportDetailPage() {
@@ -120,10 +120,10 @@ export default function SideEffectReportDetailPage() {
   };
 
   const statusColor: Record<Report['status'], string> = {
-    pending_ai: 'bg-neutral-100  text-neutral-900  border-neutral-200 ',
-    pending_review: 'bg-neutral-100  text-neutral-900  border-neutral-200 ',
-    approved: 'bg-neutral-100  text-neutral-900  border-neutral-200 ',
-    rejected: 'bg-neutral-100  text-neutral-900  border-neutral-200 ',
+    pending_ai: 'bg-blue-50 text-blue-700 border-blue-200',
+    pending_review: 'bg-amber-50 text-amber-700 border-amber-200',
+    approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    rejected: 'bg-rose-50 text-rose-700 border-rose-200',
   };
 
   return (
@@ -137,7 +137,7 @@ export default function SideEffectReportDetailPage() {
       </button>
 
       {/* Status banner */}
-      <div className={`rounded-none border-2 p-5 mb-6 ${statusColor[report.status]}`}>
+      <div className={`rounded-[16px] border-2 p-5 mb-6 ${statusColor[report.status]}`}>
         <div className="flex items-center gap-3">
           <StatusIcon className="w-6 h-6 shrink-0" />
           <div>
@@ -150,13 +150,13 @@ export default function SideEffectReportDetailPage() {
       </div>
 
       {/* Report info */}
-      <div className="glass rounded-none card-shadow p-6 mb-6">
+      <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md p-6 mb-6">
         <div className="flex items-start gap-4 mb-5">
-          <div className="w-12 h-12 rounded-none bg-neutral-100 flex items-center justify-center shrink-0">
-            <Pill className="w-6 h-6 text-neutral-900" />
+          <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-orange-400 to-rose-600 shadow-md flex items-center justify-center shrink-0">
+            <Pill className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-[18px] font-extrabold text-neutral-800">
+            <h2 className="text-[18px] font-black text-neutral-900">
               {report.medicineName}
             </h2>
             {report.condition && (
@@ -166,7 +166,7 @@ export default function SideEffectReportDetailPage() {
             )}
           </div>
           <span
-            className={`px-3 py-1 rounded-none text-[11px] font-bold uppercase tracking-wide ${severityColors[report.severity]}`}
+            className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${severityColors[report.severity]}`}
           >
             {report.severity}
           </span>
@@ -181,7 +181,7 @@ export default function SideEffectReportDetailPage() {
             {report.sideEffects.map((s) => (
               <span
                 key={s}
-                className="bg-neutral-100 text-neutral-900 text-[11px] font-semibold px-2.5 py-1 rounded-none border border-neutral-200"
+                className="bg-rose-50 text-rose-700 text-[11px] font-semibold px-2.5 py-1 rounded-full border border-rose-200"
               >
                 {s}
               </span>
@@ -200,14 +200,14 @@ export default function SideEffectReportDetailPage() {
       </div>
 
       {/* AI recommendation */}
-      <div className="glass rounded-none card-shadow p-6 mb-6">
+      <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md p-6 mb-6">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-none flex items-center justify-center">
-              <Sparkles className="w-4.5 h-4.5 text-white" />
+            <div className="w-9 h-9 rounded-[12px] bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-md flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="text-[15px] font-bold text-neutral-800">AI Recommendation</h3>
+              <h3 className="text-[15px] font-bold text-neutral-900">AI Recommendation</h3>
               <p className="text-[10px] text-neutral-400">
                 Powered by Claude
               </p>
@@ -248,12 +248,12 @@ export default function SideEffectReportDetailPage() {
               {report.aiRecommendation.alternatives.map((alt, i) => (
                 <div
                   key={i}
-                  className="p-4 rounded-none border border-neutral-200 bg-white hover:border-neutral-200 transition-all duration-200"
+                  className="p-4 rounded-[14px] border border-neutral-100 bg-white shadow-sm hover:shadow-md hover:border-emerald-200 transition-all duration-200"
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-start gap-3 flex-1">
-                      <div className="w-8 h-8 rounded-none bg-neutral-100 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-4 h-4 text-neutral-900" />
+                      <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-emerald-400 to-teal-600 shadow-sm flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
                         <p className="text-[14px] font-bold text-neutral-800">
@@ -273,7 +273,7 @@ export default function SideEffectReportDetailPage() {
                   <p className="text-[12px] text-neutral-600 leading-relaxed mb-2 ml-11">
                     {alt.reason}
                   </p>
-                  <div className="ml-11 inline-flex items-center gap-1.5 text-[10px] font-semibold text-neutral-900 bg-neutral-100 px-2 py-1 rounded-none">
+                  <div className="ml-11 inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
                     <ShieldCheck className="w-3 h-3" />
                     Avoids: {alt.avoidedSideEffect}
                   </div>
@@ -295,7 +295,7 @@ export default function SideEffectReportDetailPage() {
 
       {/* Doctor notes */}
       {report.doctorNotes && (
-        <div className="glass rounded-none card-shadow p-6">
+        <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md p-6">
           <div className="flex items-center gap-2 mb-3">
             <ScrollText className="w-4 h-4 text-neutral-900" />
             <h3 className="text-[14px] font-bold text-neutral-800">

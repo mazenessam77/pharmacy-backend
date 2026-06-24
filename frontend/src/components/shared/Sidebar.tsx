@@ -32,15 +32,15 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-none text-[12px] font-medium transition-all duration-200 ${
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-[12px] text-[12px] font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-black text-white   '
-                  : 'text-neutral-500  hover:bg-white/80  hover:text-neutral-900  hover:'
+                  ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/30'
+                  : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
               }`}
             >
               <link.icon className="w-4 h-4 shrink-0" />
               {link.label}
-              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-none bg-white/70" />}
+              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/80" />}
             </Link>
           );
         }

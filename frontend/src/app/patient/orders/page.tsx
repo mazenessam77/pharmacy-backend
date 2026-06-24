@@ -44,8 +44,8 @@ export default function PatientOrdersPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div>
-          <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Patient</p>
-          <h1 className="text-2xl font-semibold text-neutral-800">My Orders</h1>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Patient</p>
+          <h1 className="text-2xl font-black text-neutral-900">My Orders</h1>
         </div>
         <Link href="/patient/orders/new">
           <Button variant="indigo" size="sm">
@@ -61,10 +61,10 @@ export default function PatientOrdersPage() {
           <button
             key={f.value}
             onClick={() => setStatusFilter(f.value)}
-            className={`px-4 py-1.5 text-[11px] rounded-none font-medium transition-all duration-200 ${
+            className={`px-4 py-1.5 text-[11px] rounded-full font-semibold transition-all duration-200 ${
               statusFilter === f.value
-                ? 'bg-black text-white   '
-                : 'bg-white  text-neutral-500  border border-neutral-200  hover:border-neutral-200  hover:text-neutral-900 '
+                ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/30'
+                : 'bg-white text-neutral-500 border border-neutral-200 hover:border-blue-300 hover:text-blue-600'
             }`}
           >
             {f.label}
@@ -76,9 +76,9 @@ export default function PatientOrdersPage() {
       {isLoading ? (
         <ListSkeleton count={5} />
       ) : orders.length === 0 ? (
-        <div className="bg-white rounded-none border border-neutral-200 py-16 text-center">
-          <div className="w-14 h-14 bg-neutral-100 rounded-none flex items-center justify-center mx-auto mb-3">
-            <ShoppingBag className="w-7 h-7 text-neutral-500" />
+        <div className="bg-white rounded-[20px] border border-neutral-100 shadow-md py-16 text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-sky-400 to-blue-600 rounded-[18px] shadow-md flex items-center justify-center mx-auto mb-4">
+            <ShoppingBag className="w-7 h-7 text-white" />
           </div>
           <p className="text-[13px] text-neutral-500 mb-4">No orders found</p>
           <Link href="/patient/orders/new">
@@ -94,7 +94,7 @@ export default function PatientOrdersPage() {
               <Link
                 key={order._id}
                 href={`/patient/orders/${order._id}`}
-                className={`flex items-center gap-4 bg-white  border border-neutral-200  border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-none p-4 hover: hover:shadow-neutral-100  transition-all duration-200 group`}
+                className={`flex items-center gap-4 bg-white border border-neutral-100 border-l-4 ${statusBorderColor[order.status] ?? 'border-l-neutral-300'} rounded-[18px] p-4 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 group`}
               >
                 <MedicineIcon name={firstName} size="md" />
 
@@ -136,10 +136,10 @@ export default function PatientOrdersPage() {
             <button
               key={i}
               onClick={() => fetchOrders({ page: i + 1, status: statusFilter || undefined })}
-              className={`w-9 h-9 text-[12px] rounded-none font-medium transition-colors ${
+              className={`w-9 h-9 text-[12px] rounded-full font-semibold transition-colors ${
                 pagination.page === i + 1
-                  ? 'bg-black text-white '
-                  : 'bg-white  border border-neutral-200  text-neutral-600  hover:border-neutral-200 '
+                  ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/30'
+                  : 'bg-white border border-neutral-200 text-neutral-600 hover:border-blue-300 hover:text-blue-600'
               }`}
             >
               {i + 1}

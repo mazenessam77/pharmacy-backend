@@ -54,37 +54,42 @@ export default function PrescriptionsPage() {
   return (
     <div className="max-w-4xl">
       {/* Hero */}
-      <div className="bg-black text-white p-7 mb-6">
-        <div className="inline-flex items-center gap-1.5 border border-white/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
-          <FileText className="w-3 h-3" />
-          Prescriptions
+      <div className="relative overflow-hidden rounded-[24px] text-white p-7 mb-6 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 shadow-[0_30px_70px_-25px_rgba(147,51,234,0.55)]">
+        <div className="absolute inset-0 opacity-25 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 85% 15%, rgba(255,255,255,0.5) 0%, transparent 45%)' }} />
+        <div className="relative">
+          <div className="inline-flex items-center gap-1.5 bg-white/15 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-widest mb-3">
+            <FileText className="w-3 h-3" />
+            Prescriptions
+          </div>
+          <h1 className="text-[26px] font-black leading-tight">My Prescriptions</h1>
+          <p className="text-white/80 mt-1.5 text-[13px] max-w-md">
+            Upload a prescription and track its processing — extracted medicines appear here when it&apos;s done.
+          </p>
         </div>
-        <h1 className="text-[26px] font-extrabold uppercase tracking-wide leading-tight">My Prescriptions</h1>
-        <p className="text-neutral-400 mt-1.5 text-[13px] max-w-md">
-          Upload a prescription and track its processing — extracted medicines appear here when it&apos;s done.
-        </p>
       </div>
 
       {/* Uploader */}
-      <label className="flex items-center justify-between gap-4 border border-black p-5 mb-6 cursor-pointer hover:bg-neutral-50 transition-colors">
+      <label className="flex items-center justify-between gap-4 rounded-[16px] border border-neutral-200 bg-white shadow-sm p-5 mb-6 cursor-pointer hover:border-violet-300 hover:shadow-md transition-all">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-black text-white flex items-center justify-center">
+          <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white flex items-center justify-center shadow-sm">
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
           </div>
           <div>
-            <p className="text-[13px] font-bold uppercase tracking-wide">{uploading ? 'Uploading…' : 'Upload a prescription'}</p>
+            <p className="text-[13px] font-bold">{uploading ? 'Uploading…' : 'Upload a prescription'}</p>
             <p className="text-[11px] text-neutral-500">JPG, PNG or WebP — processed automatically</p>
           </div>
         </div>
-        <span className="text-[11px] font-bold uppercase tracking-widest text-neutral-500">Choose file</span>
+        <span className="text-[11px] font-bold uppercase tracking-widest text-violet-600">Choose file</span>
         <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onPick} disabled={uploading} />
       </label>
 
       {loading && !loaded ? (
         <div className="space-y-4">{[1, 2, 3].map((i) => <CardSkeleton key={i} />)}</div>
       ) : items.length === 0 ? (
-        <div className="border border-neutral-200 py-16 text-center">
-          <FileText className="w-8 h-8 text-neutral-300 mx-auto mb-3" />
+        <div className="rounded-[20px] border border-neutral-100 bg-white shadow-md py-16 text-center">
+          <div className="w-16 h-16 rounded-[18px] flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-md">
+            <FileText className="w-7 h-7 text-white" />
+          </div>
           <p className="text-[13px] text-neutral-500">No prescriptions yet — upload one above to get started.</p>
         </div>
       ) : (
@@ -103,12 +108,12 @@ function PrescriptionRow({ p }: { p: Prescription }) {
   return (
     <Link
       href={`/patient/prescriptions/${p._id}`}
-      className="block border border-neutral-200 hover:border-black transition-colors p-5"
+      className="block rounded-[16px] border border-neutral-100 bg-white shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all p-5"
     >
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 bg-neutral-100 flex items-center justify-center shrink-0">
-            <FileText className="w-4 h-4 text-neutral-500" />
+          <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-sm flex items-center justify-center shrink-0">
+            <FileText className="w-4 h-4 text-white" />
           </div>
           <div className="min-w-0">
             <p className="text-[13px] font-bold text-neutral-900">Prescription #{p._id.slice(-6)}</p>
@@ -125,9 +130,9 @@ function PrescriptionRow({ p }: { p: Prescription }) {
       </div>
 
       {/* progress bar */}
-      <div className="mt-4 h-px bg-neutral-200 relative overflow-hidden">
+      <div className="mt-4 h-1 rounded-full bg-neutral-100 relative overflow-hidden">
         <div
-          className={`absolute inset-y-0 left-0 ${p.status === 'FAILED' ? 'bg-neutral-400' : 'bg-black'}`}
+          className={`absolute inset-y-0 left-0 rounded-full ${p.status === 'FAILED' ? 'bg-rose-400' : 'bg-gradient-to-r from-violet-500 to-fuchsia-600'}`}
           style={{ width: `${meta.progress}%` }}
         />
       </div>
