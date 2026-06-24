@@ -68,8 +68,8 @@ export default function RegisterPage() {
 
   return (
     <div>
-      <h2 className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Join us</h2>
-      <h3 className="text-[28px] font-light uppercase tracking-wide mb-6">Create Account</h3>
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Join us</h2>
+      <h3 className="text-[32px] font-black tracking-tight mb-6">Create Account</h3>
 
       {/* Google button — patients only */}
       <div className="mb-2">
@@ -97,11 +97,11 @@ export default function RegisterPage() {
       </div>
 
       {/* Role Selector — sliding pill */}
-      <div className="relative flex bg-neutral-100 rounded-none overflow-hidden mb-8">
-        {/* sliding black indicator */}
+      <div className="relative flex bg-neutral-100 rounded-full overflow-hidden mb-8 p-1">
+        {/* sliding gradient indicator */}
         <div
-          className={`absolute inset-y-0 w-1/2 bg-black transition-transform duration-300 ease-out ${
-            role === 'pharmacy' ? 'translate-x-full' : 'translate-x-0'
+          className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-blue-600 to-sky-500 shadow-md shadow-blue-500/30 transition-transform duration-300 ease-out ${
+            role === 'pharmacy' ? 'translate-x-[calc(100%+4px)]' : 'translate-x-0'
           }`}
         />
         <button
@@ -207,10 +207,10 @@ export default function RegisterPage() {
                   ))}
                 </select>
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
-                <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-black scale-x-0 peer-focus:scale-x-100 transition-transform duration-300 origin-left" />
+                <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-blue-600 scale-x-0 peer-focus:scale-x-100 transition-transform duration-300 origin-left" />
               </div>
               {(errors as any).governorate && (
-                <p className="mt-1.5 text-[11px] text-neutral-900 font-medium">
+                <p className="mt-1.5 text-[11px] text-rose-600 font-medium">
                   {(errors as any).governorate.message}
                 </p>
               )}
@@ -234,7 +234,7 @@ export default function RegisterPage() {
         )}
 
         <div className="pt-4">
-          <Button type="submit" isLoading={isLoading} className="w-full group" size="lg">
+          <Button type="submit" variant="indigo" isLoading={isLoading} className="w-full group" size="lg">
             Create Account
             {!isLoading && (
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -248,7 +248,7 @@ export default function RegisterPage() {
           Already have an account?{' '}
           <Link
             href="/login"
-            className="text-black hover:opacity-60 transition-opacity duration-200 underline underline-offset-4"
+            className="font-bold text-blue-600 hover:text-blue-700 transition-colors duration-200"
           >
             Sign In
           </Link>

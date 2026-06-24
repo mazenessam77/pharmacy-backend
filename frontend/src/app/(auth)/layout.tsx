@@ -29,31 +29,28 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen flex">
 
       {/* ── Left — Editorial branding panel ──────────────────────────── */}
-      <div
-        className="hidden lg:flex lg:w-1/2 bg-black items-center justify-center p-16 relative overflow-hidden"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, rgba(255,255,255,0.045) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      >
-        {/* corner brackets */}
-        <div className="absolute top-8 left-8 w-8 h-8 border-t border-l border-neutral-800" />
-        <div className="absolute top-8 right-8 w-8 h-8 border-t border-r border-neutral-800" />
-        <div className="absolute bottom-8 left-8 w-8 h-8 border-b border-l border-neutral-800" />
-        <div className="absolute bottom-8 right-8 w-8 h-8 border-b border-r border-neutral-800" />
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-16 relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700">
+        {/* ambient highlights */}
+        <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 45%)' }} />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="text-white text-center max-w-xs">
+        {/* corner brackets */}
+        <div className="absolute top-8 left-8 w-8 h-8 border-t border-l border-white/25" />
+        <div className="absolute top-8 right-8 w-8 h-8 border-t border-r border-white/25" />
+        <div className="absolute bottom-8 left-8 w-8 h-8 border-b border-l border-white/25" />
+        <div className="absolute bottom-8 right-8 w-8 h-8 border-b border-r border-white/25" />
+
+        <div className="relative text-white text-center max-w-xs">
           {/* Logo */}
-          <h1 className="text-[42px] font-light uppercase tracking-ultra leading-tight mb-5">
-            Pharma<br />Link
+          <h1 className="text-[44px] font-black tracking-tight leading-none mb-5">
+            Pharma<span className="text-white/70">Link</span>
           </h1>
 
           {/* Divider */}
-          <div className="w-10 h-px bg-neutral-700 mx-auto mb-5" />
+          <div className="w-12 h-1 rounded-full bg-white/40 mx-auto mb-5" />
 
           {/* Tagline */}
-          <p className="text-[11px] uppercase tracking-widest text-neutral-500 leading-relaxed mb-10">
+          <p className="text-[12px] uppercase tracking-widest text-white/70 leading-relaxed mb-10">
             Your neighbourhood pharmacy,<br />connected across Egypt
           </p>
 
@@ -61,8 +58,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="space-y-3.5 text-left">
             {FEATURES.map((feat, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-px h-3 bg-neutral-700 shrink-0" />
-                <p className="text-[11px] uppercase tracking-widest text-neutral-600">{feat}</p>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                <p className="text-[11px] uppercase tracking-widest text-white/80">{feat}</p>
               </div>
             ))}
           </div>
@@ -74,7 +71,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="mb-8 sm:mb-12 lg:hidden">
-            <h1 className="text-[22px] sm:text-[24px] font-light uppercase tracking-ultra">PharmaLink</h1>
+            <h1 className="text-[24px] sm:text-[26px] font-black tracking-tight">Pharma<span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">Link</span></h1>
           </div>
           {children}
         </div>

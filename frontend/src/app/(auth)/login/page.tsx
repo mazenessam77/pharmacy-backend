@@ -50,8 +50,8 @@ export default function LoginPage() {
 
   return (
     <div>
-      <h2 className="text-[11px] uppercase tracking-widest text-neutral-400 mb-1">Welcome back</h2>
-      <h3 className="text-[28px] font-light uppercase tracking-wide mb-8">Sign In</h3>
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Welcome back</h2>
+      <h3 className="text-[32px] font-black tracking-tight mb-8">Sign In</h3>
 
       {/* Google button */}
       <div className="mb-6">
@@ -77,9 +77,9 @@ export default function LoginPage() {
 
       {/* Inline error banner */}
       {loginError && (
-        <div className="flex items-start gap-3 border-l-2 border-neutral-200 bg-neutral-100 pl-4 py-2.5 mb-6">
-          <AlertCircle className="w-3.5 h-3.5 text-neutral-900 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-neutral-900 font-medium">{loginError}</p>
+        <div className="flex items-start gap-3 rounded-[12px] border border-rose-200 bg-rose-50 px-4 py-2.5 mb-6">
+          <AlertCircle className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-rose-700 font-medium">{loginError}</p>
         </div>
       )}
 
@@ -103,7 +103,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-7 text-neutral-400 hover:text-black transition-colors duration-200 active:scale-90"
+            className="absolute right-0 top-7 text-neutral-400 hover:text-blue-600 transition-colors duration-200 active:scale-90"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -111,21 +111,21 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-between pt-1">
           <label className="flex items-center gap-2 cursor-pointer group">
-            <input type="checkbox" className="w-3.5 h-3.5 border-neutral-300 accent-black" />
-            <span className="text-[11px] uppercase tracking-widest text-neutral-500 group-hover:text-black transition-colors duration-200">
+            <input type="checkbox" className="w-3.5 h-3.5 border-neutral-300 accent-blue-600" />
+            <span className="text-[11px] uppercase tracking-widest text-neutral-500 group-hover:text-blue-600 transition-colors duration-200">
               Remember me
             </span>
           </label>
           <Link
             href="/forgot-password"
-            className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-black after:transition-all after:duration-300 hover:after:w-full"
+            className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-blue-600 transition-colors duration-200 font-semibold"
           >
             Forgot password?
           </Link>
         </div>
 
         <div className="pt-2">
-          <Button type="submit" isLoading={isLoading} className="w-full group" size="lg">
+          <Button type="submit" variant="indigo" isLoading={isLoading} className="w-full group" size="lg">
             Sign In
             {!isLoading && (
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -139,7 +139,7 @@ export default function LoginPage() {
           Don&apos;t have an account?{' '}
           <Link
             href="/register"
-            className="text-black hover:opacity-60 transition-opacity duration-200 underline underline-offset-4"
+            className="font-bold text-blue-600 hover:text-blue-700 transition-colors duration-200"
           >
             Register
           </Link>

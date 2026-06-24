@@ -27,13 +27,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <div
           className={`absolute bottom-0 left-0 right-0 h-[1.5px] transition-transform duration-300 origin-left ${
             error
-              ? 'bg-black scale-x-100'
-              : 'bg-black scale-x-0 peer-focus:scale-x-100'
+              ? 'bg-rose-500 scale-x-100'
+              : 'bg-blue-600 scale-x-0 peer-focus:scale-x-100'
           }`}
         />
       </div>
       {error && (
-        <p className="mt-1.5 text-[11px] text-neutral-900 font-medium">{error}</p>
+        <p className="mt-1.5 text-[11px] text-rose-600 font-medium">{error}</p>
       )}
     </div>
   )
