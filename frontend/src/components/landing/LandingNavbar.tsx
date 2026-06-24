@@ -7,8 +7,9 @@ import { Menu, X, Cross } from 'lucide-react';
 
 const navLinks = [
   { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
   { label: 'Categories', href: '#categories' },
+  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'News', href: '#news' },
   { label: 'About', href: '#about' },
 ];
 
@@ -40,7 +41,7 @@ export default function LandingNavbar() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
           <button onClick={() => scrollTo('#hero')} className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-black rounded-none flex items-center justify-center group-hover:bg-black transition-colors">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <Cross className="w-4 h-4 text-white fill-white" />
             </div>
             <span className={`text-[15px] font-bold tracking-tight transition-colors ${
@@ -81,7 +82,7 @@ export default function LandingNavbar() {
             </Link>
             <Link
               href="/register"
-              className="px-5 py-2.5 bg-black text-white text-[13px] font-semibold rounded-none hover:bg-black active:scale-95 transition-all duration-200"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-sky-500 text-white text-[13px] font-semibold rounded-full hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 transition-all duration-200"
             >
               Get Started
             </Link>
@@ -135,7 +136,7 @@ export default function LandingNavbar() {
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
-                className="w-full py-3 text-center text-[14px] font-semibold text-white bg-black rounded-none hover:bg-black transition-colors"
+                className="w-full py-3 text-center text-[14px] font-semibold text-white bg-gradient-to-r from-blue-600 to-sky-500 rounded-full hover:shadow-lg transition-shadow"
               >
                 Get Started Free
               </Link>

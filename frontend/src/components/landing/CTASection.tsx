@@ -13,11 +13,9 @@ export default function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="relative rounded-none overflow-hidden"
+          className="relative rounded-[32px] overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700"
           style={{
-            background:
-              '#000000',
-            boxShadow: 'none',
+            boxShadow: '0 40px 90px -30px rgba(79,70,229,0.5)',
           }}
         >
           {/* Decorative elements */}
@@ -42,7 +40,7 @@ export default function CTASection() {
           </div>
 
           <div className="relative z-10 px-10 py-16 lg:px-20 lg:py-20 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-neutral-400 mb-4">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-white/70 mb-4">
               Ready to Start?
             </p>
             <h2 className="text-[clamp(28px,4vw,48px)] font-extrabold text-white leading-tight tracking-tight mb-4">
@@ -50,7 +48,7 @@ export default function CTASection() {
               <br />
               Our Priority
             </h2>
-            <p className="text-[15px] text-neutral-400/80 max-w-md mx-auto mb-10 leading-relaxed">
+            <p className="text-[15px] text-white/80 max-w-md mx-auto mb-10 leading-relaxed">
               Join PharmaLink today and experience the future of pharmacy services —
               whether you&apos;re a patient or a pharmacy owner.
             </p>
@@ -58,14 +56,14 @@ export default function CTASection() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
-                className="group inline-flex items-center justify-center gap-2 bg-white text-neutral-900 px-8 py-3.5 rounded-none text-[14px] font-bold hover:bg-neutral-100 active:scale-[0.98] transition-all duration-200 shadow-black/10"
+                className="group inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-8 py-3.5 rounded-full text-[14px] font-bold hover:bg-neutral-100 active:scale-[0.98] transition-all duration-200"
               >
                 Create Free Account
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 text-white px-8 py-3.5 rounded-none text-[14px] font-semibold hover:bg-white/15 transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/25 text-white px-8 py-3.5 rounded-full text-[14px] font-semibold hover:bg-white/20 transition-all duration-200"
               >
                 Register Your Pharmacy
               </Link>
