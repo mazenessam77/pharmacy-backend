@@ -5,12 +5,12 @@ import { MapPin, Zap, MessageSquare, Camera, Star, Truck, Shield, Bell } from 'l
 
 const features = [
   { icon: MapPin,        title: 'Geolocation Search',   description: 'Find pharmacies near you using GPS-powered search with configurable radius.',             color: 'bg-neutral-100  text-neutral-900 ',    border: 'hover:border-neutral-200 ' },
-  { icon: Zap,           title: 'Real-time Updates',    description: 'Live order tracking with instant status updates via WebSocket connections.',              color: 'bg-neutral-100  text-neutral-900 ',  border: 'hover:border-neutral-200 ' },
+  { icon: Zap,           title: 'Real-time Updates',    description: 'Live order tracking with instant status updates as your order progresses.',              color: 'bg-neutral-100  text-neutral-900 ',  border: 'hover:border-neutral-200 ' },
   { icon: MessageSquare, title: 'In-app Chat',           description: 'Direct messaging between patients and pharmacies with typing indicators.',                color: 'bg-neutral-100  text-neutral-900 ', border: 'hover:border-neutral-200 ' },
-  { icon: Camera,        title: 'Prescription OCR',     description: 'Upload prescriptions and let AI extract medicine names automatically.',                    color: 'bg-neutral-100  text-neutral-900 ', border: 'hover:border-neutral-200 ' },
+  { icon: Camera,        title: 'Prescription Scanning', description: 'Snap a photo of your prescription and we read the medicine names for you.',              color: 'bg-neutral-100  text-neutral-900 ', border: 'hover:border-neutral-200 ' },
   { icon: Star,          title: 'Reviews & Ratings',    description: 'Rate pharmacies and read reviews to make informed decisions.',                            color: 'bg-neutral-100  text-neutral-900 ', border: 'hover:border-neutral-200 ' },
   { icon: Truck,         title: 'Delivery Tracking',    description: 'Track your order from preparation to doorstep delivery in real-time.',                    color: 'bg-neutral-100  text-neutral-900 ',    border: 'hover:border-neutral-200 ' },
-  { icon: Shield,        title: 'Secure Platform',      description: 'JWT authentication, encrypted data, and role-based access control.',                      color: 'bg-neutral-100  text-neutral-900 ',    border: 'hover:border-neutral-200 ' },
+  { icon: Shield,        title: 'Secure Platform',      description: 'Your account and data stay protected with secure sign-in and encryption.',               color: 'bg-neutral-100  text-neutral-900 ',    border: 'hover:border-neutral-200 ' },
   { icon: Bell,          title: 'Smart Notifications',  description: 'Push notifications for order updates, new offers, and messages.',                         color: 'bg-neutral-100  text-neutral-900 ',    border: 'hover:border-neutral-200 ' },
 ];
 
@@ -31,8 +31,8 @@ export default function FeaturesSection() {
             <span className="text-neutral-400">Nothing You Don&apos;t</span>
           </h2>
           <p className="text-[14px] text-neutral-500 leading-relaxed">
-            A complete pharmacy ecosystem built with modern technology for patients,
-            pharmacies, and administrators.
+            A complete pharmacy experience designed around you — find medicines,
+            compare offers, and get them delivered.
           </p>
         </div>
 

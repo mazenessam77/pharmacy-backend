@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Search, Store, MessageCircle, Package } from 'lucide-react';
 
 const steps = [
-  { number: '01', icon: Search,        title: 'Request Medicine',  description: 'Search for medicines by name or upload your prescription. Our OCR reads it for you automatically.', accent: 'bg-black',     light: 'bg-neutral-100 ',     text: 'text-neutral-900 ',     border: 'border-neutral-200 ' },
+  { number: '01', icon: Search,        title: 'Request Medicine',  description: 'Search for medicines by name or upload your prescription — we read it for you automatically.', accent: 'bg-black',     light: 'bg-neutral-100 ',     text: 'text-neutral-900 ',     border: 'border-neutral-200 ' },
   { number: '02', icon: Store,         title: 'Get Offers',        description: 'Nearby pharmacies compete to serve you with their best prices and available alternatives.',           accent: 'bg-black',   light: 'bg-neutral-100 ', text: 'text-neutral-900 ', border: 'border-neutral-200 ' },
   { number: '03', icon: MessageCircle, title: 'Choose & Chat',     description: 'Compare offers, chat directly with pharmacists, and confirm your preferred option.',                  accent: 'bg-black', light: 'bg-neutral-100 ', text: 'text-neutral-900 ', border: 'border-neutral-200 ' },
   { number: '04', icon: Package,       title: 'Track & Receive',   description: 'Follow your order in real-time from preparation to delivery right at your door.',                     accent: 'bg-black',  light: 'bg-neutral-100 ', text: 'text-neutral-900 ', border: 'border-neutral-200 ' },

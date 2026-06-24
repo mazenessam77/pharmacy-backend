@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-neutral-900 text-white border-t border-neutral-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-8 h-8 bg-black rounded-none flex items-center justify-center">
@@ -16,8 +16,8 @@ export default function Footer() {
               <span className="text-[15px] font-bold tracking-tight">PharmaLink</span>
             </div>
             <p className="text-[13px] text-neutral-400 leading-relaxed max-w-sm">
-              Connecting patients with nearby pharmacies through real-time technology.
-              A graduation project built with modern web technologies.
+              Connecting patients with nearby pharmacies — find your medicines,
+              compare offers, and get them delivered to your door.
             </p>
             <div className="flex items-center gap-6 mt-6">
               {[{ value: '27', label: 'Cities' }, { value: '500+', label: 'Medicines' }, { value: '24/7', label: 'Available' }].map((s) => (
@@ -40,21 +40,13 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 mb-5">Built With</h4>
-            <div className="space-y-3">
-              {['Next.js 14', 'Express.js', 'MongoDB', 'Socket.IO', 'Docker', 'AWS EC2'].map((tech) => (
-                <p key={tech} className="text-[13px] text-neutral-400">{tech}</p>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
       <div className="border-t border-neutral-800">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[12px] text-neutral-500">&copy; 2026 PharmaLink — Graduation Project</p>
-          <p className="text-[12px] text-neutral-600">Faculty of Computer Science</p>
+          <p className="text-[12px] text-neutral-500">&copy; 2026 PharmaLink. All rights reserved.</p>
+          <p className="text-[12px] text-neutral-600">Your health, delivered.</p>
         </div>
       </div>
     </footer>
