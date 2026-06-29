@@ -1,0 +1,13 @@
+groups:
+  - name: baseline
+    rules:
+      # Any scrape target unreachable for 2m. Expanded per phase (host/CPU/mem,
+      # container down, Mongo/Redis down, app error-rate/latency) in Phase 7.
+      - alert: TargetDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Prometheus target down: {{ $labels.job }} ({{ $labels.instance }})"
+          description: "{{ $labels.job }} has been unreachable for >2m."

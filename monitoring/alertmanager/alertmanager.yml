@@ -1,0 +1,11 @@
+# Phase 1 stub — routing/receivers (email via SMTP, or Slack webhook) are
+# configured in Phase 7 once the alert channel is chosen.
+route:
+  receiver: 'null'
+  group_by: ['alertname', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+
+receivers:
+  - name: 'null'

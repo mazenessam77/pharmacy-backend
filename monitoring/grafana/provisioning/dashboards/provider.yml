@@ -1,0 +1,12 @@
+apiVersion: 1
+providers:
+  - name: pharma
+    orgId: 1
+    folder: PharmaLink
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
+# Drop dashboard JSON into monitoring/grafana/dashboards/ to auto-provision.
+# Import-by-ID happens in the UI per phase; custom pharmacy dashboards land here.
