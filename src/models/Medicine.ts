@@ -19,4 +19,9 @@ const medicineSchema = new Schema<MedicineDocument>(
 medicineSchema.index({ name: 'text', genericName: 'text' });
 medicineSchema.index({ name: 1 });
 
+// Catalog browse: active medicines sorted by name, and category-filtered browse.
+// (Full-text search uses the text index above.) Names match the prod indexes.
+medicineSchema.index({ isActive: 1, name: 1 }, { name: 'active_name' });
+medicineSchema.index({ isActive: 1, category: 1, name: 1 }, { name: 'active_cat_name' });
+
 export const Medicine = mongoose.model<MedicineDocument>('Medicine', medicineSchema);

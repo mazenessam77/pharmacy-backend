@@ -22,4 +22,10 @@ const notificationSchema = new Schema<NotificationDocument>(
 notificationSchema.index({ userId: 1, createdAt: -1 });
 notificationSchema.index({ userId: 1, isRead: 1 });
 
+// Auto-expire READ notifications after 90 days (unread are kept). Name matches prod.
+notificationSchema.index(
+  { createdAt: 1 },
+  { name: 'ttl_read_90d', expireAfterSeconds: 7776000, partialFilterExpression: { isRead: true } }
+);
+
 export const Notification = mongoose.model<NotificationDocument>('Notification', notificationSchema);
