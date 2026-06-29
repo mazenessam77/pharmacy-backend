@@ -23,24 +23,15 @@ scrape_configs:
       - targets: ['node-exporter:9100']
         labels: { server: A }
 
-  # ── Server B (app host) — added incrementally per roadmap phase.
-  #    All targets are B's PRIVATE VPC IP, reachable only because the
-  #    monitor SG is allowed on each port (never public). ──
-  # Phase 2:
-  # - job_name: node-b
-  #   static_configs: [ { targets: ['10.0.1.222:9100'], labels: { server: B } } ]
-  # Phase 3:
-  # - job_name: cadvisor-b
-  #   static_configs: [ { targets: ['10.0.1.222:8080'], labels: { server: B } } ]
-  # Phase 4:
-  # - job_name: mongodb-b
-  #   static_configs: [ { targets: ['10.0.1.222:9216'] } ]
-  # - job_name: redis-b
-  #   static_configs: [ { targets: ['10.0.1.222:9121'] } ]
-  # Phase 5:
-  # - job_name: backend-b
-  #   metrics_path: /metrics
-  #   static_configs: [ { targets: ['10.0.1.222:9101'] } ]
-  # Phase 6:
-  # - job_name: nginx-b
-  #   static_configs: [ { targets: ['10.0.1.222:9113'] } ]
+  # ── Server B (app host) — private VPC IP, gated by the monitor SG ──
+  - job_name: node-b               # Phase 2
+    static_configs:
+      - targets: ['10.0.1.222:9100']
+        labels: { server: B }
+
+  # Added in later phases:
+  # - job_name: cadvisor-b   → 10.0.1.222:8080   (Phase 3)
+  # - job_name: mongodb-b    → 10.0.1.222:9216   (Phase 4)
+  # - job_name: redis-b      → 10.0.1.222:9121   (Phase 4)
+  # - job_name: backend-b    → 10.0.1.222:9101 /metrics  (Phase 5)
+  # - job_name: nginx-b      → 10.0.1.222:9113   (Phase 6)

@@ -1,0 +1,21 @@
+# Exporters that run ON Server B (the app host), as a separate compose project
+# (`pharma-exporters`) so they're independent of the app stack's deploy cycle.
+# All ports bind B's PRIVATE VPC IP only; ingress is gated by the monitor SG.
+# Deploy on B:  docker compose -f docker-compose.exporters.yml up -d
+name: pharma-exporters
+
+services:
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: pharma-node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    ports:
+      - "10.0.1.222:9100:9100"   # private VPC interface only
+
+  # Phase 3+ add here: cadvisor (8080), mongodb_exporter (9216),
+  # redis_exporter (9121), nginx-prometheus-exporter (9113).
