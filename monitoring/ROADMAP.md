@@ -12,8 +12,8 @@ Grafana + Alertmanager.
 ## Phase roadmap
 | Phase | Adds | New B-SG ingress (← monitor SG) | Status |
 |---|---|---|---|
-| 1 | Provision A + Prometheus + Grafana + Alertmanager | — | in progress |
-| 2 | node_exporter on B → host metrics | 9100 | |
+| 1 | Provision A + Prometheus + Grafana + Alertmanager | — | ✅ done |
+| 2 | node_exporter on B → host metrics | 9100 | ✅ done |
 | 3 | cAdvisor on B → per-container metrics | 8080 | |
 | 4 | mongodb_exporter + redis_exporter | 9216, 9121 | |
 | 5 | backend prom-client /metrics (app + business) | 9101 | |
