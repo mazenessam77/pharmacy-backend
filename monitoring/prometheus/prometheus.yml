@@ -1,0 +1,46 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: pharma
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  # ── Server A (the monitoring box itself) ──
+  - job_name: prometheus
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: monitor-host
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels: { server: A }
+
+  # ── Server B (app host) — added incrementally per roadmap phase.
+  #    All targets are B's PRIVATE VPC IP, reachable only because the
+  #    monitor SG is allowed on each port (never public). ──
+  # Phase 2:
+  # - job_name: node-b
+  #   static_configs: [ { targets: ['10.0.1.222:9100'], labels: { server: B } } ]
+  # Phase 3:
+  # - job_name: cadvisor-b
+  #   static_configs: [ { targets: ['10.0.1.222:8080'], labels: { server: B } } ]
+  # Phase 4:
+  # - job_name: mongodb-b
+  #   static_configs: [ { targets: ['10.0.1.222:9216'] } ]
+  # - job_name: redis-b
+  #   static_configs: [ { targets: ['10.0.1.222:9121'] } ]
+  # Phase 5:
+  # - job_name: backend-b
+  #   metrics_path: /metrics
+  #   static_configs: [ { targets: ['10.0.1.222:9101'] } ]
+  # Phase 6:
+  # - job_name: nginx-b
+  #   static_configs: [ { targets: ['10.0.1.222:9113'] } ]

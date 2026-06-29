@@ -1,0 +1,80 @@
+name: pharma-monitoring
+
+# Server A monitoring stack. All UIs bind to 127.0.0.1 only — reach them via
+# AWS SSM port-forwarding (no public/SG inbound). Prometheus scrapes Server B
+# over the private VPC IP (added incrementally per roadmap phase).
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      # Retention: time = intended lookback; size = hard guardrail so a
+      # cardinality spike can never fill the disk and crash the box.
+      - --storage.tsdb.retention.time=15d
+      - --storage.tsdb.retention.size=8GB
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prom-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks: [monitor]
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: alertmanager
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - am-data:/alertmanager
+    ports:
+      - "127.0.0.1:9093:9093"
+    networks: [monitor]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"   # SSM tunnel target
+    networks: [monitor]
+    depends_on: [prometheus]
+
+  # Server A's own host metrics (Server B's node_exporter is added in Phase 2).
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    ports:
+      - "127.0.0.1:9100:9100"
+    networks: [monitor]
+
+volumes:
+  prom-data:
+  am-data:
+  grafana-data:
+
+networks:
+  monitor:
+    name: pharma-monitor-net
