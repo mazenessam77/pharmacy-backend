@@ -18,7 +18,7 @@ Grafana + Alertmanager.
 | 4 | mongodb_exporter + redis_exporter | 9216, 9121 | |
 | 5 | backend prom-client /metrics (app + business) | 9101 | |
 | 6 | nginx stub_status + exporter | 9113 | |
-| 7 | Alertmanager routing + alert rules | — | |
+| 7 | Alertmanager routing + alert rules (Slack) | — | ✅ done |
 | 8 | End-to-end validation + stress replay | — | |
 | 9 (future) | Loki/Promtail · OpenTelemetry · Tempo | reserved | |
 
