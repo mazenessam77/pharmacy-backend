@@ -73,6 +73,9 @@
 | **EBS Volume** | 30 GB `gp3` | Persistent storage for host |
 | **Elastic IP** | Static | Fixed IP for DNS / HTTPS |
 | **Security Groups** | — | Port 22 (SSH), 80 (HTTP), 443 (HTTPS) |
+| **AWS Shield Standard** | Automatic · free | Always-on protection against common **Layer 3/4 DDoS** attacks for internet-facing AWS resources — the EC2 **Elastic IP** here (and the **ALB** in the target [ECS design](docs/architecture/ARCHITECTURE.md#5-security--ddos-protection)). Enabled by default on every account: no setup, no cost. **Shield Advanced is not used.** |
+
+> **DDoS protection (no extra cost):** Cloudflare fronts the origin (Layer 7 WAF + edge DDoS) and **AWS Shield Standard** automatically defends the internet-facing AWS resources against common **Layer 3/4** attacks. The architecture is unchanged — these are built-in, free protections. Details: [Security & DDoS protection](docs/architecture/ARCHITECTURE.md#5-security--ddos-protection).
 
 ---
 

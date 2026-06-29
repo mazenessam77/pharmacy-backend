@@ -30,6 +30,7 @@
 - **Amazon DynamoDB** — session / state store.
 - **Amazon SQS** — async message queue decoupling the request path from heavy workloads.
 - **CloudWatch** + **Systems Manager** — logs, metrics, alarms, parameters/secrets.
+- **AWS Shield Standard** — always-on, no-cost DDoS protection automatically applied to internet-facing AWS resources (the ALB here), mitigating common Layer 3/4 attacks. No configuration required; Shield Advanced is not used. See [§5 Security & DDoS protection](#5-security--ddos-protection).
 
 ### Refactored
 - **Application Load Balancer** — the single AWS entry point behind Cloudflare; HTTPS target group.
@@ -93,7 +94,10 @@ flowchart LR
         ALB["⚖️ Application Load Balancer<br/>(HTTPS origin)"]
         IGW["🧭 API Gateway / Envoy Ingress<br/>path-based routing"]
 
+        SHIELD["🛡️ AWS Shield Standard<br/>automatic L3/L4 DDoS protection<br/>(always-on · no extra cost)"]
+
         CF -->|origin pull HTTPS| ALB
+        SHIELD -. protects L3/L4 DDoS .-> ALB
         ALB --> IGW
 
         subgraph ECS["Amazon ECS Cluster — AWS Fargate"]
@@ -163,7 +167,21 @@ flowchart LR
 
 ---
 
-## 5. Why these choices
+## 5. Security & DDoS protection
+
+Internet-facing protection is layered — **Cloudflare** at the edge and **AWS Shield Standard** at the AWS network boundary — with no paid AWS services introduced.
+
+- **AWS Shield Standard — always-on, no extra cost.** Shield Standard is automatically enabled for every AWS account and requires no setup. It provides **automatic protection against the most common, frequently-occurring Layer 3 and Layer 4 DDoS attacks** (e.g. SYN/ACK floods, UDP reflection/amplification, and other volumetric network-layer floods), defending the application without any code or infrastructure changes.
+  - The only internet-facing AWS resource in this architecture is the **Application Load Balancer**, so Shield Standard's automatic L3/L4 mitigations apply directly to it. The diagram shows this as the `protects (L3/L4 DDoS)` edge into the ALB.
+  - Shield Standard automatically covers **any other supported internet-facing AWS resource** at no additional cost if one is ever added — **Elastic Load Balancing (ALB/NLB/CLB), Amazon CloudFront, Amazon Route 53, AWS Global Accelerator, and EC2 Elastic IPs**.
+- **AWS Shield Advanced is intentionally NOT used.** It is a paid subscription service; Shield Standard combined with Cloudflare's edge protection satisfies the DDoS-protection requirement at zero additional cost.
+- **Cloudflare edge (complementary, not AWS).** Because the origin is proxied behind Cloudflare (orange cloud), Cloudflare absorbs the bulk of volumetric and **Layer 7** attacks (WAF, rate limiting, bot mitigation) before traffic reaches AWS. The ALB security group is additionally locked to [Cloudflare's published IP ranges](https://www.cloudflare.com/ips/), so the Shield-protected origin cannot be reached directly to bypass the WAF.
+
+> **Defense in depth:** Cloudflare (L7 WAF + edge DDoS) → **AWS Shield Standard** (automatic, free L3/L4 DDoS at the ALB) → origin security group locked to Cloudflare IPs. The architecture is unchanged; only its built-in, no-cost protections are made explicit.
+
+---
+
+## 6. Why these choices
 
 - **Cloudflare at the edge (no Route 53 / CloudFront).** DNS, TLS, caching, WAF
   and DDoS all live at Cloudflare. AWS sees only Cloudflare's origin pulls, so
@@ -181,7 +199,7 @@ flowchart LR
 
 ---
 
-## 6. Implementation notes (ties to this repo)
+## 7. Implementation notes (ties to this repo)
 
 - **DNS migration:** done — `docker-compose.prod.yml`, `nginx/nginx.conf`,
   `.github/workflows/cd.yml`, `.env.prod`, `scripts/seed-pharmacies.mjs`,
@@ -199,7 +217,7 @@ flowchart LR
 
 ---
 
-## 7. Regenerating the diagram
+## 8. Regenerating the diagram
 
 The PNG is generated from `pharmalink_ecs_fargate.py` using the
 [`diagrams`](https://diagrams.mingrammer.com/) library (official AWS icons) +
