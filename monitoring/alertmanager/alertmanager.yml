@@ -1,11 +1,26 @@
-# Phase 1 stub — routing/receivers (email via SMTP, or Slack webhook) are
-# configured in Phase 7 once the alert channel is chosen.
+global:
+  resolve_timeout: 5m
+
 route:
-  receiver: 'null'
+  receiver: slack
   group_by: ['alertname', 'severity']
   group_wait: 30s
   group_interval: 5m
   repeat_interval: 3h
+  routes:
+    - matchers: ['severity="critical"']
+      group_wait: 10s
+      repeat_interval: 1h
 
 receivers:
-  - name: 'null'
+  - name: slack
+    slack_configs:
+      # Webhook secret lives ONLY on Server A at /opt/monitoring/alertmanager/slack_url
+      # (gitignored). Never commit the URL.
+      - api_url_file: /etc/alertmanager/slack_url
+        send_resolved: true
+        title: '{{ if eq .Status "firing" }}:red_circle:{{ else }}:white_check_mark:{{ end }} [{{ .CommonLabels.severity }}] {{ .CommonLabels.alertname }}'
+        text: |-
+          {{ range .Alerts }}*{{ .Labels.instance }}* — {{ .Annotations.summary }}
+          {{ .Annotations.description }}
+          {{ end }}

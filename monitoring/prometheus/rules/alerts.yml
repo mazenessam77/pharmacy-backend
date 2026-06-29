@@ -1,13 +1,34 @@
 groups:
-  - name: baseline
+  - name: infrastructure
     rules:
-      # Any scrape target unreachable for 2m. Expanded per phase (host/CPU/mem,
-      # container down, Mongo/Redis down, app error-rate/latency) in Phase 7.
       - alert: TargetDown
         expr: up == 0
         for: 2m
-        labels:
-          severity: critical
+        labels: { severity: critical }
         annotations:
-          summary: "Prometheus target down: {{ $labels.job }} ({{ $labels.instance }})"
-          description: "{{ $labels.job }} has been unreachable for >2m."
+          summary: "Target down: {{ $labels.job }}"
+          description: "{{ $labels.job }} on {{ $labels.instance }} has been unreachable for >2m."
+
+      - alert: HighCPU
+        expr: 100 - (avg by(instance, server) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "High CPU on {{ $labels.instance }} ({{ $labels.server }})"
+          description: "CPU busy >85% for 5m."
+
+      - alert: HighMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Low memory on {{ $labels.instance }} ({{ $labels.server }})"
+          description: "MemAvailable <10% for 5m."
+
+      - alert: HighDisk
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"})) * 100 > 80
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "High disk on {{ $labels.instance }} {{ $labels.mountpoint }}"
+          description: "Filesystem >80% used for 10m."
