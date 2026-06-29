@@ -39,4 +39,8 @@ orderSchema.index({ patientId: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ patientLocation: '2dsphere' });
 
+// Pharmacy dashboard hot path: orders in a governorate by status, newest first.
+// Covers filter + sort (removes the in-memory sort). Name matches the prod index.
+orderSchema.index({ governorate: 1, status: 1, createdAt: -1 }, { name: 'gov_status_created' });
+
 export const Order = mongoose.model<OrderDocument>('Order', orderSchema);
