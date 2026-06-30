@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import { registerSchema, RegisterFormData } from '@/lib/validations';
 import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
@@ -14,6 +15,7 @@ import { ArrowRight } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 export default function RegisterPage() {
+  const { t } = useTranslation('auth');
   const { register: registerUser, googleLogin, isLoading } = useAuthStore();
   const [role, setRole] = useState<'patient' | 'pharmacy'>('patient');
 
@@ -50,9 +52,9 @@ export default function RegisterPage() {
       }
 
       await registerUser(payload);
-      toast.success('Account created');
+      toast.success(t('register.createdToast'));
     } catch (err: any) {
-      toast.error(err.response?.data?.error?.message || 'Registration failed');
+      toast.error(err.response?.data?.error?.message || t('register.failed'));
     }
   };
 
@@ -60,23 +62,23 @@ export default function RegisterPage() {
     if (!credentialResponse.credential) return;
     try {
       await googleLogin(credentialResponse.credential);
-      toast.success('Account created');
+      toast.success(t('register.createdToast'));
     } catch (err: any) {
-      toast.error(err.response?.data?.error?.message || 'Google sign-in failed.');
+      toast.error(err.response?.data?.error?.message || t('register.googleError'));
     }
   };
 
   return (
     <div>
-      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Join us</h2>
-      <h3 className="text-[32px] font-black tracking-tight mb-6">Create Account</h3>
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">{t('register.eyebrow')}</h2>
+      <h3 className="text-[32px] font-black tracking-tight mb-6">{t('register.submit')}</h3>
 
       {/* Google button — patients only */}
       <div className="mb-2">
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => toast.error('Google sign-in failed.')}
+            onError={() => toast.error(t('register.googleError'))}
             theme="outline"
             size="large"
             text="signup_with"
@@ -85,14 +87,14 @@ export default function RegisterPage() {
           />
         </div>
         <p className="text-center text-[10px] uppercase tracking-widest text-neutral-400 mt-2">
-          Patients only — instant sign-up
+          {t('register.googleNote')}
         </p>
       </div>
 
       {/* Divider */}
       <div className="flex items-center gap-4 my-6">
         <div className="flex-1 h-px bg-neutral-200" />
-        <span className="text-[10px] uppercase tracking-widest text-neutral-400">or register with email</span>
+        <span className="text-[10px] uppercase tracking-widest text-neutral-400">{t('register.orWithEmail')}</span>
         <div className="flex-1 h-px bg-neutral-200" />
       </div>
 
@@ -101,7 +103,7 @@ export default function RegisterPage() {
         {/* sliding gradient indicator */}
         <div
           className={`absolute inset-y-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-blue-600 to-sky-500 shadow-md shadow-blue-500/30 transition-transform duration-300 ease-out ${
-            role === 'pharmacy' ? 'translate-x-[calc(100%+4px)]' : 'translate-x-0'
+            role === 'pharmacy' ? 'translate-x-[calc(100%+4px)] rtl:-translate-x-[calc(100%+4px)]' : 'translate-x-0'
           }`}
         />
         <button
@@ -111,7 +113,7 @@ export default function RegisterPage() {
             role === 'patient' ? 'text-white' : 'text-neutral-500 hover:text-neutral-800'
           }`}
         >
-          Patient
+          {t('register.rolePatient')}
         </button>
         <button
           type="button"
@@ -120,7 +122,7 @@ export default function RegisterPage() {
             role === 'pharmacy' ? 'text-white' : 'text-neutral-500 hover:text-neutral-800'
           }`}
         >
-          Pharmacy
+          {t('register.rolePharmacy')}
         </button>
       </div>
 
@@ -129,39 +131,39 @@ export default function RegisterPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
-            label="Full Name"
-            placeholder="John Doe"
+            label={t('register.name')}
+            placeholder={t('register.namePlaceholder')}
             error={errors.name?.message}
             {...register('name')}
           />
           <Input
-            label="Phone"
-            placeholder="+20xxxxxxxxxx"
+            label={t('register.phone')}
+            placeholder={t('register.phonePlaceholder')}
             error={errors.phone?.message}
             {...register('phone')}
           />
         </div>
 
         <Input
-          label="Email"
+          label={t('register.email')}
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('register.emailPlaceholder')}
           error={errors.email?.message}
           {...register('email')}
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input
-            label="Password"
+            label={t('register.password')}
             type="password"
-            placeholder="Min 6 characters"
+            placeholder={t('register.passwordMin')}
             error={errors.password?.message}
             {...register('password')}
           />
           <Input
-            label="Confirm Password"
+            label={t('register.confirmPassword')}
             type="password"
-            placeholder="Repeat password"
+            placeholder={t('register.confirmPasswordRepeat')}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
           />
@@ -173,41 +175,41 @@ export default function RegisterPage() {
             <div className="flex items-center gap-3">
               <div className="flex-1 h-px bg-neutral-200" />
               <p className="text-[11px] uppercase tracking-widest text-neutral-400 shrink-0">
-                Pharmacy Details
+                {t('register.pharmacyDetails')}
               </p>
               <div className="flex-1 h-px bg-neutral-200" />
             </div>
 
             <Input
-              label="Pharmacy Name"
-              placeholder="My Pharmacy"
+              label={t('register.pharmacyName')}
+              placeholder={t('register.pharmacyNamePlaceholder')}
               error={(errors as any).pharmacyName?.message}
               {...register('pharmacyName' as any)}
             />
 
             <Input
-              label="Address"
-              placeholder="Street, City"
+              label={t('register.address')}
+              placeholder={t('register.addressPlaceholder')}
               error={(errors as any).address?.message}
               {...register('address' as any)}
             />
 
             <div>
               <label className="block text-[11px] uppercase tracking-widest text-neutral-500 mb-2">
-                Governorate
+                {t('register.governorate')}
               </label>
               <div className="relative">
                 <select
                   {...register('governorate' as any)}
                   className="peer w-full py-2.5 bg-transparent text-[14px] focus:outline-none appearance-none cursor-pointer"
                 >
-                  <option value="">Select governorate</option>
+                  <option value="">{t('register.selectGovernorate')}</option>
                   {EGYPTIAN_GOVERNORATES.map((g) => (
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
-                <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-blue-600 scale-x-0 peer-focus:scale-x-100 transition-transform duration-300 origin-left" />
+                <div className="absolute bottom-0 start-0 end-0 h-px bg-neutral-200" />
+                <div className="absolute bottom-0 start-0 end-0 h-[1.5px] bg-blue-600 scale-x-0 peer-focus:scale-x-100 transition-transform duration-300 origin-left rtl:origin-right" />
               </div>
               {(errors as any).governorate && (
                 <p className="mt-1.5 text-[11px] text-rose-600 font-medium">
@@ -218,13 +220,13 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Input
-                label="Opening Time"
+                label={t('register.openingTime')}
                 type="time"
                 error={(errors as any).workingHoursOpen?.message}
                 {...register('workingHoursOpen' as any)}
               />
               <Input
-                label="Closing Time"
+                label={t('register.closingTime')}
                 type="time"
                 error={(errors as any).workingHoursClose?.message}
                 {...register('workingHoursClose' as any)}
@@ -235,9 +237,9 @@ export default function RegisterPage() {
 
         <div className="pt-4">
           <Button type="submit" variant="indigo" isLoading={isLoading} className="w-full group" size="lg">
-            Create Account
+            {t('register.submit')}
             {!isLoading && (
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180" />
             )}
           </Button>
         </div>
@@ -245,12 +247,12 @@ export default function RegisterPage() {
 
       <div className="mt-8 text-center">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400">
-          Already have an account?{' '}
+          {t('register.haveAccount')}{' '}
           <Link
             href="/login"
             className="font-bold text-blue-600 hover:text-blue-700 transition-colors duration-200"
           >
-            Sign In
+            {t('register.signIn')}
           </Link>
         </p>
       </div>

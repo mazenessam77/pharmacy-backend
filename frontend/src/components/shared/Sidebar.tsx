@@ -40,7 +40,7 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
             >
               <link.icon className="w-4 h-4 shrink-0" />
               {link.label}
-              {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/80" />}
+              {isActive && <span className="ms-auto w-1.5 h-1.5 rounded-full bg-white/80" />}
             </Link>
           );
         }
@@ -87,8 +87,8 @@ export default function Sidebar({ links, variant = 'dark', isOpen = false, onClo
 
       {/* ── Mobile drawer ─────────────────────────────────────────── */}
       <aside
-        className={`md:hidden fixed top-0 left-0 h-full w-72 z-50 flex flex-col py-6 px-3  transition-transform duration-300 ease-out ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`md:hidden fixed top-0 start-0 h-full w-72 z-50 flex flex-col py-6 px-3  transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'
         } ${
           isIndigo
             ? 'bg-white  border-r border-neutral-200 '

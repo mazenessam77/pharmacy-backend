@@ -5,20 +5,22 @@ import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
 import { LayoutDashboard, Users, Building2, ShoppingBag, Pill, AlertTriangle } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNotificationStore } from '@/store/notificationStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
 
-const links: SidebarLink[] = [
-  { href: '/admin/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/pharmacies', label: 'Pharmacies', icon: Building2 },
-  { href: '/admin/orders', label: 'Orders', icon: ShoppingBag },
-  { href: '/admin/medicines', label: 'Medicines', icon: Pill },
-  { href: '/admin/side-effects', label: 'Side Effects', icon: AlertTriangle },
-];
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('nav');
   const { fetch: fetchNotifications } = useNotificationStore();
+
+  const links: SidebarLink[] = [
+    { href: '/admin/dashboard', label: t('app.sidebar.admin.overview'), icon: LayoutDashboard },
+    { href: '/admin/users', label: t('app.sidebar.admin.users'), icon: Users },
+    { href: '/admin/pharmacies', label: t('app.sidebar.admin.pharmacies'), icon: Building2 },
+    { href: '/admin/orders', label: t('app.sidebar.admin.orders'), icon: ShoppingBag },
+    { href: '/admin/medicines', label: t('app.sidebar.admin.medicines'), icon: Pill },
+    { href: '/admin/side-effects', label: t('app.sidebar.admin.sideEffects'), icon: AlertTriangle },
+  ];
 
   useEffect(() => {
     connectSocket();

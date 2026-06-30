@@ -15,5 +15,40 @@
     "openMenu": "فتح القائمة",
     "closeMenu": "إغلاق القائمة",
     "home": "الذهاب إلى الرئيسية"
+  },
+  "app": {
+    "navbar": {
+      "notifications": "الإشعارات",
+      "profile": "الملف الشخصي",
+      "signOut": "تسجيل الخروج"
+    },
+    "sidebar": {
+      "patient": {
+        "dashboard": "لوحة التحكم",
+        "orders": "طلباتي",
+        "newRequest": "طلب جديد",
+        "medicines": "الأدوية",
+        "prescriptions": "الروشتات",
+        "saved": "المحفوظة",
+        "sideEffects": "الأعراض الجانبية",
+        "profile": "الملف الشخصي"
+      },
+      "pharmacy": {
+        "dashboard": "لوحة التحكم",
+        "orders": "الطلبات",
+        "inventory": "المخزون",
+        "sideEffects": "الأعراض الجانبية",
+        "messages": "الرسائل",
+        "settings": "الإعدادات"
+      },
+      "admin": {
+        "overview": "نظرة عامة",
+        "users": "المستخدمون",
+        "pharmacies": "الصيدليات",
+        "orders": "الطلبات",
+        "medicines": "الأدوية",
+        "sideEffects": "الأعراض الجانبية"
+      }
+    }
   }
 }

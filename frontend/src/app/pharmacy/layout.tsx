@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import ProtectedRoute from '@/components/shared/ProtectedRoute';
 import Navbar from '@/components/shared/Navbar';
 import Sidebar, { SidebarLink } from '@/components/shared/Sidebar';
@@ -8,18 +9,19 @@ import { LayoutDashboard, ShoppingBag, Package, MessageCircle, Settings, AlertTr
 import { useNotificationStore } from '@/store/notificationStore';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
 
-const links: SidebarLink[] = [
-  { href: '/pharmacy/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/pharmacy/orders', label: 'Orders', icon: ShoppingBag },
-  { href: '/pharmacy/inventory', label: 'Inventory', icon: Package },
-  { href: '/pharmacy/side-effects', label: 'Side Effects', icon: AlertTriangle },
-  { href: '/pharmacy/chat', label: 'Messages', icon: MessageCircle },
-  { href: '/pharmacy/settings', label: 'Settings', icon: Settings },
-];
-
 export default function PharmacyLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('nav');
   const { fetch: fetchNotifications } = useNotificationStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const links: SidebarLink[] = [
+    { href: '/pharmacy/dashboard', label: t('app.sidebar.pharmacy.dashboard'), icon: LayoutDashboard },
+    { href: '/pharmacy/orders', label: t('app.sidebar.pharmacy.orders'), icon: ShoppingBag },
+    { href: '/pharmacy/inventory', label: t('app.sidebar.pharmacy.inventory'), icon: Package },
+    { href: '/pharmacy/side-effects', label: t('app.sidebar.pharmacy.sideEffects'), icon: AlertTriangle },
+    { href: '/pharmacy/chat', label: t('app.sidebar.pharmacy.messages'), icon: MessageCircle },
+    { href: '/pharmacy/settings', label: t('app.sidebar.pharmacy.settings'), icon: Settings },
+  ];
 
   useEffect(() => {
     connectSocket();

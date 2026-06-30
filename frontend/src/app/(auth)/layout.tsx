@@ -2,17 +2,19 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 
-const FEATURES = [
-  'Request any medicine instantly',
-  'Compare offers from nearby pharmacies',
-  'Track your order in real time',
-];
-
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation('auth');
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
+
+  const features = [
+    t('brand.features.instant'),
+    t('brand.features.compare'),
+    t('brand.features.track'),
+  ];
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -51,12 +53,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
           {/* Tagline */}
           <p className="text-[12px] uppercase tracking-widest text-white/70 leading-relaxed mb-10">
-            Your neighbourhood pharmacy,<br />connected across Egypt
+            {t('brand.tagline')}
           </p>
 
           {/* Feature list */}
-          <div className="space-y-3.5 text-left">
-            {FEATURES.map((feat, i) => (
+          <div className="space-y-3.5 text-start">
+            {features.map((feat, i) => (
               <div key={i} className="flex items-center gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                 <p className="text-[11px] uppercase tracking-widest text-white/80">{feat}</p>

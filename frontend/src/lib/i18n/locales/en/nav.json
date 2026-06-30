@@ -15,5 +15,40 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "home": "Go to home"
+  },
+  "app": {
+    "navbar": {
+      "notifications": "Notifications",
+      "profile": "Profile",
+      "signOut": "Sign Out"
+    },
+    "sidebar": {
+      "patient": {
+        "dashboard": "Dashboard",
+        "orders": "My Orders",
+        "newRequest": "New Request",
+        "medicines": "Medicines",
+        "prescriptions": "Prescriptions",
+        "saved": "Saved",
+        "sideEffects": "Side Effects",
+        "profile": "Profile"
+      },
+      "pharmacy": {
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "inventory": "Inventory",
+        "sideEffects": "Side Effects",
+        "messages": "Messages",
+        "settings": "Settings"
+      },
+      "admin": {
+        "overview": "Overview",
+        "users": "Users",
+        "pharmacies": "Pharmacies",
+        "orders": "Orders",
+        "medicines": "Medicines",
+        "sideEffects": "Side Effects"
+      }
+    }
   }
 }

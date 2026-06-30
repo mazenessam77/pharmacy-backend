@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import { loginSchema, LoginFormData } from '@/lib/validations';
 import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/ui/Button';
@@ -13,6 +14,7 @@ import { AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 export default function LoginPage() {
+  const { t } = useTranslation('auth');
   const { login, googleLogin, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -29,9 +31,9 @@ export default function LoginPage() {
     setLoginError(null);
     try {
       await login(data);
-      toast.success('Welcome back');
+      toast.success(t('login.welcomeToast'));
     } catch (err: any) {
-      const msg = err.response?.data?.error?.message || 'Invalid email or password.';
+      const msg = err.response?.data?.error?.message || t('login.invalidCredentials');
       setLoginError(msg);
     }
   };
@@ -41,24 +43,24 @@ export default function LoginPage() {
     setLoginError(null);
     try {
       await googleLogin(credentialResponse.credential);
-      toast.success('Welcome back');
+      toast.success(t('login.welcomeToast'));
     } catch (err: any) {
-      const msg = err.response?.data?.error?.message || 'Google sign-in failed.';
+      const msg = err.response?.data?.error?.message || t('login.googleError');
       setLoginError(msg);
     }
   };
 
   return (
     <div>
-      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">Welcome back</h2>
-      <h3 className="text-[32px] font-black tracking-tight mb-8">Sign In</h3>
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600 mb-1">{t('login.title')}</h2>
+      <h3 className="text-[32px] font-black tracking-tight mb-8">{t('login.submit')}</h3>
 
       {/* Google button */}
       <div className="mb-6">
         <div className="flex justify-center">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
-            onError={() => setLoginError('Google sign-in failed. Please try again.')}
+            onError={() => setLoginError(t('login.googleError'))}
             theme="outline"
             size="large"
             text="continue_with"
@@ -71,7 +73,7 @@ export default function LoginPage() {
       {/* Divider */}
       <div className="flex items-center gap-4 mb-6">
         <div className="flex-1 h-px bg-neutral-200" />
-        <span className="text-[10px] uppercase tracking-widest text-neutral-400">or sign in with email</span>
+        <span className="text-[10px] uppercase tracking-widest text-neutral-400">{t('login.orWithEmail')}</span>
         <div className="flex-1 h-px bg-neutral-200" />
       </div>
 
@@ -85,25 +87,26 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Input
-          label="Email"
+          label={t('login.email')}
           type="email"
-          placeholder="you@example.com"
+          placeholder={t('login.emailPlaceholder')}
           error={errors.email?.message}
           {...register('email')}
         />
 
         <div className="relative">
           <Input
-            label="Password"
+            label={t('login.password')}
             type={showPassword ? 'text' : 'password'}
-            placeholder="Enter your password"
+            placeholder={t('login.passwordPlaceholder')}
             error={errors.password?.message}
             {...register('password')}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-0 top-7 text-neutral-400 hover:text-blue-600 transition-colors duration-200 active:scale-90"
+            aria-label={t('login.password')}
+            className="absolute end-0 top-7 text-neutral-400 hover:text-blue-600 transition-colors duration-200 active:scale-90"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -113,22 +116,22 @@ export default function LoginPage() {
           <label className="flex items-center gap-2 cursor-pointer group">
             <input type="checkbox" className="w-3.5 h-3.5 border-neutral-300 accent-blue-600" />
             <span className="text-[11px] uppercase tracking-widest text-neutral-500 group-hover:text-blue-600 transition-colors duration-200">
-              Remember me
+              {t('login.rememberMe')}
             </span>
           </label>
           <Link
             href="/forgot-password"
             className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-blue-600 transition-colors duration-200 font-semibold"
           >
-            Forgot password?
+            {t('login.forgotPassword')}
           </Link>
         </div>
 
         <div className="pt-2">
           <Button type="submit" variant="indigo" isLoading={isLoading} className="w-full group" size="lg">
-            Sign In
+            {t('login.submit')}
             {!isLoading && (
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 rtl:rotate-180" />
             )}
           </Button>
         </div>
@@ -136,12 +139,12 @@ export default function LoginPage() {
 
       <div className="mt-8 text-center">
         <p className="text-[11px] uppercase tracking-widest text-neutral-400">
-          Don&apos;t have an account?{' '}
+          {t('login.noAccount')}{' '}
           <Link
             href="/register"
             className="font-bold text-blue-600 hover:text-blue-700 transition-colors duration-200"
           >
-            Register
+            {t('login.register')}
           </Link>
         </p>
       </div>
