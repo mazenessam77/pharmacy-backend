@@ -4,6 +4,7 @@ import { socketAuth } from './auth.socket';
 import { registerChatHandlers } from './chat.handler';
 import { registerOrderHandlers } from './order.handler';
 import { registerPharmacyHandlers } from './pharmacy.handler';
+import { registerDeliveryHandlers } from './delivery.handler';
 import { Pharmacy } from '../models/Pharmacy';
 import { logger } from '../utils/logger';
 import { env } from '../config/env';
@@ -41,6 +42,7 @@ export const initSocket = (httpServer: HttpServer): Server => {
     registerChatHandlers(io!, socket);
     registerOrderHandlers(io!, socket);
     registerPharmacyHandlers(io!, socket);
+    registerDeliveryHandlers(io!, socket);
 
     socket.on('disconnect', () => {
       logger.info(`Socket disconnected: ${user.name} - ${socket.id}`);

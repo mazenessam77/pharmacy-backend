@@ -34,6 +34,12 @@ export const env = {
 
   GOOGLE_VISION_API_KEY: process.env.GOOGLE_VISION_API_KEY || '',
 
+  // Live delivery tracking — routing/ETA provider. Server-side key (NOT the
+  // NEXT_PUBLIC_ browser key) used for Directions API calls. Empty => routing
+  // degrades gracefully to "ETA unavailable" instead of crashing.
+  ROUTING_PROVIDER: (process.env.ROUTING_PROVIDER || 'google') as 'google' | 'none',
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
+
   GROQ_API_KEY: process.env.GROQ_API_KEY || '',
   GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
 

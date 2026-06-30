@@ -58,4 +58,39 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   SIDE_EFFECT_REPORT_NOT_FOUND: 'SIDE_EFFECT_REPORT_NOT_FOUND',
   AI_RECOMMENDATION_FAILED: 'AI_RECOMMENDATION_FAILED',
+  DELIVERY_NOT_FOUND: 'DELIVERY_NOT_FOUND',
+  DELIVERY_INVALID_STATUS: 'DELIVERY_INVALID_STATUS',
+  DELIVERY_EXISTS: 'DELIVERY_EXISTS',
+  DRIVER_NOT_FOUND: 'DRIVER_NOT_FOUND',
 } as const;
+
+// ── Live delivery tracking ──────────────────────────────────────────────────
+export const DELIVERY_STATUSES = [
+  'assigned',
+  'picked_up',
+  'in_transit',
+  'nearby',
+  'delivered',
+  'cancelled',
+] as const;
+
+/** Allowed forward transitions of the delivery state machine. */
+export const DELIVERY_TRANSITIONS: Record<string, string[]> = {
+  assigned: ['picked_up', 'cancelled'],
+  picked_up: ['in_transit', 'cancelled'],
+  in_transit: ['nearby', 'delivered', 'cancelled'],
+  nearby: ['delivered', 'cancelled'],
+};
+
+/** Statuses during which the driver's live location may be broadcast. */
+export const DELIVERY_TRACKABLE_STATUSES = ['picked_up', 'in_transit', 'nearby'];
+
+/** Terminal statuses — tracking stops, no more location writes. */
+export const DELIVERY_TERMINAL_STATUSES = ['delivered', 'cancelled'];
+
+/** Min interval (ms) between persisted GPS history samples per delivery. */
+export const GPS_SAMPLE_INTERVAL_MS = 10_000;
+/** Min interval (ms) between ETA recomputations (cost control). */
+export const ETA_REFRESH_INTERVAL_MS = 15_000;
+/** Distance (metres) under which the delivery is considered "nearby". */
+export const NEARBY_THRESHOLD_M = 400;

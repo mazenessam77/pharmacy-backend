@@ -23,6 +23,7 @@ import reviewRoutes from './routes/review.routes';
 import notificationRoutes from './routes/notification.routes';
 import adminRoutes from './routes/admin.routes';
 import sideEffectRoutes from './routes/sideEffect.routes';
+import deliveryRoutes from './routes/delivery.routes';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/side-effects', sideEffectRoutes);
+app.use('/api/deliveries', deliveryRoutes);
 
 // Error handling
 app.use(notFoundHandler);
