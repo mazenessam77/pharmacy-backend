@@ -28,8 +28,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ isLoading: true });
     try {
       const res = await messageService.getHistory(orderId, recipientId, { limit: 100 });
-      const messages = res.data.data?.messages || res.data.data || [];
-      set({ messages: messages.reverse() });
+      // Backend already returns messages oldest -> newest (chronological), which
+      // is the order ChatWindow renders. Do NOT reverse it again.
+      const data = res.data?.data;
+      const messages = Array.isArray(data) ? data : data?.messages ?? [];
+      set({ messages });
     } catch {
       // silent
     } finally {
