@@ -1,5 +1,6 @@
 'use client';
 
+import LanguageGate from '@/components/shared/LanguageGate';
 import LandingNavbar from '@/components/landing/LandingNavbar';
 import HeroSection from '@/components/landing/HeroSection';
 import MedicineShowcase from '@/components/landing/MedicineShowcase';
@@ -13,6 +14,7 @@ import Footer from '@/components/landing/Footer';
 export default function Home() {
   return (
     <main>
+      <LanguageGate />
       <LandingNavbar />
       <HeroSection />
       <MedicineShowcase />

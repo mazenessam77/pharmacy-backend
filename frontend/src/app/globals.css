@@ -14,6 +14,18 @@
     font-family: var(--font-sans, 'Helvetica Neue', Helvetica, Arial, sans-serif);
     -webkit-font-smoothing: antialiased;
   }
+  /* Arabic typography — Latin UI fonts render Arabic poorly; use a cross-OS
+     Arabic-capable stack only when the document is in Arabic. */
+  :lang(ar),
+  [dir='rtl'] {
+    font-family: 'Segoe UI', Tahoma, 'Geeza Pro', 'Noto Sans Arabic', 'Cairo',
+      'Helvetica Neue', Arial, sans-serif;
+  }
+  /* Keep Latin/number runs (emails, codes) LTR even inside an RTL document. */
+  [dir='rtl'] .force-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
   ::selection {
     @apply bg-black text-white;
   }

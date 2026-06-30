@@ -1,0 +1,19 @@
+{
+  "links": {
+    "features": "المميزات",
+    "categories": "الفئات",
+    "howItWorks": "كيف يعمل",
+    "news": "الأخبار",
+    "about": "من نحن"
+  },
+  "actions": {
+    "signIn": "تسجيل الدخول",
+    "getStarted": "ابدأ الآن",
+    "getStartedFree": "ابدأ مجانًا"
+  },
+  "aria": {
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "home": "الذهاب إلى الرئيسية"
+  }
+}

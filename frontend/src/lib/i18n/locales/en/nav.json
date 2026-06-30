@@ -1,0 +1,19 @@
+{
+  "links": {
+    "features": "Features",
+    "categories": "Categories",
+    "howItWorks": "How It Works",
+    "news": "News",
+    "about": "About"
+  },
+  "actions": {
+    "signIn": "Sign In",
+    "getStarted": "Get Started",
+    "getStartedFree": "Get Started Free"
+  },
+  "aria": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "home": "Go to home"
+  }
+}

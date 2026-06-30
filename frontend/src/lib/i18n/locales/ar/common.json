@@ -1,0 +1,39 @@
+{
+  "brand": "PharmaLink",
+  "buttons": {
+    "getStarted": "ابدأ الآن",
+    "getStartedFree": "ابدأ مجانًا",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "register": "إنشاء حساب",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "cancel": "إلغاء",
+    "submit": "إرسال",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "confirm": "تأكيد",
+    "search": "بحث",
+    "viewAll": "عرض الكل",
+    "tryNow": "جرّبه الآن",
+    "seeHowItWorks": "شاهد كيف يعمل",
+    "learnMore": "اعرف المزيد"
+  },
+  "states": {
+    "loading": "جارٍ التحميل…",
+    "empty": "لا يوجد شيء هنا بعد",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "noResults": "لا توجد نتائج"
+  },
+  "language": {
+    "label": "اللغة",
+    "change": "تغيير اللغة",
+    "english": "English",
+    "arabic": "العربية"
+  }
+}

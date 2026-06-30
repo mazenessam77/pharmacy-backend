@@ -1,0 +1,16 @@
+{
+  "tagline": "Connecting patients with nearby pharmacies — find your medicines, compare offers, and get them delivered to your door.",
+  "stats": {
+    "cities": "Cities",
+    "medicines": "Medicines",
+    "available": "Available"
+  },
+  "platform": "Platform",
+  "links": {
+    "signIn": "Sign In",
+    "registerPatient": "Register as Patient",
+    "registerPharmacy": "Register Pharmacy"
+  },
+  "copyright": "© {{year}} PharmaLink. All rights reserved.",
+  "slogan": "Your health, delivered."
+}

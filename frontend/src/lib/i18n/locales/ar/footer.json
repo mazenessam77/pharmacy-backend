@@ -1,0 +1,16 @@
+{
+  "tagline": "نربط المرضى بالصيدليات القريبة — اعثر على أدويتك، قارن العروض، واحصل عليها أمام باب منزلك.",
+  "stats": {
+    "cities": "مدينة",
+    "medicines": "دواء",
+    "available": "متاح"
+  },
+  "platform": "المنصة",
+  "links": {
+    "signIn": "تسجيل الدخول",
+    "registerPatient": "تسجيل كمريض",
+    "registerPharmacy": "تسجيل صيدلية"
+  },
+  "copyright": "© {{year}} PharmaLink. جميع الحقوق محفوظة.",
+  "slogan": "صحتك، تصل إليك."
+}
