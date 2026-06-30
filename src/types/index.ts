@@ -73,6 +73,80 @@ export interface IOrder {
   createdAt: Date;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Live delivery tracking domain (additive — does not change Order.status)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type DeliveryStatus =
+  | 'assigned'
+  | 'picked_up'
+  | 'in_transit'
+  | 'nearby'
+  | 'delivered'
+  | 'cancelled';
+
+/** GeoJSON point — coordinates are ALWAYS [lng, lat]. */
+export interface GeoPoint {
+  type: 'Point';
+  coordinates: number[];
+}
+
+/** A single GPS fix from the driver device. */
+export interface IDriverLocationFix {
+  lng: number;
+  lat: number;
+  heading?: number; // degrees, 0-360 (clockwise from north)
+  speed?: number; // metres / second
+  accuracy?: number; // metres
+  recordedAt: Date;
+}
+
+export interface IDriver {
+  _id: Types.ObjectId;
+  userId?: Types.ObjectId; // optional link to a User (driver login), if any
+  name: string;
+  phone: string;
+  photoUrl?: string;
+  vehicleType: string;
+  vehiclePlate: string;
+  rating: number;
+  status: 'online' | 'offline' | 'on_delivery';
+  createdAt: Date;
+}
+
+export interface IDelivery {
+  _id: Types.ObjectId;
+  orderId: Types.ObjectId;
+  patientId: Types.ObjectId;
+  pharmacyId: Types.ObjectId;
+  driverId?: Types.ObjectId;
+  status: DeliveryStatus;
+  pickup: { point: GeoPoint; address?: string };
+  dropoff: { point: GeoPoint; address?: string };
+  route?: { polyline: string; distanceM: number; durationS: number; fetchedAt: Date };
+  eta?: { seconds: number; distanceM: number; updatedAt: Date };
+  lastLocation?: IDriverLocationFix;
+  timeline: { status: DeliveryStatus; at: Date }[];
+  cancelReason?: string;
+  assignedAt?: Date;
+  pickedUpAt?: Date;
+  deliveredAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** Sampled GPS history (TTL-expired) — NOT every ping. */
+export interface IDriverLocation {
+  _id: Types.ObjectId;
+  deliveryId: Types.ObjectId;
+  driverId: Types.ObjectId;
+  point: GeoPoint;
+  heading?: number;
+  speed?: number;
+  accuracy?: number;
+  recordedAt: Date;
+}
+
 export interface IOrderResponse {
   _id: Types.ObjectId;
   orderId: Types.ObjectId;
