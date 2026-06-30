@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import SaveOrderMedicineButton from '@/components/shared/SaveOrderMedicineButton';
 import { useSavedMedicationStore } from '@/store/savedMedicationStore';
 import { MessageCircle, X, Check, Star, Pill, Truck, Calendar, StickyNote, Building2, Tag } from 'lucide-react';
+import OrderTrackingSection from '@/components/delivery/OrderTrackingSection';
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -82,6 +83,12 @@ export default function OrderDetailPage() {
           </Badge>
         </div>
       </div>
+
+      {/* Live delivery tracking — only for delivery orders that are in motion. */}
+      {currentOrder.deliveryType === 'delivery' &&
+        !['pending', 'offered', 'cancelled'].includes(currentOrder.status) && (
+          <OrderTrackingSection orderId={currentOrder._id} />
+        )}
 
       {/* Order Info */}
       <div className="bg-white rounded-[18px] border border-neutral-100 shadow-md p-6 mb-4">
