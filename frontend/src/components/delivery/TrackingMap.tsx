@@ -37,7 +37,7 @@ export default function TrackingMap({
     googleMapsApiKey: apiKey,
     libraries: LIBRARIES,
   });
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [, setMap] = useState<google.maps.Map | null>(null);
 
   const pickup = { lat: snapshot.pickup.lat, lng: snapshot.pickup.lng };
   const dropoff = { lat: snapshot.dropoff.lat, lng: snapshot.dropoff.lng };
