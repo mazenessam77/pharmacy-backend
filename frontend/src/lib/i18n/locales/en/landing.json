@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "badge": "Live across all 27 governorates",
+    "titleLine1": "Your Medicine,",
+    "titleHighlight": "Delivered Fast.",
+    "subtitle": "Connect with nearby pharmacies in real-time. Upload prescriptions, compare offers, chat with pharmacists, and get your medicines delivered — all from one bright, simple platform.",
+    "trust": {
+      "governorates": "27 Governorates",
+      "rating": "4.9 / 5 Rating",
+      "secure": "Secure & Encrypted",
+      "realtime": "Real-time Updates"
+    },
+    "featured": {
+      "tag": "Featured",
+      "title": "Same-Day Prescription Delivery",
+      "subtitle": "Snap your prescription, we read it for you, and a nearby pharmacy delivers — fast."
+    },
+    "tiles": {
+      "painRelief": { "label": "Pain Relief", "sub": "Analgesics & NSAIDs" },
+      "vitamins": { "label": "Vitamins", "sub": "Daily Wellness" },
+      "chronicCare": { "label": "Chronic Care", "sub": "Diabetes & Cardio" }
+    },
+    "medicineCount": "500+",
+    "medicinesAcross": "medicines across 27 cities"
+  }
+}

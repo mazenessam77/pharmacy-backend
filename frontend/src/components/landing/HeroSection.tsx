@@ -3,14 +3,24 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Play, MapPin, Star, Shield, Zap } from 'lucide-react';
-
-const featureTiles = [
-  { label: 'Pain Relief',    sub: 'Analgesics & NSAIDs', icon: '💊', gradient: 'from-sky-400 to-blue-600' },
-  { label: 'Vitamins',       sub: 'Daily Wellness',      icon: '🌿', gradient: 'from-emerald-400 to-teal-600' },
-  { label: 'Chronic Care',   sub: 'Diabetes & Cardio',   icon: '❤️', gradient: 'from-rose-400 to-pink-600' },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function HeroSection() {
+  const { t } = useTranslation(['landing', 'common']);
+
+  const featureTiles = [
+    { label: t('hero.tiles.painRelief.label'), sub: t('hero.tiles.painRelief.sub'), icon: '💊', gradient: 'from-sky-400 to-blue-600' },
+    { label: t('hero.tiles.vitamins.label'), sub: t('hero.tiles.vitamins.sub'), icon: '🌿', gradient: 'from-emerald-400 to-teal-600' },
+    { label: t('hero.tiles.chronicCare.label'), sub: t('hero.tiles.chronicCare.sub'), icon: '❤️', gradient: 'from-rose-400 to-pink-600' },
+  ];
+
+  const trust = [
+    { icon: MapPin, text: t('hero.trust.governorates') },
+    { icon: Star, text: t('hero.trust.rating') },
+    { icon: Shield, text: t('hero.trust.secure') },
+    { icon: Zap, text: t('hero.trust.realtime') },
+  ];
+
   return (
     <section
       id="hero"
@@ -28,22 +38,20 @@ export default function HeroSection() {
               <div className="inline-flex items-center gap-2 bg-white border border-neutral-200 rounded-full px-4 py-1.5 mb-7 shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[11px] text-neutral-700 font-semibold uppercase tracking-wider">
-                  Live across all 27 governorates
+                  {t('hero.badge')}
                 </span>
               </div>
 
               <h1 className="text-[clamp(42px,6vw,76px)] font-black text-neutral-900 leading-[0.98] tracking-tight mb-6">
-                Your Medicine,
+                {t('hero.titleLine1')}
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 bg-clip-text text-transparent">
-                  Delivered Fast.
+                  {t('hero.titleHighlight')}
                 </span>
               </h1>
 
               <p className="text-[16px] text-neutral-500 leading-relaxed max-w-[460px] mb-9">
-                Connect with nearby pharmacies in real-time. Upload prescriptions,
-                compare offers, chat with pharmacists, and get your medicines
-                delivered — all from one bright, simple platform.
+                {t('hero.subtitle')}
               </p>
             </motion.div>
 
@@ -57,15 +65,15 @@ export default function HeroSection() {
                 href="/register"
                 className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-sky-500 text-white px-8 py-4 rounded-full text-[14px] font-bold hover:shadow-[0_16px_40px_-12px_rgba(37,99,235,0.6)] active:scale-[0.98] transition-all duration-200"
               >
-                Get Started Free
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                {t('common:buttons.getStartedFree')}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform rtl:rotate-180" />
               </Link>
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center gap-2 bg-white border border-neutral-200 text-neutral-800 px-8 py-4 rounded-full text-[14px] font-semibold hover:border-neutral-300 hover:shadow-md transition-all duration-200"
               >
-                <Play className="w-4 h-4 fill-neutral-800" />
-                See How It Works
+                <Play className="w-4 h-4 fill-neutral-800 rtl:-scale-x-100" />
+                {t('common:buttons.seeHowItWorks')}
               </Link>
             </motion.div>
 
@@ -75,12 +83,7 @@ export default function HeroSection() {
               transition={{ duration: 0.7, delay: 0.45 }}
               className="flex flex-wrap items-center gap-x-6 gap-y-3"
             >
-              {[
-                { icon: MapPin, text: '27 Governorates' },
-                { icon: Star, text: '4.9 / 5 Rating' },
-                { icon: Shield, text: 'Secure & Encrypted' },
-                { icon: Zap, text: 'Real-time Updates' },
-              ].map(({ icon: Icon, text }) => (
+              {trust.map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-center gap-1.5">
                   <Icon className="w-4 h-4 text-blue-600" />
                   <span className="text-[12.5px] text-neutral-600 font-medium">{text}</span>
@@ -96,27 +99,27 @@ export default function HeroSection() {
             transition={{ duration: 0.85, delay: 0.25 }}
             className="hidden lg:block"
           >
-            {/* Flagship promo card (the "Call of Duty" banner) */}
+            {/* Flagship promo card */}
             <div className="relative rounded-[28px] overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 p-8 min-h-[260px] flex flex-col justify-between shadow-[0_30px_70px_-25px_rgba(79,70,229,0.55)]">
               <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at 85% 15%, rgba(255,255,255,0.5) 0%, transparent 45%)' }} />
               <div className="relative z-10 flex items-start justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 bg-white/15 rounded-full px-3 py-1">
-                  Featured
+                  {t('hero.featured.tag')}
                 </span>
                 <span className="text-4xl">🚚</span>
               </div>
               <div className="relative z-10">
                 <h3 className="text-white font-black text-[26px] leading-tight tracking-tight">
-                  Same-Day<br />Prescription Delivery
+                  {t('hero.featured.title')}
                 </h3>
                 <p className="text-white/75 text-[13px] mt-2 max-w-[260px]">
-                  Snap your prescription, we read it for you, and a nearby pharmacy delivers — fast.
+                  {t('hero.featured.subtitle')}
                 </p>
                 <Link
                   href="/register"
                   className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-bold text-white bg-white/15 hover:bg-white/25 rounded-full px-4 py-2 transition-colors"
                 >
-                  Try it now <ArrowRight className="w-3.5 h-3.5" />
+                  {t('common:buttons.tryNow')} <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                 </Link>
               </div>
             </div>
@@ -147,8 +150,8 @@ export default function HeroSection() {
               transition={{ delay: 1, duration: 0.5 }}
               className="mt-4 mx-auto w-fit flex items-center gap-2 bg-white rounded-full px-5 py-2.5 shadow-lg border border-neutral-100"
             >
-              <span className="text-[13px] font-extrabold text-blue-600">500+</span>
-              <span className="text-[12px] text-neutral-500">medicines across 27 cities</span>
+              <span className="text-[13px] font-extrabold text-blue-600">{t('hero.medicineCount')}</span>
+              <span className="text-[12px] text-neutral-500">{t('hero.medicinesAcross')}</span>
             </motion.div>
           </motion.div>
         </div>

@@ -4,16 +4,20 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Cross } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'Categories', href: '#categories' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'News', href: '#news' },
-  { label: 'About', href: '#about' },
-];
+  { key: 'links.features', href: '#features' },
+  { key: 'links.categories', href: '#categories' },
+  { key: 'links.howItWorks', href: '#how-it-works' },
+  { key: 'links.news', href: '#news' },
+  { key: 'links.about', href: '#about' },
+] as const;
 
 export default function LandingNavbar() {
+  const { t } = useTranslation('nav');
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -40,7 +44,11 @@ export default function LandingNavbar() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
-          <button onClick={() => scrollTo('#hero')} className="flex items-center gap-2.5 group">
+          <button
+            onClick={() => scrollTo('#hero')}
+            aria-label={t('aria.home')}
+            className="flex items-center gap-2.5 group"
+          >
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
               <Cross className="w-4 h-4 text-white fill-white" />
             </div>
@@ -63,13 +71,14 @@ export default function LandingNavbar() {
                     : 'text-neutral-600 hover:text-neutral-900'
                 }`}
               >
-                {link.label}
+                {t(link.key)}
               </button>
             ))}
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher variant="full" />
             <Link
               href="/login"
               className={`text-[13px] font-medium px-4 py-2 rounded-none transition-colors duration-200 ${
@@ -78,20 +87,23 @@ export default function LandingNavbar() {
                   : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
-              Sign In
+              {t('actions.signIn')}
             </Link>
             <Link
               href="/register"
               className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-sky-500 text-white text-[13px] font-semibold rounded-full hover:shadow-lg hover:shadow-blue-500/30 active:scale-95 transition-all duration-200"
             >
-              Get Started
+              {t('actions.getStarted')}
             </Link>
           </div>
 
-          {/* Mobile: hamburger */}
-          <div className="lg:hidden flex items-center gap-2">
+          {/* Mobile: switcher + hamburger */}
+          <div className="lg:hidden flex items-center gap-1">
+            <LanguageSwitcher variant="compact" />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? t('aria.closeMenu') : t('aria.openMenu')}
+              aria-expanded={mobileOpen}
               className={`p-2 rounded-none transition-colors ${
                 scrolled
                   ? 'text-neutral-700 hover:bg-neutral-100'
@@ -119,9 +131,9 @@ export default function LandingNavbar() {
                 <button
                   key={link.href}
                   onClick={() => scrollTo(link.href)}
-                  className="text-left px-4 py-3 text-[14px] font-medium text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-none transition-colors"
+                  className="text-start px-4 py-3 text-[14px] font-medium text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-none transition-colors"
                 >
-                  {link.label}
+                  {t(link.key)}
                 </button>
               ))}
             </div>
@@ -131,14 +143,14 @@ export default function LandingNavbar() {
                 onClick={() => setMobileOpen(false)}
                 className="w-full py-3 text-center text-[14px] font-semibold text-neutral-700 border border-neutral-200 rounded-none hover:border-neutral-200 hover:text-neutral-900 transition-colors"
               >
-                Sign In
+                {t('actions.signIn')}
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
                 className="w-full py-3 text-center text-[14px] font-semibold text-white bg-gradient-to-r from-blue-600 to-sky-500 rounded-full hover:shadow-lg transition-shadow"
               >
-                Get Started Free
+                {t('actions.getStartedFree')}
               </Link>
             </div>
           </motion.div>

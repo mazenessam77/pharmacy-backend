@@ -8,10 +8,16 @@ export const metadata: Metadata = {
   description: 'Connect with nearby pharmacies, request medicines, and get them delivered.',
 };
 
+// Runs before first paint to set <html lang/dir> from the saved preference
+// (localStorage → cookie → browser language). Prevents any LTR↔RTL flash for
+// returning users; the React provider keeps it in sync afterwards.
+const setInitialLang = `(function(){try{var k='pharmalink.lang';var s=null;try{s=localStorage.getItem(k);}catch(e){}if(s!=='en'&&s!=='ar'){var m=document.cookie.match(/(?:^|; )pharmalink\\.lang=([^;]+)/);if(m){s=m[1];}}if(s!=='en'&&s!=='ar'){s=(navigator.language||'').toLowerCase().indexOf('ar')===0?'ar':'en';}var el=document.documentElement;el.lang=s;el.dir=(s==='ar'?'rtl':'ltr');}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <body className="bg-white text-black">
+        <script dangerouslySetInnerHTML={{ __html: setInitialLang }} />
         <Providers>
           {children}
           <Toaster

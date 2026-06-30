@@ -2,8 +2,23 @@
 
 import Link from 'next/link';
 import { Cross } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t } = useTranslation('footer');
+
+  const stats = [
+    { value: '27', label: t('stats.cities') },
+    { value: '500+', label: t('stats.medicines') },
+    { value: '24/7', label: t('stats.available') },
+  ];
+
+  const links = [
+    { label: t('links.signIn'), href: '/login' },
+    { label: t('links.registerPatient'), href: '/register' },
+    { label: t('links.registerPharmacy'), href: '/register' },
+  ];
+
   return (
     <footer className="bg-neutral-950 text-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
@@ -16,11 +31,10 @@ export default function Footer() {
               <span className="text-[15px] font-bold tracking-tight">PharmaLink</span>
             </div>
             <p className="text-[13px] text-neutral-400 leading-relaxed max-w-sm">
-              Connecting patients with nearby pharmacies — find your medicines,
-              compare offers, and get them delivered to your door.
+              {t('tagline')}
             </p>
             <div className="flex items-center gap-6 mt-6">
-              {[{ value: '27', label: 'Cities' }, { value: '500+', label: 'Medicines' }, { value: '24/7', label: 'Available' }].map((s) => (
+              {stats.map((s) => (
                 <div key={s.label}>
                   <p className="text-[16px] font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">{s.value}</p>
                   <p className="text-[10px] text-neutral-500 uppercase tracking-widest font-medium">{s.label}</p>
@@ -30,9 +44,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 mb-5">Platform</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 mb-5">{t('platform')}</h4>
             <div className="space-y-3">
-              {[{ label: 'Sign In', href: '/login' }, { label: 'Register as Patient', href: '/register' }, { label: 'Register Pharmacy', href: '/register' }].map((link) => (
+              {links.map((link) => (
                 <Link key={link.label} href={link.href} className="block text-[13px] text-neutral-400 hover:text-white transition-colors duration-200">
                   {link.label}
                 </Link>
@@ -44,8 +58,8 @@ export default function Footer() {
 
       <div className="border-t border-neutral-800">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[12px] text-neutral-500">&copy; 2026 PharmaLink. All rights reserved.</p>
-          <p className="text-[12px] text-neutral-600">Your health, delivered.</p>
+          <p className="text-[12px] text-neutral-500">{t('copyright', { year: new Date().getFullYear() })}</p>
+          <p className="text-[12px] text-neutral-600">{t('slogan')}</p>
         </div>
       </div>
     </footer>

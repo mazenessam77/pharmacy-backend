@@ -1,0 +1,39 @@
+{
+  "brand": "PharmaLink",
+  "buttons": {
+    "getStarted": "Get Started",
+    "getStartedFree": "Get Started Free",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "register": "Register",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "search": "Search",
+    "viewAll": "View All",
+    "tryNow": "Try it now",
+    "seeHowItWorks": "See How It Works",
+    "learnMore": "Learn More"
+  },
+  "states": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "noResults": "No results found"
+  },
+  "language": {
+    "label": "Language",
+    "change": "Change language",
+    "english": "English",
+    "arabic": "العربية"
+  }
+}
