@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useNotificationStore } from '@/store/notificationStore';
-import { Bell, LogOut, User, ChevronDown, Menu } from 'lucide-react';
+import { Bell, LogOut, User, ChevronDown, Menu, MessageCircle } from 'lucide-react';
 
 interface NavbarProps {
   onMenuToggle?: () => void;
@@ -34,6 +34,8 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
   };
 
   const basePath = user?.role === 'admin' ? '/admin' : user?.role === 'pharmacy' ? '/pharmacy' : '/patient';
+  // Chat exists for patients and pharmacies (not admin).
+  const canChat = user?.role === 'patient' || user?.role === 'pharmacy';
 
   return (
     <header className="h-14 border-b border-neutral-200 bg-white flex items-center px-4 sm:px-6 justify-between sticky top-0 z-30 transition-colors duration-200">
@@ -50,6 +52,18 @@ export default function Navbar({ onMenuToggle }: NavbarProps) {
         <Link href={`${basePath}/dashboard`} className="text-[13px] font-bold text-neutral-800 tracking-tight">
           PharmaLink
         </Link>
+
+        {/* Messages — quick access to conversations (patient & pharmacy) */}
+        {canChat && (
+          <Link
+            href={`${basePath}/chat`}
+            aria-label="Messages"
+            className="inline-flex items-center gap-1.5 ms-1 text-[12px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">Messages</span>
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-3 sm:gap-4">
