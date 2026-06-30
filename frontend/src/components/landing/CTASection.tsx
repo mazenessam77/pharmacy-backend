@@ -3,8 +3,11 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Stethoscope } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function CTASection() {
+  const { t } = useTranslation('landing');
+
   return (
     <section className="py-28 bg-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -20,14 +23,14 @@ export default function CTASection() {
         >
           {/* Decorative elements */}
           <div
-            className="absolute top-0 right-0 w-96 h-96 rounded-none pointer-events-none"
+            className="absolute top-0 end-0 w-96 h-96 rounded-none pointer-events-none"
             style={{
               background:
                 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
             }}
           />
           <div
-            className="absolute -bottom-20 -left-10 w-64 h-64 rounded-none pointer-events-none"
+            className="absolute -bottom-20 -start-10 w-64 h-64 rounded-none pointer-events-none"
             style={{
               background:
                 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
@@ -35,22 +38,21 @@ export default function CTASection() {
           />
 
           {/* Stethoscope watermark */}
-          <div className="absolute top-6 right-10 opacity-[0.07] pointer-events-none">
+          <div className="absolute top-6 end-10 opacity-[0.07] pointer-events-none">
             <Stethoscope className="w-40 h-40 text-white" />
           </div>
 
           <div className="relative z-10 px-10 py-16 lg:px-20 lg:py-20 text-center">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-white/70 mb-4">
-              Ready to Start?
+              {t('cta.eyebrow')}
             </p>
             <h2 className="text-[clamp(28px,4vw,48px)] font-extrabold text-white leading-tight tracking-tight mb-4">
-              Your Health,
+              {t('cta.titleLine1')}
               <br />
-              Our Priority
+              {t('cta.titleLine2')}
             </h2>
             <p className="text-[15px] text-white/80 max-w-md mx-auto mb-10 leading-relaxed">
-              Join PharmaLink today and experience the future of pharmacy services —
-              whether you&apos;re a patient or a pharmacy owner.
+              {t('cta.subtitle')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -58,14 +60,14 @@ export default function CTASection() {
                 href="/register"
                 className="group inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-8 py-3.5 rounded-full text-[14px] font-bold hover:bg-neutral-100 active:scale-[0.98] transition-all duration-200"
               >
-                Create Free Account
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                {t('cta.createAccount')}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform rtl:rotate-180" />
               </Link>
               <Link
                 href="/register"
                 className="inline-flex items-center justify-center gap-2 bg-white/10 border border-white/25 text-white px-8 py-3.5 rounded-full text-[14px] font-semibold hover:bg-white/20 transition-all duration-200"
               >
-                Register Your Pharmacy
+                {t('cta.registerPharmacy')}
               </Link>
             </div>
           </div>

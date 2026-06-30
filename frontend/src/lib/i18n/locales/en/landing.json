@@ -22,5 +22,100 @@
     },
     "medicineCount": "500+",
     "medicinesAcross": "medicines across 27 cities"
+  },
+  "features": {
+    "eyebrow": "Platform Features",
+    "titleLine1": "Everything You Need,",
+    "titleHighlight": "Nothing You Don't",
+    "subtitle": "A complete pharmacy experience designed around you — find medicines, compare offers, and get them delivered.",
+    "items": {
+      "geo": { "title": "Geolocation Search", "description": "Find pharmacies near you using GPS-powered search with configurable radius." },
+      "realtime": { "title": "Real-time Updates", "description": "Live order tracking with instant status updates as your order progresses." },
+      "chat": { "title": "In-app Chat", "description": "Direct messaging between patients and pharmacies with typing indicators." },
+      "scan": { "title": "Prescription Scanning", "description": "Snap a photo of your prescription and we read the medicine names for you." },
+      "reviews": { "title": "Reviews & Ratings", "description": "Rate pharmacies and read reviews to make informed decisions." },
+      "delivery": { "title": "Delivery Tracking", "description": "Track your order from preparation to doorstep delivery in real-time." },
+      "secure": { "title": "Secure Platform", "description": "Your account and data stay protected with secure sign-in and encryption." },
+      "notifications": { "title": "Smart Notifications", "description": "Push notifications for order updates, new offers, and messages." }
+    }
+  },
+  "howItWorks": {
+    "eyebrow": "How It Works",
+    "title": "Four Simple Steps",
+    "subtitle": "From request to doorstep in minutes.",
+    "stepLabel": "Step",
+    "steps": {
+      "request": { "title": "Request Medicine", "description": "Search for medicines by name or upload your prescription — we read it for you automatically." },
+      "offers": { "title": "Get Offers", "description": "Nearby pharmacies compete to serve you with their best prices and available alternatives." },
+      "chat": { "title": "Choose & Chat", "description": "Compare offers, chat directly with pharmacists, and confirm your preferred option." },
+      "track": { "title": "Track & Receive", "description": "Follow your order in real-time from preparation to delivery right at your door." }
+    }
+  },
+  "cta": {
+    "eyebrow": "Ready to Start?",
+    "titleLine1": "Your Health,",
+    "titleLine2": "Our Priority",
+    "subtitle": "Join PharmaLink today and experience the future of pharmacy services — whether you're a patient or a pharmacy owner.",
+    "createAccount": "Create Free Account",
+    "registerPharmacy": "Register Your Pharmacy"
+  },
+  "about": {
+    "eyebrow": "About Us",
+    "titleLine1": "Built With Purpose,",
+    "titleHighlight": "Delivered With Care",
+    "subtitle": "PharmaLink bridges the gap between patients and pharmacies, making it simple to find the medicines you need and get them delivered to your door.",
+    "missionTitle": "Our Mission",
+    "missionBody": "To make pharmaceutical services easier to access by connecting you with nearby pharmacies — with transparent pricing, instant communication, and reliable delivery, all in one place.",
+    "stats": {
+      "availableValue": "24/7",
+      "available": "Available",
+      "trackingValue": "Live",
+      "tracking": "Order Tracking",
+      "verifiedValue": "Verified",
+      "verified": "Pharmacies"
+    },
+    "whyTitle": "Why PharmaLink",
+    "highlights": {
+      "near": { "title": "Pharmacies Near You", "description": "We connect you with trusted pharmacies in your area so you get what you need, faster." },
+      "available": { "title": "Always Available", "description": "Request medicines and track your orders any time of day, right from your phone." },
+      "safe": { "title": "Safe & Reliable", "description": "Verified pharmacies, transparent pricing, and secure ordering you can count on." }
+    }
+  },
+  "categories": {
+    "eyebrow": "Medicine Categories",
+    "title": "Browse by Category",
+    "subtitle": "Hundreds of medicines across all major categories, available from nearby pharmacies in real-time.",
+    "viewAll": "View All",
+    "items": {
+      "pain": { "name": "Pain Relief", "desc": "Paracetamol, Ibuprofen, Aspirin & more", "count": "80+ products", "tag": "Most Popular" },
+      "antibiotics": { "name": "Antibiotics", "desc": "Amoxicillin, Azithromycin & capsules", "count": "45+ products", "tag": "Prescription" },
+      "vitamins": { "name": "Vitamins & Wellness", "desc": "Vitamin C, D, B-Complex & supplements", "count": "120+ products", "tag": "OTC" },
+      "chronic": { "name": "Chronic Disease", "desc": "Diabetes, Blood Pressure & Cholesterol", "count": "60+ products", "tag": "Long-term" },
+      "firstAid": { "name": "First Aid", "desc": "Bandages, Antiseptics & Wound care", "count": "35+ products", "tag": "Emergency" },
+      "eyeEar": { "name": "Eye & Ear Care", "desc": "Eye drops, Ear drops & solutions", "count": "30+ products", "tag": "Specialist" },
+      "skincare": { "name": "Skincare", "desc": "Creams, ointments & topical gels", "count": "55+ products", "tag": "Topical" },
+      "babyMother": { "name": "Baby & Mother Care", "desc": "Infant formulas, supplements & care", "count": "40+ products", "tag": "Pediatric" }
+    }
+  },
+  "news": {
+    "eyebrow": "Latest News",
+    "title": "What's New at PharmaLink",
+    "readMore": "Read more",
+    "date": "Jun 2026",
+    "items": {
+      "storage": { "tag": "Health Tips", "title": "How to store your medicines safely at home", "excerpt": "Heat, light and humidity can reduce a medicine's potency. A few simple habits keep them effective." },
+      "scanning": { "tag": "Product", "title": "Prescription scanning is now faster than ever", "excerpt": "Our improved reader extracts medicine names from a photo in seconds — fewer typos, quicker orders." },
+      "coverage": { "tag": "Community", "title": "PharmaLink now live across all 27 governorates", "excerpt": "Patients everywhere can now connect with nearby pharmacies and get medicines delivered to their door." }
+    },
+    "partner": {
+      "title": "Partner Your Pharmacy",
+      "body": "Reach more patients, manage orders in real-time, and grow your pharmacy with PharmaLink.",
+      "cta": "Register Your Pharmacy"
+    },
+    "careers": {
+      "title": "Join Our Team",
+      "body": "We're building the future of pharmacy access. Help us connect patients with care that's fast and reliable.",
+      "cta": "See Open Roles"
+    }
   }
 }
