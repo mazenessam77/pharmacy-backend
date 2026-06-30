@@ -15,6 +15,7 @@ import { createNotification } from './notification.service';
 import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
 import { haversineMeters, isValidLngLat, type LngLat } from '../utils/geo';
+import { toObjectId } from '../utils/objectId';
 import {
   DELIVERY_TRANSITIONS,
   DELIVERY_TRACKABLE_STATUSES,
@@ -41,7 +42,10 @@ export async function assignDriver(params: {
   orderId: string;
   driverId: string;
 }): Promise<DeliveryDocument> {
-  const { orderId, driverId } = params;
+  // Sanitize user-controlled ids into real ObjectIds before ANY query reaches
+  // Mongo. Rejects objects/arrays/operators/empty/invalid ids (NoSQL-injection).
+  const orderId = toObjectId(params.orderId);
+  const driverId = toObjectId(params.driverId);
 
   const order = await Order.findById(orderId);
   if (!order) throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);

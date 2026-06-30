@@ -1,7 +1,13 @@
 import { z } from 'zod';
+import { objectIdSchema } from '../utils/objectId';
+
+/** `:orderId` route param — must be a valid ObjectId before any query. */
+export const orderIdParamSchema = z.object({
+  orderId: objectIdSchema,
+});
 
 export const assignDriverSchema = z.object({
-  driverId: z.string().min(1, 'driverId is required'),
+  driverId: objectIdSchema,
 });
 
 /** A single GPS fix. Ranges reject obviously bogus / spoofed values. */

@@ -4,6 +4,7 @@ import { Driver } from '../models/Driver';
 import { Pharmacy } from '../models/Pharmacy';
 import { AppError } from '../utils/AppError';
 import { ERROR_CODES } from '../utils/constants';
+import { toObjectId } from '../utils/objectId';
 import { IUser } from '../types';
 
 type AuthedUser = IUser & { _id: any };
@@ -48,7 +49,9 @@ export const authorizeDelivery = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const delivery = await Delivery.findOne({ orderId: req.params.orderId });
+    // toObjectId rejects any non-ObjectId id (objects/operators/invalid) with a
+    // 400 before the value can reach the query.
+    const delivery = await Delivery.findOne({ orderId: toObjectId(req.params.orderId) });
     if (!delivery) {
       throw new AppError('Delivery not found.', 404, ERROR_CODES.DELIVERY_NOT_FOUND);
     }

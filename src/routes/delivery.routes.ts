@@ -2,16 +2,21 @@ import { Router } from 'express';
 import * as deliveryController from '../controllers/delivery.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorizeDelivery } from '../middleware/authorizeDelivery';
-import { validate } from '../middleware/validate';
+import { validate, validateParams } from '../middleware/validate';
 import {
   assignDriverSchema,
   gpsFixSchema,
+  orderIdParamSchema,
   updateDeliveryStatusSchema,
 } from '../validations/delivery.validation';
 
 const router = Router();
 
 router.use(authenticate);
+
+// Every route is scoped to `:orderId` — validate it as an ObjectId up front so a
+// malformed / injection id never reaches a query (NoSQL-injection defence).
+router.use('/:orderId', validateParams(orderIdParamSchema));
 
 // Assignment creates the delivery, so it can't use authorizeDelivery (no delivery
 // exists yet) — ownership is enforced inside the controller.

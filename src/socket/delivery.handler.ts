@@ -1,7 +1,9 @@
+import { Types } from 'mongoose';
 import { Server, Socket } from 'socket.io';
 import { Delivery } from '../models/Delivery';
 import { canAccessDelivery, isDeliveryDriver } from '../middleware/authorizeDelivery';
 import { gpsFixSchema } from '../validations/delivery.validation';
+import { isValidObjectId } from '../utils/objectId';
 import * as deliveryService from '../services/delivery.service';
 import { logger } from '../utils/logger';
 
@@ -14,8 +16,8 @@ export const registerDeliveryHandlers = (_io: Server, socket: Socket): void => {
   // ALWAYS authorized server-side — we never trust a client-supplied room name.
   socket.on('delivery:subscribe', async (data: { orderId?: string }) => {
     try {
-      if (!data?.orderId) return;
-      const delivery = await Delivery.findOne({ orderId: data.orderId });
+      if (!isValidObjectId(data?.orderId)) return;
+      const delivery = await Delivery.findOne({ orderId: new Types.ObjectId(data.orderId) });
       if (!delivery) return;
       if (!(await canAccessDelivery(socket.user as any, delivery))) {
         socket.emit('delivery:error', { message: 'Forbidden' });
@@ -29,8 +31,8 @@ export const registerDeliveryHandlers = (_io: Server, socket: Socket): void => {
 
   socket.on('delivery:unsubscribe', async (data: { orderId?: string }) => {
     try {
-      if (!data?.orderId) return;
-      const delivery = await Delivery.findOne({ orderId: data.orderId }).select('_id');
+      if (!isValidObjectId(data?.orderId)) return;
+      const delivery = await Delivery.findOne({ orderId: new Types.ObjectId(data.orderId) }).select('_id');
       if (delivery) socket.leave(deliveryService.deliveryRoom(delivery._id));
     } catch {
       /* ignore */
@@ -46,9 +48,9 @@ export const registerDeliveryHandlers = (_io: Server, socket: Socket): void => {
       lastPing.set(socket.id, now);
 
       const parsed = gpsFixSchema.safeParse(data);
-      if (!parsed.success || !data?.orderId) return;
+      if (!parsed.success || !isValidObjectId(data?.orderId)) return;
 
-      const delivery = await Delivery.findOne({ orderId: data.orderId });
+      const delivery = await Delivery.findOne({ orderId: new Types.ObjectId(data.orderId) });
       if (!delivery) return;
       if (!(await isDeliveryDriver(socket.user as any, delivery))) return;
 

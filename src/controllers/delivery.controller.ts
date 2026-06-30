@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { ERROR_CODES } from '../utils/constants';
+import { toObjectId } from '../utils/objectId';
 import { Order } from '../models/Order';
 import { Pharmacy } from '../models/Pharmacy';
 import { Driver } from '../models/Driver';
@@ -13,7 +14,7 @@ import { startSimulation } from '../services/deliverySimulator.service';
 
 /** POST /api/deliveries/:orderId/assign  — pharmacy owner of the order, or admin. */
 export const assignDelivery = asyncHandler(async (req: Request, res: Response) => {
-  const order = await Order.findById(req.params.orderId);
+  const order = await Order.findById(toObjectId(req.params.orderId));
   if (!order) throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
 
   if (req.user!.role !== 'admin') {
