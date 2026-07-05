@@ -130,6 +130,12 @@ pending ──▶ offered ──▶ confirmed ──▶ preparing ──▶ out_
                                                                 cancelled
 ```
 
+### Prescription Upload & Pharmacy Response Workflow
+
+Prescriptions are shared directly with pharmacies for manual review — no AI analysis:
+
+![Prescription upload & pharmacy response workflow](docs/architecture/prescription-workflow.jpg)
+
 ---
 
 ## API Reference
