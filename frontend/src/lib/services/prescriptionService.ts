@@ -4,10 +4,9 @@ import { Prescription, PaginatedResponse } from '@/types';
 
 export const prescriptionService = {
   /**
-   * Async pipeline upload: presign → PUT straight to S3 → complete.
-   * `complete` creates the Prescription (status UPLOADED) and queues it for
-   * background processing. Returns the same `{ data: { prescription } }`
-   * shape as the old multipart endpoint, so callers are unchanged.
+   * Upload: presign → PUT straight to S3 → complete.
+   * `complete` creates the Prescription (status REVIEW_REQUIRED — no automated
+   * analysis; pharmacies review the image manually with the order).
    */
   upload: async (file: File) => {
     const presign = await api.post('/prescriptions/presign', { contentType: file.type });
@@ -29,24 +28,13 @@ export const prescriptionService = {
     });
   },
 
-  scan: (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);        // must match upload.single('image') on the backend
-    return api.post('/prescriptions/scan', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
-
   getAll: (params?: { page?: number; limit?: number }) =>
     api.get<PaginatedResponse<Prescription>>('/prescriptions', { params }),
 
+  /**
+   * Works for the owning patient and for pharmacies that received an order
+   * carrying this prescription. `data.imageUrl` is a short-lived signed URL.
+   */
   getById: (id: string) =>
     api.get<{ success: boolean; data: Prescription }>(`/prescriptions/${id}`),
-
-  /** Re-queue a FAILED prescription (same S3 object, no re-upload). */
-  resubmit: (id: string) =>
-    api.post<{ success: boolean; data: { prescription: Prescription } }>(`/prescriptions/${id}/resubmit`),
-
-  verify: (id: string, extractedMeds?: { name: string; confidence: number }[]) =>
-    api.put(`/prescriptions/${id}/verify`, { extractedMeds }),
 };

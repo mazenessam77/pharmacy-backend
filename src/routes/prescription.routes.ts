@@ -10,18 +10,17 @@ import { presignUploadSchema, completeUploadSchema } from '../validations/prescr
 const router = Router();
 
 router.use(authenticate);
-router.use(authorize('patient'));
 
-// Async pipeline: presigned S3 upload → complete (creates doc + enqueues SQS job)
-router.post('/presign', uploadLimiter, validate(presignUploadSchema), prescriptionController.presignUpload);
-router.post('/complete', uploadLimiter, validate(completeUploadSchema), prescriptionController.completeUpload);
-router.get('/:id/image', prescriptionController.getPrescriptionImage);
+// Upload flow (patients only): presigned S3 PUT → complete. No automated
+// analysis — the image is stored as-is for pharmacists to review manually.
+router.post('/presign', authorize('patient'), uploadLimiter, validate(presignUploadSchema), prescriptionController.presignUpload);
+router.post('/complete', authorize('patient'), uploadLimiter, validate(completeUploadSchema), prescriptionController.completeUpload);
+router.post('/upload', authorize('patient'), uploadLimiter, upload.single('image'), prescriptionController.uploadPrescription);
+router.get('/', authorize('patient'), prescriptionController.getPrescriptions);
 
-router.post('/upload', uploadLimiter, upload.single('image'), prescriptionController.uploadPrescription);
-router.post('/scan', uploadLimiter, upload.single('image'), prescriptionController.scanPrescription);
-router.get('/', prescriptionController.getPrescriptions);
-router.get('/:id', prescriptionController.getPrescriptionById);
-router.post('/:id/resubmit', uploadLimiter, prescriptionController.resubmitPrescription);
-router.put('/:id/verify', prescriptionController.verifyPrescription);
+// Viewing: the owning patient, or a pharmacy that received an order carrying
+// this prescription (object-level check inside the controller).
+router.get('/:id', authorize('patient', 'pharmacy'), prescriptionController.getPrescriptionById);
+router.get('/:id/image', authorize('patient', 'pharmacy'), prescriptionController.getPrescriptionImage);
 
 export default router;

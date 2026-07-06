@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { FileText, Upload, Loader2, ArrowRight, Pill, AlertTriangle } from 'lucide-react';
+import { FileText, Upload, Loader2, ArrowRight, Pill } from 'lucide-react';
 import Badge from '@/components/ui/Badge';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { usePrescriptionStore } from '@/store/prescriptionStore';
@@ -12,24 +12,14 @@ import { metaFor } from '@/lib/prescriptionStatus';
 import { formatDateTime } from '@/lib/helpers';
 import { Prescription } from '@/types';
 
-const POLL_MS = 7000;
-
 export default function PrescriptionsPage() {
-  const { items, loading, loaded, fetchList, hasActive } = usePrescriptionStore();
+  const { items, loading, loaded, fetchList } = usePrescriptionStore();
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchList();
   }, [fetchList]);
-
-  // Poll the list while any prescription is still processing; idle otherwise.
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (hasActive()) fetchList();
-    }, POLL_MS);
-    return () => clearInterval(id);
-  }, [fetchList, hasActive]);
 
   const onPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,7 +31,7 @@ export default function PrescriptionsPage() {
     setUploading(true);
     try {
       await prescriptionService.upload(file);
-      toast.success('Prescription uploaded — processing started');
+      toast.success('Prescription uploaded');
       await fetchList();
     } catch (err: any) {
       toast.error(err?.response?.data?.error?.message || 'Upload failed');
@@ -63,7 +53,7 @@ export default function PrescriptionsPage() {
           </div>
           <h1 className="text-[26px] font-black leading-tight">My Prescriptions</h1>
           <p className="text-white/80 mt-1.5 text-[13px] max-w-md">
-            Upload a prescription and track its processing — extracted medicines appear here when it&apos;s done.
+            Upload a prescription and attach it to an order — pharmacies review the image and reply with availability and prices.
           </p>
         </div>
       </div>
@@ -76,7 +66,7 @@ export default function PrescriptionsPage() {
           </div>
           <div>
             <p className="text-[13px] font-bold">{uploading ? 'Uploading…' : 'Upload a prescription'}</p>
-            <p className="text-[11px] text-neutral-500">JPG, PNG or WebP — processed automatically</p>
+            <p className="text-[11px] text-neutral-500">JPG, PNG or WebP — shared only with pharmacies you order from</p>
           </div>
         </div>
         <span className="text-[11px] font-bold uppercase tracking-widest text-violet-600">Choose file</span>
@@ -121,25 +111,14 @@ function PrescriptionRow({ p }: { p: Prescription }) {
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <Badge variant={meta.variant}>
-            {meta.active && <Loader2 className="w-2.5 h-2.5 mr-1 inline animate-spin" />}
-            {meta.label}
-          </Badge>
+          <Badge variant={meta.variant}>{meta.label}</Badge>
           <ArrowRight className="w-4 h-4 text-neutral-300" />
         </div>
       </div>
 
-      {/* progress bar */}
-      <div className="mt-4 h-1 rounded-full bg-neutral-100 relative overflow-hidden">
-        <div
-          className={`absolute inset-y-0 left-0 rounded-full ${p.status === 'FAILED' ? 'bg-rose-400' : 'bg-gradient-to-r from-violet-500 to-fuchsia-600'}`}
-          style={{ width: `${meta.progress}%` }}
-        />
-      </div>
-      <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-500">
+      <div className="mt-3 flex items-center justify-between text-[11px] text-neutral-500">
         <span>{meta.hint}</span>
         {p.status === 'PROCESSED' && <span className="inline-flex items-center gap-1 font-medium text-neutral-700"><Pill className="w-3 h-3" />{medCount} medicine{medCount === 1 ? '' : 's'}</span>}
-        {p.status === 'FAILED' && <span className="inline-flex items-center gap-1 font-medium text-neutral-700"><AlertTriangle className="w-3 h-3" />Tap to retry</span>}
       </div>
     </Link>
   );

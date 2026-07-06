@@ -5,22 +5,21 @@ type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
 interface StatusMeta {
   label: string;
   variant: BadgeVariant;
-  active: boolean; // true while work is still in flight (keep polling)
-  /** 0–100 progress for the tracker; FAILED stays where it died. */
-  progress: number;
   hint: string;
 }
 
+// REVIEW_REQUIRED is the post-upload state — prescriptions are stored as-is
+// and reviewed manually by the pharmacies an order is sent to. The other
+// statuses only exist on legacy prescriptions from the retired automatic-
+// processing pipeline and are kept so old records still render sensibly.
 export const PRESCRIPTION_STATUS_META: Record<PrescriptionStatus, StatusMeta> = {
-  UPLOADED: { label: 'Uploaded', variant: 'default', active: true, progress: 20, hint: 'Image received, preparing to process.' },
-  QUEUED: { label: 'Queued', variant: 'info', active: true, progress: 40, hint: 'Waiting in the processing queue.' },
-  PROCESSING: { label: 'Processing', variant: 'info', active: true, progress: 70, hint: 'Reading your prescription…' },
-  PROCESSED: { label: 'Processed', variant: 'success', active: false, progress: 100, hint: 'Done — your medicines are ready below.' },
-  FAILED: { label: 'Failed', variant: 'danger', active: false, progress: 100, hint: 'We could not process this prescription.' },
-  REVIEW_REQUIRED: { label: 'Review Required', variant: 'warning', active: false, progress: 100, hint: 'A pharmacist needs to review this prescription.' },
+  UPLOADED: { label: 'Uploaded', variant: 'success', hint: 'Stored securely — attach it to an order and pharmacies will review it.' },
+  QUEUED: { label: 'Uploaded', variant: 'success', hint: 'Stored securely — attach it to an order and pharmacies will review it.' },
+  PROCESSING: { label: 'Uploaded', variant: 'success', hint: 'Stored securely — attach it to an order and pharmacies will review it.' },
+  PROCESSED: { label: 'Processed', variant: 'success', hint: 'Processed by the retired auto-reader — medicines below.' },
+  FAILED: { label: 'Uploaded', variant: 'default', hint: 'The image is stored and viewable by pharmacies you order from.' },
+  REVIEW_REQUIRED: { label: 'Awaiting review', variant: 'info', hint: 'Stored securely — pharmacies review it with your order.' },
 };
 
 export const metaFor = (status?: PrescriptionStatus): StatusMeta =>
-  PRESCRIPTION_STATUS_META[status ?? 'UPLOADED'] ?? PRESCRIPTION_STATUS_META.UPLOADED;
-
-export const isActive = (status?: PrescriptionStatus): boolean => metaFor(status).active;
+  PRESCRIPTION_STATUS_META[status ?? 'REVIEW_REQUIRED'] ?? PRESCRIPTION_STATUS_META.REVIEW_REQUIRED;

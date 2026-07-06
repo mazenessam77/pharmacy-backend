@@ -107,8 +107,8 @@ export default function NewOrderPage() {
     e.preventDefault();
 
     const validMeds = medicines.filter((m) => m.name.trim());
-    if (validMeds.length === 0) {
-      toast.error('Add at least one medicine');
+    if (validMeds.length === 0 && !prescriptionId) {
+      toast.error('Add at least one medicine or upload a prescription');
       return;
     }
 
@@ -151,7 +151,7 @@ export default function NewOrderPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
               <Pill className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800">Medicines</p>
+            <p className="text-[13px] font-semibold text-neutral-800">Medicines <span className="text-neutral-400 font-normal">(optional with a prescription)</span></p>
           </div>
           <div className="space-y-3">
             {medicines.map((med, i) => (
@@ -209,7 +209,7 @@ export default function NewOrderPage() {
           {prescriptionId ? (
             <div className="flex items-center gap-2 text-neutral-900">
               <CheckCircle2 className="w-4 h-4" />
-              <span className="text-[13px] font-medium">Prescription uploaded successfully</span>
+              <span className="text-[13px] font-medium">Prescription uploaded — pharmacies will review it with your order</span>
             </div>
           ) : (
             <div className="border-2 border-dashed border-neutral-200 rounded-none p-5 text-center hover:border-neutral-200 transition-colors">

@@ -177,16 +177,19 @@ export interface SubmitOfferData {
 }
 
 // ── Prescription ──
+// Pharmacies viewing an order's prescription receive a trimmed shape
+// (_id, imageUrl, doctorName, createdAt) — hence the optional owner fields.
 export interface Prescription {
   _id: string;
-  patientId: string;
+  patientId?: string;
   imageUrl: string;
   extractedText?: string;
   extractedMeds?: { name: string; confidence: number }[];
-  isVerified: boolean;
+  isVerified?: boolean;
   doctorName?: string;
-  // Async pipeline (S3 upload → background processing)
   s3Key?: string;
+  // REVIEW_REQUIRED (awaiting manual pharmacy review) is the post-upload
+  // state; the others are legacy statuses from the retired auto pipeline.
   status?: PrescriptionStatus;
   queuedAt?: string;
   processingStartedAt?: string;
@@ -195,7 +198,7 @@ export interface Prescription {
   errorDetails?: string;
   processingNotes?: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export type PrescriptionStatus =
@@ -206,8 +209,6 @@ export type PrescriptionStatus =
   | 'FAILED'
   | 'REVIEW_REQUIRED';
 
-/** Statuses where the patient should keep polling (work still in flight). */
-export const PRESCRIPTION_ACTIVE_STATUSES: PrescriptionStatus[] = ['UPLOADED', 'QUEUED', 'PROCESSING'];
 
 // ── Message ──
 export type MessageType = 'text' | 'image' | 'alternative';
