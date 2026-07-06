@@ -153,27 +153,33 @@ export interface CreateOrderData {
 }
 
 // ── Order Response (Offer) ──
+export type OfferAvailability = 'full' | 'partial' | 'none';
+
 export interface OrderResponse {
   _id: string;
   orderId: string;
   pharmacyId: string | Pharmacy;
-  availableMeds: { name: string; price: number; inStock: boolean }[];
+  availableMeds: { name: string; quantity?: number; price: number; inStock: boolean }[];
   alternatives: { originalName: string; alternativeName: string; alternativePrice: number }[];
   totalPrice: number;
   deliveryFee: number;
   distanceKm?: number;
   estimatedTime: string;
+  notes?: string;
+  availability?: OfferAvailability;
   status: 'offered' | 'accepted' | 'rejected' | 'expired';
   createdAt: string;
   updatedAt: string;
 }
 
 export interface SubmitOfferData {
-  availableMeds: { name: string; price: number; inStock: boolean }[];
+  availableMeds: { name: string; quantity?: number; price: number; inStock: boolean }[];
   alternatives?: { originalName: string; alternativeName: string; alternativePrice: number }[];
   totalPrice: number;
   deliveryFee: number;
   estimatedTime: string;
+  notes?: string;
+  availability?: OfferAvailability;
 }
 
 // ── Prescription ──

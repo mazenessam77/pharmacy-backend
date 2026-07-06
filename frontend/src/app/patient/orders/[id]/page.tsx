@@ -14,7 +14,8 @@ import { OrderResponse, Pharmacy } from '@/types';
 import toast from 'react-hot-toast';
 import SaveOrderMedicineButton from '@/components/shared/SaveOrderMedicineButton';
 import { useSavedMedicationStore } from '@/store/savedMedicationStore';
-import { MessageCircle, X, Check, Star, Pill, Truck, Calendar, StickyNote, Building2, Tag } from 'lucide-react';
+import { MessageCircle, X, Check, Star, Pill, Truck, Calendar, StickyNote, Building2, Tag, Clock, AlertTriangle } from 'lucide-react';
+import { getSocket } from '@/lib/socket';
 import OrderTrackingSection from '@/components/delivery/OrderTrackingSection';
 
 export default function OrderDetailPage() {
@@ -36,6 +37,35 @@ export default function OrderDetailPage() {
   useEffect(() => {
     fetchSaved();
   }, [fetchSaved]);
+
+  // Live marketplace updates: new offers and status changes appear instantly.
+  // The backend already emits these to the patient's private room.
+  useEffect(() => {
+    if (!id) return;
+    let cleanup: (() => void) | null = null;
+    (async () => {
+      const socket = await getSocket();
+      const onNewResponse = (data: { response?: { orderId?: string } }) => {
+        if (data.response?.orderId === id) {
+          fetchResponses(id);
+          toast('New pharmacy offer received', { icon: '💊' });
+        }
+      };
+      const onStatus = (data: { orderId?: string }) => {
+        if (data.orderId === id) {
+          fetchOrder(id);
+          fetchResponses(id);
+        }
+      };
+      socket.on('order:new-response', onNewResponse);
+      socket.on('order:status-updated', onStatus);
+      cleanup = () => {
+        socket.off('order:new-response', onNewResponse);
+        socket.off('order:status-updated', onStatus);
+      };
+    })();
+    return () => cleanup?.();
+  }, [id, fetchOrder, fetchResponses]);
 
   const handleCancel = async () => {
     try {
@@ -171,78 +201,127 @@ export default function OrderDetailPage() {
               Pharmacy Offers ({responses.length})
             </p>
           </div>
-          <div className="space-y-3">
-            {responses.map((resp) => {
-              const pharmacy = resp.pharmacyId as Pharmacy;
-              const isAccepted = resp.status === 'accepted';
-              return (
-                <div
-                  key={resp._id}
-                  className={`bg-white rounded-[16px] border p-5 shadow-sm ${
-                    isAccepted ? 'border-emerald-200 bg-emerald-50/40' : 'border-neutral-100'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="text-[14px] font-semibold text-neutral-800">
-                        {typeof pharmacy === 'object' ? pharmacy.pharmacyName : 'Pharmacy'}
-                      </p>
-                      {resp.distanceKm && (
-                        <p className="text-[11px] text-neutral-400 mt-0.5">{resp.distanceKm.toFixed(1)} km away</p>
+          {(() => {
+            // Side-by-side comparison: cheapest live offer first, best value tagged.
+            const grand = (r: OrderResponse) => r.totalPrice + (r.deliveryFee || 0);
+            const sorted = [...responses].sort((a, b) => {
+              if ((a.status === 'offered') !== (b.status === 'offered')) return a.status === 'offered' ? -1 : 1;
+              return grand(a) - grand(b);
+            });
+            const bestId = sorted.find((r) => r.status === 'offered')?._id;
+            const availabilityMeta: Record<string, { label: string; cls: string }> = {
+              full: { label: 'Fully available', cls: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+              partial: { label: 'Partially available', cls: 'text-amber-700 bg-amber-50 border-amber-200' },
+              none: { label: 'Not available', cls: 'text-rose-700 bg-rose-50 border-rose-200' },
+            };
+            return (
+              <div className="grid md:grid-cols-2 gap-3 items-start">
+                {sorted.map((resp) => {
+                  const pharmacy = resp.pharmacyId as Pharmacy;
+                  const isAccepted = resp.status === 'accepted';
+                  const missing = resp.availableMeds.filter((m) => !m.inStock);
+                  const avail = resp.availability ? availabilityMeta[resp.availability] : null;
+                  return (
+                    <div
+                      key={resp._id}
+                      className={`bg-white rounded-[16px] border p-5 shadow-sm relative ${
+                        isAccepted ? 'border-emerald-300 bg-emerald-50/40' : 'border-neutral-100'
+                      }`}
+                    >
+                      {resp._id === bestId && sorted.filter((r) => r.status === 'offered').length > 1 && (
+                        <span className="absolute -top-2.5 start-4 text-[9px] font-bold uppercase tracking-widest bg-blue-600 text-white px-2 py-0.5 rounded-full">
+                          Best price
+                        </span>
                       )}
-                    </div>
-                    <Badge variant={isAccepted ? 'success' : resp.status === 'rejected' ? 'danger' : 'default'}>
-                      {resp.status}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-1.5 mb-4 bg-neutral-50 rounded-[12px] p-3">
-                    {resp.availableMeds.map((med, i) => (
-                      <div key={i} className="flex justify-between text-[13px]">
-                        <span className={med.inStock ? 'text-neutral-700' : 'text-neutral-400'}>
-                          {med.name}
-                          {!med.inStock && <span className="text-[11px] ml-1">(out of stock)</span>}
-                        </span>
-                        <span className={med.inStock ? 'font-medium text-neutral-800' : 'text-neutral-400'}>
-                          {med.inStock ? `${med.price} EGP` : '—'}
-                        </span>
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="text-[14px] font-semibold text-neutral-800">
+                            {typeof pharmacy === 'object' ? pharmacy.pharmacyName : 'Pharmacy'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {typeof pharmacy === 'object' && pharmacy.rating > 0 && (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-neutral-500">
+                                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                {pharmacy.rating.toFixed(1)}
+                              </span>
+                            )}
+                            {resp.estimatedTime && (
+                              <span className="inline-flex items-center gap-1 text-[11px] text-neutral-400">
+                                <Clock className="w-3 h-3" /> {resp.estimatedTime}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <Badge variant={isAccepted ? 'success' : resp.status === 'rejected' ? 'danger' : 'default'}>
+                          {resp.status}
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
 
-                  {resp.alternatives.length > 0 && (
-                    <div className="border-t border-neutral-100 pt-3 mb-3">
-                      <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1.5">Alternatives</p>
-                      {resp.alternatives.map((alt, i) => (
-                        <p key={i} className="text-[12px] text-neutral-500">
-                          {alt.originalName} → {alt.alternativeName} ({alt.alternativePrice} EGP)
-                        </p>
-                      ))}
-                    </div>
-                  )}
+                      {avail && (
+                        <span className={`inline-block text-[10px] uppercase tracking-widest border px-2 py-0.5 rounded-full mb-3 ${avail.cls}`}>
+                          {avail.label}
+                        </span>
+                      )}
 
-                  <div className="flex items-center justify-between pt-3 border-t border-neutral-100">
-                    <div className="text-[13px] text-neutral-600">
-                      Total:{' '}
-                      <span className="text-neutral-900 font-semibold">{resp.totalPrice} EGP</span>
-                      {resp.deliveryFee > 0 && (
-                        <span className="text-neutral-400 text-[12px]"> + {resp.deliveryFee} EGP delivery</span>
+                      <div className="space-y-1.5 mb-3 bg-neutral-50 rounded-[12px] p-3">
+                        {resp.availableMeds.filter((m) => m.inStock).map((med, i) => (
+                          <div key={i} className="flex justify-between text-[13px]">
+                            <span className="text-neutral-700">
+                              {med.name}
+                              {(med.quantity ?? 1) > 1 && <span className="text-neutral-400"> ×{med.quantity}</span>}
+                            </span>
+                            <span className="font-medium text-neutral-800">
+                              {(med.price * (med.quantity ?? 1)).toFixed(2)} EGP
+                            </span>
+                          </div>
+                        ))}
+                        {missing.length > 0 && (
+                          <div className="pt-2 mt-1 border-t border-neutral-200/70">
+                            <p className="text-[10px] uppercase tracking-widest text-rose-500 mb-1 inline-flex items-center gap-1">
+                              <AlertTriangle className="w-3 h-3" /> Missing
+                            </p>
+                            {missing.map((med, i) => (
+                              <p key={i} className="text-[12px] text-neutral-400 line-through">{med.name}</p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {resp.alternatives.length > 0 && (
+                        <div className="mb-3">
+                          <p className="text-[10px] uppercase tracking-widest text-neutral-400 mb-1">Alternatives</p>
+                          {resp.alternatives.map((alt, i) => (
+                            <p key={i} className="text-[12px] text-neutral-500">
+                              {alt.originalName} → <span className="text-neutral-700">{alt.alternativeName}</span> ({alt.alternativePrice} EGP)
+                            </p>
+                          ))}
+                        </div>
                       )}
-                      {resp.estimatedTime && (
-                        <span className="text-neutral-400 text-[12px]"> · {resp.estimatedTime}</span>
+
+                      {resp.notes && (
+                        <p className="text-[12px] text-neutral-500 italic mb-3">“{resp.notes}”</p>
+                      )}
+
+                      <div className="pt-3 border-t border-neutral-100 space-y-0.5 text-[12px] text-neutral-500">
+                        <div className="flex justify-between"><span>Medicines</span><span>{resp.totalPrice.toFixed(2)} EGP</span></div>
+                        <div className="flex justify-between"><span>Delivery</span><span>{(resp.deliveryFee || 0).toFixed(2)} EGP</span></div>
+                        <div className="flex justify-between text-[14px] font-semibold text-neutral-900 pt-1">
+                          <span>Total</span><span>{grand(resp).toFixed(2)} EGP</span>
+                        </div>
+                      </div>
+
+                      {resp.status === 'offered' && currentOrder.status !== 'confirmed' && (
+                        <Button variant="success" size="sm" className="w-full mt-3" onClick={() => handleAcceptOffer(resp._id)}>
+                          <Check className="w-3.5 h-3.5" />
+                          Accept This Offer
+                        </Button>
                       )}
                     </div>
-                    {resp.status === 'offered' && currentOrder.status !== 'confirmed' && (
-                      <Button variant="success" size="sm" onClick={() => handleAcceptOffer(resp._id)}>
-                        <Check className="w-3.5 h-3.5" />
-                        Accept Offer
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
       )}
 
