@@ -41,6 +41,7 @@ export const createOrderResponseSchema = z.object({
     .array(
       z.object({
         name: z.string().min(1),
+        quantity: z.number().int().min(1).default(1),
         price: z.number().min(0),
         inStock: z.boolean().default(true),
       })
@@ -59,4 +60,6 @@ export const createOrderResponseSchema = z.object({
   totalPrice: z.number().min(0),
   deliveryFee: z.number().min(0).default(0),
   estimatedTime: z.string().optional(),
+  notes: z.string().max(500).optional(),
+  availability: z.enum(['full', 'partial', 'none']).optional(),
 });

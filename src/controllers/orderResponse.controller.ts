@@ -14,7 +14,7 @@ import { User } from '../models/User';
 
 export const submitResponse = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.params;
-  const { availableMeds, alternatives, totalPrice, deliveryFee, estimatedTime } = req.body;
+  const { availableMeds, alternatives, totalPrice, deliveryFee, estimatedTime, notes, availability } = req.body;
 
   const pharmacy = await Pharmacy.findOne({ userId: req.user!._id });
   if (!pharmacy) {
@@ -44,6 +44,13 @@ export const submitResponse = asyncHandler(async (req: Request, res: Response) =
   // Distance is 0 in governorate-based system
   const distanceKm = 0;
 
+  // Order-level fulfilment: explicit value wins; otherwise derive it from the
+  // per-medicine stock flags so old clients keep working unchanged.
+  const meds: { inStock: boolean }[] = availableMeds || [];
+  const inStockCount = meds.filter((m) => m.inStock !== false).length;
+  const derivedAvailability =
+    inStockCount === meds.length ? 'full' : inStockCount === 0 ? 'none' : 'partial';
+
   const orderResponse = await OrderResponse.create({
     orderId,
     pharmacyId: pharmacy._id,
@@ -53,6 +60,8 @@ export const submitResponse = asyncHandler(async (req: Request, res: Response) =
     deliveryFee: deliveryFee || 0,
     distanceKm,
     estimatedTime,
+    notes,
+    availability: availability || derivedAvailability,
   });
 
   // Update order status to offered

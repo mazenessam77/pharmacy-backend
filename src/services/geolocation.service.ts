@@ -22,6 +22,9 @@ export const findPharmaciesByGovernorate = async (
       $match: {
         governorate,
         isOpen: true,
+        // Marketplace rule: only verified pharmacies receive new-order
+        // broadcasts (unverified ones can still browse their dashboard).
+        isVerified: true,
       },
     },
     {

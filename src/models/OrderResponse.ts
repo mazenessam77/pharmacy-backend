@@ -10,6 +10,7 @@ const orderResponseSchema = new Schema<OrderResponseDocument>(
     availableMeds: [
       {
         name: { type: String, required: true },
+        quantity: { type: Number, default: 1, min: 1 },
         price: { type: Number, required: true },
         inStock: { type: Boolean, default: true },
       },
@@ -25,6 +26,10 @@ const orderResponseSchema = new Schema<OrderResponseDocument>(
     deliveryFee: { type: Number, default: 0 },
     distanceKm: { type: Number },
     estimatedTime: { type: String },
+    notes: { type: String, maxlength: 500 },
+    // Derived from the per-medicine inStock flags when the pharmacy doesn't
+    // set it explicitly (see submitResponse). Legacy offers default to 'full'.
+    availability: { type: String, enum: ['full', 'partial', 'none'], default: 'full' },
     status: {
       type: String,
       enum: ['offered', 'accepted', 'rejected', 'expired'],
