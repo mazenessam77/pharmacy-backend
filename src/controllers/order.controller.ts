@@ -8,6 +8,7 @@ import { findPharmaciesByGovernorate } from '../services/geolocation.service';
 import { createNotification } from '../services/notification.service';
 import { getIO } from '../socket';
 import { getPagination } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
 import { sendOrderConfirmationEmail } from '../services/email.service';
 
@@ -48,6 +49,12 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
 
   const io = getIO();
 
+  const medicineCount = medicines?.length ?? 0;
+  const notificationBody =
+    medicineCount > 0
+      ? `A patient in ${governorate} is requesting ${medicineCount} medicine(s)`
+      : `A patient in ${governorate} sent a prescription for review`;
+
   // Notify each pharmacy in the governorate
   for (const pharmacy of governoratePharmacies) {
     if (io) {
@@ -58,7 +65,7 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
       userId: pharmacy.userId,
       type: 'new_order',
       title: 'New Order in Your Area',
-      body: `A patient in ${governorate} is requesting ${medicines.length} medicine(s)`,
+      body: notificationBody,
       data: { orderId: order._id.toString() },
     });
   }
@@ -137,19 +144,43 @@ export const getOrderById = asyncHandler(async (req: Request, res: Response) => 
   const order = await Order.findById(req.params.id)
     .populate('patientId', 'name phone avatar')
     .populate('acceptedPharmacy', 'pharmacyName rating location workingHours userId')
-    .populate('prescriptionId')
+    // Only display metadata — the image itself is fetched through
+    // GET /prescriptions/:id which re-checks authorization per viewer.
+    .populate('prescriptionId', 'status createdAt')
     .populate('acceptedResponse');
 
   if (!order) {
     throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
   }
 
-  // Check access: patient owns it, or pharmacy is involved, or admin
+  // Check access: patient owns it, pharmacy received it, or admin
   if (
     req.user!.role === 'patient' &&
     order.patientId._id.toString() !== req.user!._id.toString()
   ) {
     throw new AppError('Not authorized.', 403, ERROR_CODES.FORBIDDEN);
+  }
+
+  if (req.user!.role === 'pharmacy') {
+    const pharmacy = await Pharmacy.findOne({ userId: req.user!._id }, { _id: 1, governorate: 1 }).lean();
+    if (!pharmacy) {
+      throw new AppError('Pharmacy profile not found.', 404, ERROR_CODES.PHARMACY_NOT_FOUND);
+    }
+
+    const isAcceptedPharmacy =
+      order.acceptedPharmacy && order.acceptedPharmacy._id.toString() === pharmacy._id.toString();
+    const isOpenInGovernorate =
+      ['pending', 'offered'].includes(order.status) && order.governorate === pharmacy.governorate;
+
+    if (!isAcceptedPharmacy && !isOpenInGovernorate) {
+      logger.warn('Unauthorized order access attempt', {
+        orderId: String(req.params.id),
+        userId: String(req.user!._id),
+        pharmacyId: pharmacy._id.toString(),
+        ip: req.ip,
+      });
+      throw new AppError('Not authorized.', 403, ERROR_CODES.FORBIDDEN);
+    }
   }
 
   res.json({
@@ -263,6 +294,17 @@ export const reorder = asyncHandler(async (req: Request, res: Response) => {
 
   if (!originalOrder) {
     throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
+  }
+
+  // A prescription-only order has no medicine lines to copy, and silently
+  // re-sending an old prescription is not something we do on the patient's
+  // behalf — they attach it to a fresh order explicitly.
+  if (originalOrder.medicines.length === 0) {
+    throw new AppError(
+      'This order only contained a prescription — place a new order and attach it again.',
+      400,
+      ERROR_CODES.VALIDATION_ERROR
+    );
   }
 
   const governorate = originalOrder.governorate || 'Giza';

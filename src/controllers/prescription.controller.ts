@@ -1,21 +1,89 @@
 import { Request, Response } from 'express';
-import { Prescription } from '../models/Prescription';
+import mongoose from 'mongoose';
+import { Prescription, PrescriptionDocument } from '../models/Prescription';
+import { Order } from '../models/Order';
+import { Pharmacy } from '../models/Pharmacy';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { uploadToCloudinary } from '../services/upload.service';
-import { processPrescriptionImage, processImageFromUrl } from '../services/ocr.service';
 import {
   presignPrescriptionUpload,
   prescriptionObjectExists,
   presignPrescriptionView,
-  enqueuePrescriptionProcessing,
 } from '../services/rxPipeline.service';
 import { getPagination } from '../utils/helpers';
+import { logger } from '../utils/logger';
 import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
 
 /**
+ * Object-level authorization for viewing a single prescription.
+ *
+ * Patient: only their own. Missing and not-theirs are both a 404 so
+ * existence is never revealed.
+ *
+ * Pharmacy: only when an order carrying this prescription was distributed to
+ * them — same governorate while the order is still open (pending/offered),
+ * or they are the pharmacy the patient confirmed. Every denial is a uniform
+ * 403 (no existence leak) and is logged.
+ */
+const loadViewablePrescription = async (req: Request): Promise<PrescriptionDocument> => {
+  const id = String(req.params.id);
+  const requester = req.user!;
+
+  if (requester.role === 'patient') {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
+    }
+    const prescription = await Prescription.findOne({ _id: id, patientId: requester._id });
+    if (!prescription) {
+      throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
+    }
+    return prescription;
+  }
+
+  const deny = (reason: string): never => {
+    logger.warn('Unauthorized prescription access attempt', {
+      prescriptionId: id,
+      userId: String(requester._id),
+      role: requester.role,
+      ip: req.ip,
+      reason,
+    });
+    throw new AppError('You do not have access to this prescription.', 403, ERROR_CODES.FORBIDDEN);
+  };
+
+  if (!mongoose.isValidObjectId(id)) {
+    return deny('invalid id');
+  }
+
+  const pharmacy = await Pharmacy.findOne({ userId: requester._id }, { _id: 1, governorate: 1 }).lean();
+  if (!pharmacy) {
+    return deny('no pharmacy profile');
+  }
+
+  const distributed = await Order.exists({
+    prescriptionId: id,
+    $or: [
+      { acceptedPharmacy: pharmacy._id },
+      { governorate: pharmacy.governorate, status: { $in: ['pending', 'offered'] } },
+    ],
+  });
+  if (!distributed) {
+    return deny('no distributed order');
+  }
+
+  // Only what the pharmacy-facing responses expose — never the patient
+  // reference, extracted text, or pipeline internals.
+  const prescription = await Prescription.findById(id).select('imageUrl s3Key doctorName createdAt');
+  if (!prescription) {
+    return deny('dangling order reference');
+  }
+  return prescription;
+};
+
+/**
  * POST /api/prescriptions/presign
- * Step 1 of the async upload: hand the browser a short-lived S3 PUT URL.
+ * Step 1 of the upload: hand the browser a short-lived S3 PUT URL.
  * The key is server-generated under prescriptions/<patientId>/ — the client
  * never chooses where it writes.
  */
@@ -30,13 +98,13 @@ export const presignUpload = asyncHandler(async (req: Request, res: Response) =>
 
 /**
  * POST /api/prescriptions/complete
- * Step 2: after the browser PUT succeeds, create the Prescription document
- * (status UPLOADED) and enqueue the processing job for the Lambda consumer.
+ * Step 2: after the browser PUT succeeds, create the Prescription document in
+ * REVIEW_REQUIRED — there is no automated analysis; pharmacists review the
+ * image manually when the patient attaches it to an order.
  */
 export const completeUpload = asyncHandler(async (req: Request, res: Response) => {
   const patientId = String(req.user!._id);
   const s3Key = String(req.body.s3Key);
-  const notes = req.body.notes === undefined ? undefined : String(req.body.notes);
 
   // Ownership: a patient can only register keys under their own prefix.
   if (!s3Key.startsWith(`prescriptions/${patientId}/`)) {
@@ -52,64 +120,12 @@ export const completeUpload = asyncHandler(async (req: Request, res: Response) =
     patientId: req.user!._id,
     imageUrl: `s3://${s3Key}`, // private object; viewing goes through /:id/image
     s3Key,
-    status: 'UPLOADED',
+    status: 'REVIEW_REQUIRED',
     extractedText: '',
     extractedMeds: [],
   });
 
-  try {
-    await enqueuePrescriptionProcessing({ patientId, s3Key, notes });
-  } catch (err) {
-    // Without the queue message the doc would sit UPLOADED forever — undo and
-    // let the client retry the whole complete step.
-    await Prescription.deleteOne({ _id: prescription._id });
-    throw new AppError('Could not queue prescription for processing — please retry.', 503, ERROR_CODES.VALIDATION_ERROR);
-  }
-
-  // Reflect that it's now waiting in the queue (the consumer moves it on to
-  // PROCESSING/PROCESSED). Best-effort — the doc is already created and queued.
-  prescription.status = 'QUEUED';
-  prescription.queuedAt = new Date();
-  await prescription.save();
-
   res.status(201).json({ success: true, data: { prescription } });
-});
-
-/**
- * POST /api/prescriptions/:id/resubmit
- * Re-queue a FAILED prescription for processing (same S3 object, no re-upload).
- */
-export const resubmitPrescription = asyncHandler(async (req: Request, res: Response) => {
-  const prescription = await Prescription.findOne({
-    _id: String(req.params.id),
-    patientId: req.user!._id,
-  });
-
-  if (!prescription) {
-    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
-  }
-  if (!prescription.s3Key) {
-    throw new AppError('This prescription cannot be reprocessed.', 400, ERROR_CODES.VALIDATION_ERROR);
-  }
-  if (prescription.status !== 'FAILED') {
-    throw new AppError('Only failed prescriptions can be resubmitted.', 409, ERROR_CODES.VALIDATION_ERROR);
-  }
-
-  await enqueuePrescriptionProcessing({
-    patientId: String(req.user!._id),
-    s3Key: prescription.s3Key,
-    notes: prescription.processingNotes,
-  });
-
-  // Reset to a fresh processing cycle.
-  prescription.status = 'QUEUED';
-  prescription.queuedAt = new Date();
-  prescription.errorDetails = undefined;
-  prescription.failedAt = undefined;
-  prescription.processingStartedAt = undefined;
-  await prescription.save();
-
-  res.json({ success: true, data: { prescription } });
 });
 
 /**
@@ -118,14 +134,7 @@ export const resubmitPrescription = asyncHandler(async (req: Request, res: Respo
  * (legacy Cloudinary prescriptions redirect to their stored URL).
  */
 export const getPrescriptionImage = asyncHandler(async (req: Request, res: Response) => {
-  const prescription = await Prescription.findOne({
-    _id: String(req.params.id),
-    patientId: req.user!._id,
-  });
-
-  if (!prescription) {
-    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
-  }
+  const prescription = await loadViewablePrescription(req);
 
   const url = prescription.s3Key
     ? await presignPrescriptionView(prescription.s3Key)
@@ -153,35 +162,6 @@ export const uploadPrescription = asyncHandler(async (req: Request, res: Respons
   });
 });
 
-export const scanPrescription = asyncHandler(async (req: Request, res: Response) => {
-  let ocrResult;
-
-  if (req.file) {
-    // Process uploaded image
-    ocrResult = await processPrescriptionImage(req.file.buffer);
-  } else if (req.body.imageUrl) {
-    // Process from URL
-    ocrResult = await processImageFromUrl(req.body.imageUrl);
-  } else {
-    throw new AppError('Provide an image file or imageUrl.', 400, ERROR_CODES.VALIDATION_ERROR);
-  }
-
-  // Save prescription
-  const imageUrl = req.body.imageUrl || (req.file ? (await uploadToCloudinary(req.file.buffer, 'pharmacy-app/prescriptions')).url : '');
-
-  const prescription = await Prescription.create({
-    patientId: req.user!._id,
-    imageUrl,
-    extractedText: ocrResult.extractedText,
-    extractedMeds: ocrResult.extractedMeds,
-  });
-
-  res.status(201).json({
-    success: true,
-    data: prescription,
-  });
-});
-
 export const getPrescriptions = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
   const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
@@ -203,46 +183,31 @@ export const getPrescriptions = asyncHandler(async (req: Request, res: Response)
 });
 
 export const getPrescriptionById = asyncHandler(async (req: Request, res: Response) => {
-  const prescription = await Prescription.findOne({
-    _id: String(req.params.id),
-    patientId: req.user!._id,
-  });
-
-  if (!prescription) {
-    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
-  }
+  const prescription = await loadViewablePrescription(req);
 
   // For S3-backed prescriptions, surface a short-lived presigned GET so the
   // browser can render the original image directly (the stored imageUrl is a
   // private s3:// reference). Legacy Cloudinary URLs pass through unchanged.
-  const data = prescription.toObject() as unknown as Record<string, unknown>;
-  if (prescription.s3Key) {
-    data.imageUrl = await presignPrescriptionView(prescription.s3Key);
+  const imageUrl = prescription.s3Key
+    ? await presignPrescriptionView(prescription.s3Key)
+    : prescription.imageUrl;
+
+  // A pharmacist only needs the image and basic display metadata — never the
+  // patient reference, S3 key, or pipeline internals.
+  if (req.user!.role === 'pharmacy') {
+    return res.json({
+      success: true,
+      data: {
+        _id: prescription._id,
+        imageUrl,
+        doctorName: prescription.doctorName,
+        createdAt: prescription.createdAt,
+      },
+    });
   }
+
+  const data = prescription.toObject() as unknown as Record<string, unknown>;
+  data.imageUrl = imageUrl;
 
   res.json({ success: true, data });
-});
-
-export const verifyPrescription = asyncHandler(async (req: Request, res: Response) => {
-  const prescription = await Prescription.findOne({
-    _id: req.params.id,
-    patientId: req.user!._id,
-  });
-
-  if (!prescription) {
-    throw new AppError('Prescription not found.', 404, ERROR_CODES.PRESCRIPTION_NOT_FOUND);
-  }
-
-  // Update with patient-confirmed meds if provided
-  if (req.body.extractedMeds) {
-    prescription.extractedMeds = req.body.extractedMeds;
-  }
-
-  prescription.isVerified = true;
-  await prescription.save();
-
-  res.json({
-    success: true,
-    data: prescription,
-  });
 });

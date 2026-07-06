@@ -71,7 +71,9 @@ export default function PharmacyOrdersPage() {
                 </Badge>
               </div>
               <p className="text-[14px] mb-2">
-                {order.medicines.map((m) => `${m.name} x${m.quantity}`).join(', ')}
+                {order.medicines.length > 0
+                  ? order.medicines.map((m) => `${m.name} x${m.quantity}`).join(', ')
+                  : '📄 Prescription order — review the image'}
               </p>
               <div className="flex items-center justify-between">
                 <p className="text-[11px] text-neutral-400 capitalize">{order.deliveryType}</p>

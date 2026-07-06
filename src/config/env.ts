@@ -32,8 +32,6 @@ export const env = {
 
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
 
-  GOOGLE_VISION_API_KEY: process.env.GOOGLE_VISION_API_KEY || '',
-
   // Live delivery tracking — routing/ETA provider. Server-side key (NOT the
   // NEXT_PUBLIC_ browser key) used for Directions API calls. Empty => routing
   // degrades gracefully to "ETA unavailable" instead of crashing.
@@ -43,9 +41,8 @@ export const env = {
   GROQ_API_KEY: process.env.GROQ_API_KEY || '',
   GROQ_MODEL: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
 
-  // Async prescription pipeline (S3 presigned uploads + SQS). Empty in dev
-  // unless configured — the presign/complete endpoints 503 cleanly when unset.
+  // Prescription image storage (S3 presigned uploads). Empty in dev unless
+  // configured — the presign/complete endpoints 503 cleanly when unset.
   AWS_REGION: process.env.AWS_REGION || 'eu-west-2',
   PRESCRIPTIONS_BUCKET: process.env.PRESCRIPTIONS_BUCKET || '',
-  PRESCRIPTION_QUEUE_URL: process.env.PRESCRIPTION_QUEUE_URL || '',
 };

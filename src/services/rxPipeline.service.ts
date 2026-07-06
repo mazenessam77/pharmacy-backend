@@ -1,16 +1,18 @@
 import { randomUUID } from 'crypto';
 import { S3Client, PutObjectCommand, GetObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { env } from '../config/env';
 import { AppError } from '../utils/AppError';
 import { ERROR_CODES } from '../utils/constants';
 
 /**
- * Producer side of the async prescription pipeline:
+ * Prescription image storage:
  *   presign (browser PUTs the image straight to S3)
- *   → complete (Prescription doc created, message enqueued)
- *   → SQS → prescription-processor Lambda marks it PROCESSED.
+ *   → complete (Prescription doc created, status REVIEW_REQUIRED — awaiting
+ *     manual pharmacy review).
+ *
+ * There is no automated processing — the private object is only ever read
+ * back through short-lived presigned GET URLs for authorized viewers.
  *
  * Credentials come from the default provider chain — on prod that's the EC2
  * instance role (pharma-ec2-ssm) via IMDSv2; nothing is stored in .env.
@@ -25,12 +27,11 @@ const ALLOWED_CONTENT_TYPES: Record<string, string> = {
 const PRESIGN_TTL_SECONDS = 300; // 5 min to start the upload
 const VIEW_TTL_SECONDS = 300;
 
-// Module-level singletons — reused across requests (connection pooling).
+// Module-level singleton — reused across requests (connection pooling).
 const s3 = new S3Client({ region: env.AWS_REGION });
-const sqs = new SQSClient({ region: env.AWS_REGION });
 
 const assertConfigured = (): void => {
-  if (!env.PRESCRIPTIONS_BUCKET || !env.PRESCRIPTION_QUEUE_URL) {
+  if (!env.PRESCRIPTIONS_BUCKET) {
     throw new AppError(
       'Prescription uploads are not configured on this environment.',
       503,
@@ -79,20 +80,5 @@ export const presignPrescriptionView = async (s3Key: string): Promise<string> =>
     s3,
     new GetObjectCommand({ Bucket: env.PRESCRIPTIONS_BUCKET, Key: s3Key }),
     { expiresIn: VIEW_TTL_SECONDS }
-  );
-};
-
-/** Enqueue the processing job for the Lambda consumer. */
-export const enqueuePrescriptionProcessing = async (msg: {
-  patientId: string;
-  s3Key: string;
-  notes?: string;
-}): Promise<void> => {
-  assertConfigured();
-  await sqs.send(
-    new SendMessageCommand({
-      QueueUrl: env.PRESCRIPTION_QUEUE_URL,
-      MessageBody: JSON.stringify(msg),
-    })
   );
 };
