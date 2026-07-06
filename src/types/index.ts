@@ -153,6 +153,7 @@ export interface IOrderResponse {
   pharmacyId: Types.ObjectId;
   availableMeds: {
     name: string;
+    quantity: number;
     price: number;
     inStock: boolean;
   }[];
@@ -165,6 +166,10 @@ export interface IOrderResponse {
   deliveryFee: number;
   distanceKm?: number;
   estimatedTime?: string;
+  /** Pharmacist note shown to the patient alongside the offer. */
+  notes?: string;
+  /** Order-level fulfilment: everything / some items / nothing in stock. */
+  availability: 'full' | 'partial' | 'none';
   status: 'offered' | 'accepted' | 'rejected' | 'expired';
   createdAt: Date;
 }

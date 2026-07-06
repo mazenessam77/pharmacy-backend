@@ -45,11 +45,12 @@ beforeAll(async () => {
       location: { type: 'Point', coordinates: [31.2, 30.0] },
     });
 
-  const [patientA, patientB, gizaUser, cairoUser] = await Promise.all([
+  const [patientA, patientB, gizaUser, cairoUser, unverifiedUser] = await Promise.all([
     mkUser('PatientA', 'patient'),
     mkUser('PatientB', 'patient'),
     mkUser('GizaPharm', 'pharmacy'),
     mkUser('CairoPharm', 'pharmacy'),
+    mkUser('UnverifiedPharm', 'pharmacy'),
   ]);
 
   const [gizaPharmacy] = await Promise.all([
@@ -66,6 +67,14 @@ beforeAll(async () => {
       governorate: 'Cairo',
       isVerified: true,
       location: { type: 'Point', coordinates: [31.24, 30.05] },
+    }),
+    // Same governorate but NOT verified — must be excluded from broadcasts.
+    Pharmacy.create({
+      userId: unverifiedUser._id,
+      pharmacyName: 'Unverified Pharmacy',
+      governorate: 'Giza',
+      isVerified: false,
+      location: { type: 'Point', coordinates: [31.21, 30.01] },
     }),
   ]);
   gizaPharmacyId = gizaPharmacy._id.toString();
@@ -114,6 +123,9 @@ describe('Prescription-only order creation', () => {
     expect(res.status).toBe(201);
     orderId = res.body.data.order._id;
     expect(res.body.data.order.prescriptionId).toBe(prescriptionId);
+    // Marketplace broadcast: only VERIFIED pharmacies in the governorate
+    // (Giza has one verified + one unverified; Cairo is out of area).
+    expect(res.body.data.pharmaciesNotified).toBe(1);
   });
 
   it("rejects using another patient's prescription", async () => {
@@ -176,13 +188,25 @@ describe('Pharmacy response → patient selection (full loop)', () => {
       .post(`/api/orders/${orderId}/responses`)
       .set(auth(gizaPharmacyToken))
       .send({
-        availableMeds: [{ name: 'Panadol Extra', price: 55, inStock: true }],
-        totalPrice: 55,
+        availableMeds: [
+          { name: 'Panadol Extra', quantity: 2, price: 55, inStock: true },
+          { name: 'Augmentin 1g', quantity: 1, price: 120, inStock: false },
+        ],
+        alternatives: [
+          { originalName: 'Augmentin 1g', alternativeName: 'Megamox 1g', alternativePrice: 95 },
+        ],
+        totalPrice: 110,
         deliveryFee: 10,
         estimatedTime: '30 mins',
+        notes: 'Augmentin is out of stock — Megamox is the same active ingredient.',
       });
     expect(res.status).toBe(201);
     responseId = res.body.data.response?._id ?? res.body.data._id;
+    const offer = res.body.data.response ?? res.body.data;
+    expect(offer.availableMeds[0].quantity).toBe(2);
+    expect(offer.notes).toContain('Megamox');
+    // one of two meds out of stock -> derived availability
+    expect(offer.availability).toBe('partial');
 
     const order = await Order.findById(orderId);
     expect(order!.status).toBe('offered');
