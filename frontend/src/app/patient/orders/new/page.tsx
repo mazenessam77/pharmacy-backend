@@ -18,9 +18,14 @@ interface MedicineEntry {
   quantity: number;
 }
 
+type OrderType = 'prescription' | 'manual';
+
 export default function NewOrderPage() {
   const router = useRouter();
   const { createOrder, isLoading } = useOrderStore();
+  // Two distinct flows: most patients with a prescription don't know the
+  // medicine names, so they should never be asked to type them.
+  const [orderType, setOrderType] = useState<OrderType>('prescription');
   const [medicines, setMedicines] = useState<MedicineEntry[]>([{ name: '', quantity: 1 }]);
   const [deliveryType, setDeliveryType] = useState<'delivery' | 'pickup'>('delivery');
   const [governorate, setGovernorate] = useState('Giza');
@@ -41,6 +46,7 @@ export default function NewOrderPage() {
     const draft = consumeDraft();
     if (draft && draft.length > 0) {
       setMedicines(draft.map((d) => ({ name: d.name, quantity: d.quantity || 1 })));
+      setOrderType('manual'); // the basket IS the medicine list
       toast.success('Basket loaded — review and submit your request');
     }
   }, [consumeDraft]);
@@ -106,9 +112,13 @@ export default function NewOrderPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validMeds = medicines.filter((m) => m.name.trim());
-    if (validMeds.length === 0 && !prescriptionId) {
-      toast.error('Add at least one medicine or upload a prescription');
+    const validMeds = orderType === 'manual' ? medicines.filter((m) => m.name.trim()) : [];
+    if (orderType === 'prescription' && !prescriptionId) {
+      toast.error(prescriptionFile ? 'Press "Upload Prescription" and wait for it to finish' : 'Upload your prescription first');
+      return;
+    }
+    if (orderType === 'manual' && validMeds.length === 0) {
+      toast.error('Add at least one medicine');
       return;
     }
 
@@ -124,7 +134,8 @@ export default function NewOrderPage() {
         deliveryType,
         paymentMethod,
         notes: notes || undefined,
-        prescriptionId: prescriptionId || undefined,
+        // Only a prescription order carries the prescription.
+        prescriptionId: orderType === 'prescription' ? prescriptionId || undefined : undefined,
         governorate,
         patientLocation: location || undefined,
       });
@@ -145,13 +156,50 @@ export default function NewOrderPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-        {/* Medicines */}
+        {/* Order type — exactly one flow is shown at a time */}
+        <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
+          <p className="text-[13px] font-semibold text-neutral-800 mb-3">How would you like to order?</p>
+          <div role="radiogroup" aria-label="Order type" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {([
+              { key: 'prescription', icon: FileImage, title: 'Order using a Prescription', desc: 'Upload a photo — the pharmacist reads it and builds your offer.' },
+              { key: 'manual', icon: Pill, title: 'Order by entering Medicines', desc: 'You already know the names — type them yourself.' },
+            ] as const).map((opt) => (
+              <button
+                key={opt.key}
+                type="button"
+                role="radio"
+                aria-checked={orderType === opt.key}
+                onClick={() => setOrderType(opt.key)}
+                className={`relative flex items-start gap-3 p-4 rounded-[14px] border-2 text-left transition-all duration-200 ${
+                  orderType === opt.key
+                    ? 'border-blue-500 bg-blue-50/50 shadow-sm'
+                    : 'border-neutral-200 bg-neutral-50 hover:border-neutral-300'
+                }`}
+              >
+                <span className={`mt-0.5 w-4 h-4 shrink-0 rounded-full border-2 flex items-center justify-center ${
+                  orderType === opt.key ? 'border-blue-600' : 'border-neutral-300'
+                }`}>
+                  {orderType === opt.key && <span className="w-2 h-2 rounded-full bg-blue-600" />}
+                </span>
+                <span>
+                  <span className={`flex items-center gap-1.5 text-[13px] font-bold ${orderType === opt.key ? 'text-blue-700' : 'text-neutral-700'}`}>
+                    <opt.icon className="w-3.5 h-3.5" /> {opt.title}
+                  </span>
+                  <span className="block text-[11px] text-neutral-400 mt-1 leading-snug">{opt.desc}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Medicines — manual flow only */}
+        {orderType === 'manual' && (
         <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
               <Pill className="w-4 h-4 text-white" />
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800">Medicines <span className="text-neutral-400 font-normal">(optional with a prescription)</span></p>
+            <p className="text-[13px] font-semibold text-neutral-800">Medicines</p>
           </div>
           <div className="space-y-3">
             {medicines.map((med, i) => (
@@ -197,15 +245,23 @@ export default function NewOrderPage() {
             <Plus className="w-3.5 h-3.5" /> Add Medicine
           </button>
         </div>
+        )}
 
-        {/* Prescription Upload */}
+        {/* Prescription Upload — prescription flow only */}
+        {orderType === 'prescription' && (
         <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
-              <FileImage className="w-4 h-4 text-white" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sky-500 rounded-[10px] shadow-sm flex items-center justify-center">
+                <FileImage className="w-4 h-4 text-white" />
+              </div>
+              <p className="text-[13px] font-semibold text-neutral-800">Prescription</p>
             </div>
-            <p className="text-[13px] font-semibold text-neutral-800">Prescription <span className="text-neutral-400 font-normal">(Optional)</span></p>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Required</span>
           </div>
+          <p className="text-[11px] text-neutral-400 -mt-2 mb-4">
+            No need to type medicine names — the pharmacist reads your prescription and sends an offer.
+          </p>
           {prescriptionId ? (
             <div className="flex items-center gap-2 text-neutral-900">
               <CheckCircle2 className="w-4 h-4" />
@@ -235,6 +291,7 @@ export default function NewOrderPage() {
             </div>
           )}
         </div>
+        )}
 
         {/* Governorate */}
         <div className="bg-white rounded-[18px] border border-neutral-100 shadow-sm p-4 sm:p-6">
@@ -469,7 +526,7 @@ export default function NewOrderPage() {
           className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
           size="lg"
         >
-          Submit Medicine Request
+          {orderType === 'prescription' ? 'Send Prescription to Pharmacies' : 'Submit Medicine Request'}
         </Button>
       </form>
     </div>
