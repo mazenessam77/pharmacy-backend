@@ -11,6 +11,8 @@ import { Order } from '../models/Order';
 import { Prescription } from '../models/Prescription';
 import { Notification } from '../models/Notification';
 import { SavedBasket } from '../models/SavedBasket';
+import { Pharmacy } from '../models/Pharmacy';
+import { OrderResponse } from '../models/OrderResponse';
 import { generateAccessToken } from '../utils/jwt';
 
 jest.setTimeout(120_000);
@@ -52,11 +54,15 @@ beforeAll(async () => {
   const orders = Order.collection;
   const oid = () => new mongoose.Types.ObjectId();
   const orderIds = [oid(), oid(), oid()];
+  const phUser = await mkUser('TimelinePh2', 'pharmacy');
+  const deliveryPh = await Pharmacy.create({ userId: phUser._id, pharmacyName: 'Ezaby', rating: 4.8, governorate: 'Giza', isVerified: true, location: { type: 'Point', coordinates: [31.2, 30.0] } });
+  const accResp = await OrderResponse.create({ orderId: orderIds[0], pharmacyId: deliveryPh._id, availableMeds: [{ name: 'Panadol', quantity: 1, price: 40, inStock: true }, { name: 'Vitamin D', quantity: 2, price: 60, inStock: true }], totalPrice: 160, deliveryFee: 20, status: 'accepted' });
   await orders.insertMany([
     // delivered order: created 100m ago, delivered 10m ago
     {
       _id: orderIds[0], patientId: a._id, medicines: [{ name: 'Panadol', quantity: 1 }],
       governorate: 'Giza', status: 'delivered', deliveryType: 'delivery', paymentMethod: 'cash',
+      acceptedPharmacy: deliveryPh._id, acceptedResponse: accResp._id,
       createdAt: at(100), updatedAt: at(10), deliveredAt: at(10),
     },
     // cancelled order: created 90m ago, cancelled 50m ago
@@ -159,6 +165,32 @@ describe('event derivation', () => {
     const del = events.find((e: any) => e.type === 'ORDER_DELIVERED');
     expect(del.canReorder).toBe(true);
     expect(del.summary).toBeDefined();
+    // enriched fields
+    expect(del.summary.pharmacyName).toBe('Ezaby');
+    expect(del.summary.rating).toBeCloseTo(4.8);
+    expect(del.summary.medicineCount).toBe(2);
+    expect(del.summary.deliveryFee).toBe(20);
+    expect(del.summary.total).toBe(180); // 160 + 20
+    // duration = deliveredAt(10m ago) - createdAt(100m ago) = 90 min (computed)
+    expect(del.summary.durationMinutes).toBe(90);
+  });
+
+  it('a delivered order with no accepted offer still summarizes gracefully', async () => {
+    const res = await get(patientAToken, '?limit=50');
+    // the cancelled order is not delivered; add a fresh no-offer delivered order
+    const noOffer = new mongoose.Types.ObjectId();
+    await Order.collection.insertOne({
+      _id: noOffer, patientId: patientAId, medicines: [{ name: 'Aspirin', quantity: 1 }],
+      governorate: 'Giza', status: 'delivered', deliveryType: 'delivery', paymentMethod: 'cash',
+      createdAt: at(200), updatedAt: at(150), deliveredAt: at(150),
+    } as any);
+    const again = await get(patientAToken, '?limit=50');
+    const ev = again.body.data.events.find((e: any) => e.orderId === noOffer.toString() && e.type === 'ORDER_DELIVERED');
+    expect(ev).toBeDefined();
+    expect(ev.canReorder).toBe(true);
+    expect(ev.summary.medicineCount).toBe(0); // no accepted offer -> empty meds
+    expect(ev.summary.total).toBe(0);
+    expect(ev.summary.durationMinutes).toBe(50); // still computed from timestamps
   });
 
   it('never leaks another patient’s activity (isolation)', async () => {
