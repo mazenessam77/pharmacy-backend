@@ -163,6 +163,17 @@ export const acceptResponse = asyncHandler(async (req: Request, res: Response) =
   order.acceptedResponse = response._id;
   await order.save();
 
+  // Record the patient's own acceptance in their notification stream — it is
+  // the platform's event log (and feeds the Activity Timeline). Marked read:
+  // the patient performed the action, so it must not inflate unread badges.
+  await createNotification({
+    userId: order.patientId,
+    type: 'order_status',
+    title: 'Offer accepted',
+    body: `You accepted ${(response.pharmacyId as any).pharmacyName}'s offer (${response.totalPrice} EGP).`,
+    data: { orderId: order._id.toString(), responseId: response._id.toString(), status: 'confirmed' },
+  });
+
   // Notify pharmacy
   const pharmacy = response.pharmacyId as any;
   const io = getIO();

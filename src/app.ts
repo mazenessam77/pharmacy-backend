@@ -24,6 +24,7 @@ import notificationRoutes from './routes/notification.routes';
 import adminRoutes from './routes/admin.routes';
 import sideEffectRoutes from './routes/sideEffect.routes';
 import deliveryRoutes from './routes/delivery.routes';
+import timelineRoutes from './routes/timeline.routes';
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/side-effects', sideEffectRoutes);
 app.use('/api/deliveries', deliveryRoutes);
+app.use('/api/timeline', timelineRoutes);
 
 // Error handling
 app.use(notFoundHandler);
