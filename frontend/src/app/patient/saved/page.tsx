@@ -34,7 +34,10 @@ import { useOrderStore } from '@/store/orderStore';
 import { medicineService } from '@/lib/services/medicineService';
 import { SavedMedication, SavedBasket, ReminderFrequency } from '@/types';
 
-type Tab = 'medications' | 'baskets';
+import ActivityTimeline from '@/components/timeline/ActivityTimeline';
+import { History } from 'lucide-react';
+
+type Tab = 'medications' | 'baskets' | 'timeline';
 
 export default function SavedPage() {
   const [tab, setTab] = useState<Tab>('medications');
@@ -64,9 +67,18 @@ export default function SavedPage() {
         <TabButton active={tab === 'baskets'} onClick={() => setTab('baskets')} icon={<ShoppingBasket className="w-3.5 h-3.5" />}>
           Baskets
         </TabButton>
+        <TabButton active={tab === 'timeline'} onClick={() => setTab('timeline')} icon={<History className="w-3.5 h-3.5" />}>
+          Activity Timeline
+        </TabButton>
       </div>
 
-      {tab === 'medications' ? <MedicationsTab /> : <BasketsTab />}
+      {tab === 'medications' ? (
+        <MedicationsTab />
+      ) : tab === 'baskets' ? (
+        <BasketsTab />
+      ) : (
+        <ActivityTimeline onViewBasket={() => setTab('baskets')} />
+      )}
     </div>
   );
 }

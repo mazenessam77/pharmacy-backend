@@ -42,5 +42,18 @@ orderSchema.index({ patientLocation: '2dsphere' });
 // Pharmacy dashboard hot path: orders in a governorate by status, newest first.
 // Covers filter + sort (removes the in-memory sort). Name matches the prod index.
 orderSchema.index({ governorate: 1, status: 1, createdAt: -1 }, { name: 'gov_status_created' });
+// Timeline: ORDER_DELIVERED events are paged on deliveredAt. Partial => only
+// delivered orders are indexed (small), and the timeline query is a pure
+// index range scan instead of a patient-wide scan + in-memory sort.
+orderSchema.index(
+  { patientId: 1, deliveredAt: -1 },
+  { name: 'patient_delivered', partialFilterExpression: { deliveredAt: { $exists: true } } }
+);
+// Timeline: ORDER_CANCELLED events are paged on updatedAt, which is stable for
+// cancelled orders because 'cancelled' is terminal. Partial => only cancelled.
+orderSchema.index(
+  { patientId: 1, updatedAt: -1 },
+  { name: 'patient_cancelled', partialFilterExpression: { status: 'cancelled' } }
+);
 
 export const Order = mongoose.model<OrderDocument>('Order', orderSchema);
