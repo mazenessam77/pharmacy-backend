@@ -57,6 +57,9 @@ export interface TimelineEvent {
   orderId?: string;
   prescriptionId?: string;
   basketId?: string;
+  /** Only on ORDER_DELIVERED — enables the inline summary card + Reorder. */
+  canReorder?: boolean;
+  summary?: { pharmacyName?: string; meds: { name: string; quantity: number }[]; total: number };
 }
 
 export type TimelineTypeFilter = 'orders' | 'offers' | 'prescriptions' | 'favorites' | 'baskets';
@@ -166,22 +169,40 @@ export async function getTimeline(
     tasks.push(
       Order.find(
         { patientId, deliveredAt: before ? before : { $exists: true } },
-        { deliveredAt: 1 }
+        { deliveredAt: 1, acceptedPharmacy: 1, acceptedResponse: 1 }
       )
         .sort({ deliveredAt: -1 })
         .limit(fetch)
+        .populate('acceptedPharmacy', 'pharmacyName')
+        .populate('acceptedResponse', 'availableMeds totalPrice deliveryFee')
         .lean()
         .then((docs) =>
           docs
             .filter((d) => d.deliveredAt)
-            .map((d) => ({
-              id: `ORDER_DELIVERED:${d._id}`,
-              type: 'ORDER_DELIVERED' as const,
-              title: 'Order delivered',
-              description: 'Your medicines arrived. Hope you feel better soon!',
-              timestamp: d.deliveredAt as Date,
-              orderId: String(d._id),
-            }))
+            .map((d: any) => {
+              const meds = Array.isArray(d.acceptedResponse?.availableMeds)
+                ? d.acceptedResponse.availableMeds
+                    .filter((m: any) => m.inStock !== false)
+                    .map((m: any) => ({ name: m.name, quantity: m.quantity || 1 }))
+                : [];
+              const total = (d.acceptedResponse?.totalPrice || 0) + (d.acceptedResponse?.deliveryFee || 0);
+              return {
+                id: `ORDER_DELIVERED:${d._id}`,
+                type: 'ORDER_DELIVERED' as const,
+                title: 'Order delivered',
+                description: d.acceptedPharmacy?.pharmacyName
+                  ? `Delivered by ${d.acceptedPharmacy.pharmacyName}.`
+                  : 'Your medicines arrived. Hope you feel better soon!',
+                timestamp: d.deliveredAt as Date,
+                orderId: String(d._id),
+                canReorder: true,
+                summary: {
+                  pharmacyName: d.acceptedPharmacy?.pharmacyName,
+                  meds: meds.slice(0, 5),
+                  total,
+                },
+              };
+            })
         )
     );
     // Cancelled — terminal status, so updatedAt is the cancellation moment.
@@ -215,8 +236,8 @@ export async function getTimeline(
         .sort({ createdAt: -1 })
         .limit(fetch)
         .lean()
-        .then((docs) =>
-          docs.flatMap((n: any): TimelineEvent[] => {
+        .then((docs) => {
+          const raw = docs.flatMap((n: any): TimelineEvent[] => {
             const orderId = n.data?.orderId ? String(n.data.orderId) : undefined;
             if (n.type === 'new_offer') {
               return [{
@@ -238,8 +259,20 @@ export async function getTimeline(
               timestamp: n.createdAt as Date,
               orderId,
             }];
-          })
-        )
+          });
+          // Keep only the newest of each repeated status milestone per order
+          // (docs are already newest-first). OFFER_RECEIVED is exempt — multiple
+          // pharmacies legitimately produce multiple offers.
+          const DEDUPE = new Set(['ORDER_PREPARING', 'ORDER_OUT_FOR_DELIVERY', 'OFFER_ACCEPTED', 'ORDER_STATUS']);
+          const seen = new Set<string>();
+          return raw.filter((ev) => {
+            if (!DEDUPE.has(ev.type)) return true;
+            const key = `${ev.type}:${ev.orderId}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+        })
     );
   }
 

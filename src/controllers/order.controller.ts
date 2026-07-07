@@ -340,3 +340,51 @@ export const reorder = asyncHandler(async (req: Request, res: Response) => {
     data: { order: newOrder },
   });
 });
+
+/**
+ * GET /api/orders/:id/reorder-context
+ * Read-only prefill for the "Reorder" review flow. NO writes — the patient
+ * reviews/edits, then submits through the normal POST /api/orders (which owns
+ * all broadcast/marketplace logic). Object-level: the order must belong to the
+ * requester, and only DELIVERED orders can be reordered.
+ *
+ * Medicines are prefilled from what was actually delivered (the accepted
+ * offer's in-stock lines), falling back to the originally requested list.
+ */
+export const getReorderContext = asyncHandler(async (req: Request, res: Response) => {
+  const order = await Order.findOne({ _id: req.params.id, patientId: req.user!._id })
+    .populate('acceptedResponse', 'availableMeds')
+    .populate('acceptedPharmacy', 'pharmacyName')
+    .lean();
+
+  if (!order) {
+    throw new AppError('Order not found.', 404, ERROR_CODES.ORDER_NOT_FOUND);
+  }
+  if (order.status !== 'delivered') {
+    throw new AppError('Only delivered orders can be reordered.', 400, ERROR_CODES.ORDER_INVALID_STATUS);
+  }
+
+  const accepted: any = order.acceptedResponse;
+  const fromOffer: { name: string; quantity: number }[] = Array.isArray(accepted?.availableMeds)
+    ? accepted.availableMeds
+        .filter((m: any) => m.inStock !== false)
+        .map((m: any) => ({ name: m.name, quantity: m.quantity || 1 }))
+    : [];
+  const medicines = fromOffer.length > 0
+    ? fromOffer
+    : (order.medicines || []).map((m: any) => ({ name: m.name, quantity: m.quantity || 1 }));
+
+  res.json({
+    success: true,
+    data: {
+      governorate: order.governorate,
+      deliveryType: order.deliveryType,
+      medicines,
+      // The original prescription is the patient's own — offered only so they
+      // can EXPLICITLY choose to reuse it; never auto-applied.
+      hadPrescription: !!order.prescriptionId,
+      prescriptionId: order.prescriptionId ? String(order.prescriptionId) : undefined,
+      pharmacyName: (order.acceptedPharmacy as any)?.pharmacyName,
+    },
+  });
+});

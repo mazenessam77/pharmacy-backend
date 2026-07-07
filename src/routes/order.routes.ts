@@ -15,5 +15,6 @@ router.get('/:id', authorize('patient', 'pharmacy', 'admin'), orderController.ge
 router.put('/:id/cancel', authorize('patient'), orderController.cancelOrder);
 router.put('/:id/status', authorize('pharmacy'), validate(updateOrderStatusSchema), orderController.updateOrderStatus);
 router.post('/:id/reorder', authorize('patient'), orderController.reorder);
+router.get('/:id/reorder-context', authorize('patient'), orderController.getReorderContext);
 
 export default router;

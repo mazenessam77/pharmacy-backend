@@ -90,6 +90,10 @@ beforeAll(async () => {
       data: { orderId: orderIds[0].toString(), status: 'confirmed' }, isRead: true, createdAt: at(70), updatedAt: at(70) },
     { userId: a._id, type: 'order_status', title: 'Order Status Updated', body: 'preparing',
       data: { orderId: orderIds[0].toString(), status: 'preparing' }, isRead: true, createdAt: at(40), updatedAt: at(40) },
+    { userId: a._id, type: 'order_status', title: 'Order Status Updated', body: 'preparing',
+      data: { orderId: orderIds[0].toString(), status: 'preparing' }, isRead: true, createdAt: at(39), updatedAt: at(39) },
+    { userId: a._id, type: 'order_status', title: 'Order Status Updated', body: 'preparing',
+      data: { orderId: orderIds[0].toString(), status: 'preparing' }, isRead: true, createdAt: at(38), updatedAt: at(38) },
     // delivered status notification must be SKIPPED (durable event covers it)
     { userId: a._id, type: 'order_status', title: 'Order Status Updated', body: 'delivered',
       data: { orderId: orderIds[0].toString(), status: 'delivered' }, isRead: true, createdAt: at(10), updatedAt: at(10) },
@@ -148,6 +152,13 @@ describe('event derivation', () => {
 
     const cancelled = events.find((e: any) => e.type === 'ORDER_CANCELLED');
     expect(cancelled.description).toContain('Changed my mind');
+
+    // repeated 'preparing' status noise collapses to a single milestone
+    expect(events.filter((e: any) => e.type === 'ORDER_PREPARING')).toHaveLength(1);
+    // delivered event carries a reorder summary + flag
+    const del = events.find((e: any) => e.type === 'ORDER_DELIVERED');
+    expect(del.canReorder).toBe(true);
+    expect(del.summary).toBeDefined();
   });
 
   it('never leaks another patient’s activity (isolation)', async () => {
