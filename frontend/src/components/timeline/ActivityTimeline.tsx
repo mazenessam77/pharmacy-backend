@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   FileText,
   ShoppingBag,
@@ -34,6 +35,8 @@ interface TimelineEvent {
   orderId?: string;
   prescriptionId?: string;
   basketId?: string;
+  canReorder?: boolean;
+  summary?: { pharmacyName?: string; meds: { name: string; quantity: number }[]; total: number };
 }
 
 const META: Record<EventType, { icon: React.ElementType; cls: string }> = {
@@ -59,6 +62,18 @@ const FILTERS = [
   { key: 'baskets', label: 'Baskets' },
 ] as const;
 
+/** Human date bucket for grouping (Today / Yesterday / 'Jun 30' / 'Jun 30, 2025'). */
+function dateBucket(iso: string): string {
+  const d = new Date(iso);
+  const now = new Date();
+  const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((startOf(now) - startOf(d)) / 86_400_000);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  const sameYear = d.getFullYear() === now.getFullYear();
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
+}
+
 function SkeletonRow() {
   return (
     <div className="flex gap-4 animate-pulse">
@@ -79,6 +94,7 @@ export default function ActivityTimeline({ onViewBasket }: { onViewBasket?: () =
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const [initialised, setInitialised] = useState(false);
+  const router = useRouter();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
 
@@ -204,8 +220,18 @@ export default function ActivityTimeline({ onViewBasket }: { onViewBasket?: () =
           const meta = META[ev.type] ?? META.ORDER_STATUS;
           const Icon = meta.icon;
           const last = i === events.length - 1 && !hasMore;
+          const bucket = dateBucket(ev.timestamp);
+          const showHeader = i === 0 || bucket !== dateBucket(events[i - 1].timestamp);
           return (
-            <li key={ev.id} className="relative flex gap-4">
+            <div key={ev.id}>
+            {showHeader && (
+              <li className="list-none">
+                <p className={`text-[11px] font-bold uppercase tracking-widest text-neutral-400 ${i === 0 ? '' : 'mt-2'} mb-4`}>
+                  {bucket}
+                </p>
+              </li>
+            )}
+            <li className="relative flex gap-4">
               {/* rail */}
               {!last && <span className="absolute start-[17px] top-9 bottom-0 w-px bg-neutral-200" />}
               <span
@@ -223,12 +249,49 @@ export default function ActivityTimeline({ onViewBasket }: { onViewBasket?: () =
                     {timeAgo(ev.timestamp)}
                   </span>
                 </div>
-                {ev.description && (
-                  <p className="text-[12.5px] text-neutral-500 mt-0.5 leading-relaxed">{ev.description}</p>
+                {ev.canReorder && ev.summary ? (
+                  <div className="mt-2 border border-neutral-200 rounded-[12px] p-3.5 bg-neutral-50/60">
+                    {ev.summary.pharmacyName && (
+                      <p className="text-[12px] font-semibold text-neutral-800 mb-1.5">{ev.summary.pharmacyName}</p>
+                    )}
+                    <ul className="space-y-0.5 mb-2">
+                      {ev.summary.meds.map((m, k) => (
+                        <li key={k} className="text-[12px] text-neutral-600 flex justify-between">
+                          <span>{m.name}{m.quantity > 1 ? ` ×${m.quantity}` : ''}</span>
+                        </li>
+                      ))}
+                      {ev.summary.meds.length === 0 && (
+                        <li className="text-[12px] text-neutral-400">Order delivered</li>
+                      )}
+                    </ul>
+                    {ev.summary.total > 0 && (
+                      <p className="text-[12px] text-neutral-500 mb-2.5">
+                        Total: <span className="font-semibold text-neutral-800">{ev.summary.total.toFixed(2)} EGP</span>
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <Link href={`/patient/orders/${ev.orderId}`} className="text-[11px] font-bold text-neutral-600 hover:text-neutral-900">
+                        View Order
+                      </Link>
+                      <button
+                        onClick={() => router.push(`/patient/orders/new?reorder=${ev.orderId}`)}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-gradient-to-r from-blue-600 to-sky-500 px-3 py-1.5 rounded-full hover:shadow-md active:scale-95 transition-all"
+                      >
+                        <RotateCcw className="w-3 h-3" /> Reorder
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {ev.description && (
+                      <p className="text-[12.5px] text-neutral-500 mt-0.5 leading-relaxed">{ev.description}</p>
+                    )}
+                    <div className="mt-1.5">{cta(ev)}</div>
+                  </>
                 )}
-                <div className="mt-1.5">{cta(ev)}</div>
               </div>
             </li>
+            </div>
           );
         })}
       </ol>
