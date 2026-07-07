@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import api from '@/lib/api';
 import { useOrderStore } from '@/store/orderStore';
 import { useRequestDraftStore } from '@/store/requestDraftStore';
 import { prescriptionService } from '@/lib/services/prescriptionService';
@@ -32,6 +33,12 @@ export default function NewOrderPage() {
   const [notes, setNotes] = useState('');
   const [prescriptionFile, setPrescriptionFile] = useState<File | null>(null);
   const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
+  // Reorder review: prefilled from a delivered order. If it carried a
+  // prescription, the patient must EXPLICITLY choose reuse vs upload.
+  const searchParams = useSearchParams();
+  const reorderId = searchParams.get('reorder');
+  const [reuseRxId, setReuseRxId] = useState<string | null>(null);
+  const [rxChoice, setRxChoice] = useState<'reuse' | 'upload' | null>(null);
   const [uploading, setUploading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'instapay' | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -50,6 +57,31 @@ export default function NewOrderPage() {
       toast.success('Basket loaded — review and submit your request');
     }
   }, [consumeDraft]);
+
+  useEffect(() => {
+    if (!reorderId) return;
+    let cancelled = false;
+    api.get(`/orders/${reorderId}/reorder-context`).then((res) => {
+      if (cancelled) return;
+      const ctx = res.data.data;
+      setGovernorate(ctx.governorate || 'Giza');
+      setDeliveryType(ctx.deliveryType || 'delivery');
+      if (ctx.hadPrescription) {
+        setOrderType('prescription');
+        setReuseRxId(ctx.prescriptionId || null); // patient's own rx, reuse is opt-in
+        setRxChoice(null); // force an explicit choice
+        setPrescriptionId(null);
+      } else if (ctx.medicines?.length) {
+        setOrderType('manual');
+        setMedicines(ctx.medicines.map((m: any) => ({ name: m.name, quantity: m.quantity || 1 })));
+      }
+      toast.success('Loaded from your delivered order — review and submit');
+    }).catch(() => toast.error('Could not load that order for reorder'));
+    return () => { cancelled = true; };
+  }, [reorderId]);
+
+  const chooseReuse = () => { setRxChoice('reuse'); setPrescriptionId(reuseRxId); };
+  const chooseUpload = () => { setRxChoice('upload'); setPrescriptionId(null); setPrescriptionFile(null); };
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -114,7 +146,11 @@ export default function NewOrderPage() {
 
     const validMeds = orderType === 'manual' ? medicines.filter((m) => m.name.trim()) : [];
     if (orderType === 'prescription' && !prescriptionId) {
-      toast.error(prescriptionFile ? 'Press "Upload Prescription" and wait for it to finish' : 'Upload your prescription first');
+      if (reuseRxId && rxChoice === null) {
+        toast.error('Choose to reuse your previous prescription or upload a new one');
+      } else {
+        toast.error(prescriptionFile ? 'Press "Upload Prescription" and wait for it to finish' : 'Upload your prescription first');
+      }
       return;
     }
     if (orderType === 'manual' && validMeds.length === 0) {
@@ -262,6 +298,27 @@ export default function NewOrderPage() {
           <p className="text-[11px] text-neutral-400 -mt-2 mb-4">
             No need to type medicine names — the pharmacist reads your prescription and sends an offer.
           </p>
+          {reuseRxId && (
+            <div className="mb-4">
+              <p className="text-[11px] text-neutral-500 mb-2">This is a reorder — we never assume your old prescription is still valid. Please choose:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button type="button" onClick={chooseReuse}
+                  className={`p-3 rounded-[12px] border-2 text-left text-[12px] font-semibold transition-colors ${rxChoice === 'reuse' ? 'border-blue-500 bg-blue-50/50 text-blue-700' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'}`}>
+                  ♻️ Reuse previous prescription
+                </button>
+                <button type="button" onClick={chooseUpload}
+                  className={`p-3 rounded-[12px] border-2 text-left text-[12px] font-semibold transition-colors ${rxChoice === 'upload' ? 'border-blue-500 bg-blue-50/50 text-blue-700' : 'border-neutral-200 text-neutral-600 hover:border-neutral-300'}`}>
+                  ⬆️ Upload a new prescription
+                </button>
+              </div>
+              {rxChoice === 'reuse' && (
+                <div className="flex items-center gap-2 text-emerald-700 mt-3 text-[12px] font-medium">
+                  <CheckCircle2 className="w-4 h-4" /> Reusing your previous prescription
+                </div>
+              )}
+            </div>
+          )}
+          {reuseRxId && rxChoice !== 'upload' ? null : (<>
           {prescriptionId ? (
             <div className="flex items-center gap-2 text-neutral-900">
               <CheckCircle2 className="w-4 h-4" />
@@ -290,6 +347,7 @@ export default function NewOrderPage() {
               )}
             </div>
           )}
+          </>)}
         </div>
         )}
 
