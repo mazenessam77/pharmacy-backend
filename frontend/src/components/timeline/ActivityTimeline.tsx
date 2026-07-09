@@ -22,7 +22,7 @@ import {
   Star,
 } from 'lucide-react';
 import api from '@/lib/api';
-import { timeAgo } from '@/components/delivery/steps';
+import { relativeTime, fullTimestamp } from '@/lib/relativeTime';
 import { buildItems, dateBucket, fmtDuration, type EventType, type Summary, type TimelineEvent, type OrderItem, type Item } from '@/lib/timelineGrouping';
 
 const META: Record<EventType, { icon: React.ElementType; cls: string }> = {
@@ -92,8 +92,8 @@ function OrderCard({ item }: { item: OrderItem }) {
             {status.label}
           </span>
         </div>
-        <span className="text-[11px] text-neutral-400 shrink-0 tabular-nums" title={new Date(item.ts).toLocaleString()}>
-          {timeAgo(item.ts)}
+        <span className="text-[11px] text-neutral-400 shrink-0 tabular-nums" title={fullTimestamp(item.ts)}>
+          {relativeTime(item.ts)}
         </span>
       </div>
 
@@ -165,7 +165,7 @@ function OrderCard({ item }: { item: OrderItem }) {
                 </span>
                 <div className="flex-1 flex items-baseline justify-between gap-2">
                   <span className="text-[12px] text-neutral-700">{ev.title}</span>
-                  <span className="text-[10.5px] text-neutral-400 tabular-nums shrink-0">{timeAgo(ev.timestamp)}</span>
+                  <span className="text-[10.5px] text-neutral-400 tabular-nums shrink-0" title={fullTimestamp(ev.timestamp)}>{relativeTime(ev.timestamp)}</span>
                 </div>
               </li>
             );
@@ -329,8 +329,8 @@ export default function ActivityTimeline({ onViewBasket }: { onViewBasket?: () =
                     <>
                       <div className="flex items-baseline justify-between gap-3">
                         <p className="text-[13.5px] font-semibold text-neutral-900">{item.event.title}</p>
-                        <span className="text-[11px] text-neutral-400 shrink-0 tabular-nums" title={new Date(item.event.timestamp).toLocaleString()}>
-                          {timeAgo(item.event.timestamp)}
+                        <span className="text-[11px] text-neutral-400 shrink-0 tabular-nums" title={fullTimestamp(item.event.timestamp)}>
+                          {relativeTime(item.event.timestamp)}
                         </span>
                       </div>
                       {item.event.description && (
