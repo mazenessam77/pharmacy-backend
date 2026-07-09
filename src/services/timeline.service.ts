@@ -59,7 +59,16 @@ export interface TimelineEvent {
   basketId?: string;
   /** Only on ORDER_DELIVERED — enables the inline summary card + Reorder. */
   canReorder?: boolean;
-  summary?: { pharmacyName?: string; meds: { name: string; quantity: number }[]; total: number };
+  summary?: {
+    pharmacyName?: string;
+    rating?: number;
+    meds: { name: string; quantity: number }[];
+    medicineCount: number;
+    deliveryFee: number;
+    total: number;
+    /** deliveredAt - createdAt, minutes. Computed on read, never persisted. */
+    durationMinutes?: number;
+  };
 }
 
 export type TimelineTypeFilter = 'orders' | 'offers' | 'prescriptions' | 'favorites' | 'baskets';
@@ -169,11 +178,11 @@ export async function getTimeline(
     tasks.push(
       Order.find(
         { patientId, deliveredAt: before ? before : { $exists: true } },
-        { deliveredAt: 1, acceptedPharmacy: 1, acceptedResponse: 1 }
+        { deliveredAt: 1, createdAt: 1, acceptedPharmacy: 1, acceptedResponse: 1 }
       )
         .sort({ deliveredAt: -1 })
         .limit(fetch)
-        .populate('acceptedPharmacy', 'pharmacyName')
+        .populate('acceptedPharmacy', 'pharmacyName rating')
         .populate('acceptedResponse', 'availableMeds totalPrice deliveryFee')
         .lean()
         .then((docs) =>
@@ -185,7 +194,12 @@ export async function getTimeline(
                     .filter((m: any) => m.inStock !== false)
                     .map((m: any) => ({ name: m.name, quantity: m.quantity || 1 }))
                 : [];
-              const total = (d.acceptedResponse?.totalPrice || 0) + (d.acceptedResponse?.deliveryFee || 0);
+              const deliveryFee = d.acceptedResponse?.deliveryFee || 0;
+              const total = (d.acceptedResponse?.totalPrice || 0) + deliveryFee;
+              const durationMinutes =
+                d.createdAt && d.deliveredAt
+                  ? Math.max(0, Math.round((new Date(d.deliveredAt).getTime() - new Date(d.createdAt).getTime()) / 60000))
+                  : undefined;
               return {
                 id: `ORDER_DELIVERED:${d._id}`,
                 type: 'ORDER_DELIVERED' as const,
@@ -198,8 +212,12 @@ export async function getTimeline(
                 canReorder: true,
                 summary: {
                   pharmacyName: d.acceptedPharmacy?.pharmacyName,
+                  rating: d.acceptedPharmacy?.rating || undefined,
                   meds: meds.slice(0, 5),
+                  medicineCount: meds.length,
+                  deliveryFee,
                   total,
+                  durationMinutes,
                 },
               };
             })
