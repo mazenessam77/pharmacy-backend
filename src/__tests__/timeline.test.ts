@@ -176,8 +176,7 @@ describe('event derivation', () => {
   });
 
   it('a delivered order with no accepted offer still summarizes gracefully', async () => {
-    const res = await get(patientAToken, '?limit=50');
-    // the cancelled order is not delivered; add a fresh no-offer delivered order
+    // a fresh delivered order with no accepted offer (pharmacy/response absent)
     const noOffer = new mongoose.Types.ObjectId();
     await Order.collection.insertOne({
       _id: noOffer, patientId: patientAId, medicines: [{ name: 'Aspirin', quantity: 1 }],
