@@ -13,7 +13,7 @@ import {
 } from '../services/rxPipeline.service';
 import { getPagination } from '../utils/helpers';
 import { logger } from '../utils/logger';
-import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 
 /**
  * Object-level authorization for viewing a single prescription.
@@ -163,8 +163,8 @@ export const uploadPrescription = asyncHandler(async (req: Request, res: Respons
 });
 
 export const getPrescriptions = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const [prescriptions, total] = await Promise.all([

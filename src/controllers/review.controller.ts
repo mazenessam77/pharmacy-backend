@@ -5,7 +5,7 @@ import { Pharmacy } from '../models/Pharmacy';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { getPagination } from '../utils/helpers';
-import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 
 export const createReview = asyncHandler(async (req: Request, res: Response) => {
   const { pharmacyId, orderId, rating, comment } = req.body;
@@ -62,8 +62,8 @@ export const createReview = asyncHandler(async (req: Request, res: Response) => 
 
 export const getPharmacyReviews = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const [reviews, total] = await Promise.all([

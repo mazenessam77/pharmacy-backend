@@ -8,6 +8,7 @@ import {
   ERROR_CODES,
   DEFAULT_PAGE,
   DEFAULT_LIMIT,
+  MAX_LIMIT,
 } from '../utils/constants';
 import { generateAlternativeRecommendation } from '../services/medicine-ai.service';
 import { createNotification } from '../services/notification.service';
@@ -67,8 +68,8 @@ export const createSideEffectReport = asyncHandler(async (req: Request, res: Res
 });
 
 export const getMySideEffectReports = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const filter = { patientId: req.user!._id };
@@ -114,8 +115,8 @@ export const listPendingReports = asyncHandler(async (req: Request, res: Respons
     throw new AppError('Forbidden.', 403, ERROR_CODES.FORBIDDEN);
   }
 
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const status = (req.query.status as string) || 'pending_review';
   const skip = (page - 1) * limit;
 

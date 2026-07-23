@@ -5,11 +5,11 @@ import { Pharmacy } from '../models/Pharmacy';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { findPharmaciesByGovernorate } from '../services/geolocation.service';
-import { createNotification } from '../services/notification.service';
+import { createNotification, createBulkNotifications } from '../services/notification.service';
 import { getIO } from '../socket';
 import { getPagination } from '../utils/helpers';
 import { logger } from '../utils/logger';
-import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { ERROR_CODES, CANCELLABLE_STATUSES, PHARMACY_UPDATABLE_STATUSES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 import { sendOrderConfirmationEmail } from '../services/email.service';
 
 export const createOrder = asyncHandler(async (req: Request, res: Response) => {
@@ -55,20 +55,25 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
       ? `A patient in ${governorate} is requesting ${medicineCount} medicine(s)`
       : `A patient in ${governorate} sent a prescription for review`;
 
-  // Notify each pharmacy in the governorate
-  for (const pharmacy of governoratePharmacies) {
-    if (io) {
+  // Socket emits are synchronous and cheap — do them inline.
+  if (io) {
+    for (const pharmacy of governoratePharmacies) {
       io.to(`pharmacy:${pharmacy._id}`).emit('pharmacy:new-order', { order });
     }
+  }
 
-    await createNotification({
+  // Persist + push the notifications off the request path: each one costs a
+  // Mongo insert and an FCM round-trip, and the patient must not wait
+  // N-pharmacies × that before getting their confirmation.
+  createBulkNotifications(
+    governoratePharmacies.map((pharmacy) => ({
       userId: pharmacy.userId,
       type: 'new_order',
       title: 'New Order in Your Area',
       body: notificationBody,
       data: { orderId: order._id.toString() },
-    });
-  }
+    }))
+  ).catch((err) => logger.error('Order notification fan-out failed:', err));
 
   res.status(201).json({
     success: true,
@@ -77,8 +82,8 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getOrders = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const status = req.query.status as string;
   const skip = (page - 1) * limit;
 

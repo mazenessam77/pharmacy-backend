@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 import { verifyAccessToken } from '../utils/jwt';
-import { User } from '../models/User';
+import { getUserCached } from '../services/userCache.service';
 import { logger } from '../utils/logger';
 
 export const socketAuth = async (socket: Socket, next: (err?: Error) => void): Promise<void> => {
@@ -12,7 +12,7 @@ export const socketAuth = async (socket: Socket, next: (err?: Error) => void): P
     }
 
     const decoded = verifyAccessToken(token);
-    const user = await User.findById(decoded.id);
+    const user = await getUserCached(decoded.id);
 
     if (!user || user.isBanned) {
       return next(new Error('User not found or banned'));

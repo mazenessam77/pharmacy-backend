@@ -34,8 +34,10 @@ app.set('trust proxy', 1);
 
 // Global middleware
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// Images never travel as JSON (multer / S3 presign handle them), so a large
+// JSON limit only serves memory-exhaustion requests.
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // NB: no cookie-parser on purpose — auth is header-only Bearer tokens, so no
 // ambient credentials exist and CSRF protection isn't required.
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));

@@ -9,6 +9,11 @@ export const hashToken = (token: string): string => {
   return crypto.createHash('sha256').update(token).digest('hex');
 };
 
+/** Escape user input before embedding it in a $regex — prevents ReDoS / pattern injection. */
+export const escapeRegex = (input: string): string => {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 export const getPagination = (page: number, limit: number, total: number): PaginationResult => {
   return {
     page,

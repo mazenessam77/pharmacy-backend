@@ -6,7 +6,9 @@ import { ERROR_CODES } from '../utils/constants';
 export const validate = (schema: ZodSchema) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
     try {
-      schema.parse(req.body);
+      // Keep the parsed output: zod strips unknown keys, so fields outside the
+      // schema can never reach a controller (mass-assignment hardening).
+      req.body = schema.parse(req.body);
       next();
     } catch (error) {
       if (error instanceof ZodError) {
