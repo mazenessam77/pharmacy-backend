@@ -9,8 +9,9 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { createNotification } from '../services/notification.service';
 import { sendPharmacyVerificationEmail } from '../services/email.service';
-import { getPagination } from '../utils/helpers';
-import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { getPagination, escapeRegex } from '../utils/helpers';
+import { invalidateUserCache } from '../services/userCache.service';
+import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 
 export const getStats = asyncHandler(async (_req: Request, res: Response) => {
   const today = new Date();
@@ -37,8 +38,8 @@ export const getStats = asyncHandler(async (_req: Request, res: Response) => {
 });
 
 export const getPendingPharmacies = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const [pharmacies, total] = await Promise.all([
@@ -103,8 +104,8 @@ export const verifyPharmacy = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const search = req.query.search as string;
   const role = req.query.role as string;
   const skip = (page - 1) * limit;
@@ -112,9 +113,11 @@ export const getUsers = asyncHandler(async (req: Request, res: Response) => {
   const filter: any = {};
   if (role) filter.role = role;
   if (search) {
+    // Escaped: a raw user pattern here is a ReDoS vector against the DB.
+    const safe = escapeRegex(search);
     filter.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } },
+      { name: { $regex: safe, $options: 'i' } },
+      { email: { $regex: safe, $options: 'i' } },
     ];
   }
 
@@ -142,6 +145,8 @@ export const banUser = asyncHandler(async (req: Request, res: Response) => {
 
   user.isBanned = !user.isBanned;
   await user.save({ validateBeforeSave: false });
+  // Bans must bite immediately — do not wait out the auth-cache TTL.
+  await invalidateUserCache(user._id.toString());
 
   res.json({
     success: true,
@@ -150,8 +155,8 @@ export const banUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const getAllOrders = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const status = req.query.status as string;
   const skip = (page - 1) * limit;
 
@@ -232,6 +237,7 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
     Notification.deleteMany({ userId: user._id }),
     User.findByIdAndDelete(user._id),
   ]);
+  await invalidateUserCache(user._id.toString());
 
   res.json({ success: true, data: { message: 'User and all related data deleted.' } });
 });
@@ -258,8 +264,8 @@ export const deletePharmacy = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const getAllPharmacies = asyncHandler(async (req: Request, res: Response) => {
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const [pharmacies, total] = await Promise.all([

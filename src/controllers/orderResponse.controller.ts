@@ -9,7 +9,7 @@ import { createNotification } from '../services/notification.service';
 import { sendOrderConfirmationEmail } from '../services/email.service';
 import { getIO } from '../socket';
 import { getPagination } from '../utils/helpers';
-import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 import { User } from '../models/User';
 
 export const submitResponse = asyncHandler(async (req: Request, res: Response) => {
@@ -100,8 +100,8 @@ export const submitResponse = asyncHandler(async (req: Request, res: Response) =
 
 export const getResponses = asyncHandler(async (req: Request, res: Response) => {
   const { orderId } = req.params;
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   const order = await Order.findById(orderId);

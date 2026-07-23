@@ -6,12 +6,12 @@ import { AppError } from '../utils/AppError';
 import { createNotification } from '../services/notification.service';
 import { getIO } from '../socket';
 import { getPagination } from '../utils/helpers';
-import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT } from '../utils/constants';
+import { ERROR_CODES, DEFAULT_PAGE, DEFAULT_LIMIT, MAX_LIMIT } from '../utils/constants';
 
 export const getChatHistory = asyncHandler(async (req: Request, res: Response) => {
   const { orderId, recipientId } = req.params;
-  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = Math.max(parseInt(req.query.page as string) || DEFAULT_PAGE, 1);
+  const limit = Math.min(parseInt(req.query.limit as string) || DEFAULT_LIMIT, MAX_LIMIT);
   const skip = (page - 1) * limit;
 
   // Verify user is part of this conversation

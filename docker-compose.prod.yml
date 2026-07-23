@@ -2,11 +2,11 @@ version: '3.8'
 
 services:
   mongodb:
-    # Published ONLY on the EC2 private VPC interface (never 0.0.0.0) so the
-    # prescription-processor Lambda can reach it over the VPC. Ingress on
-    # 27017 is gated by the security group (source = the Lambda's SG only).
-    ports: !override
-      - "10.0.1.222:27017:27017"
+    # No published ports: the Rx-processing Lambda that needed VPC access to
+    # 27017 was retired 2026-07-02, so only containers on the compose network
+    # may reach Mongo. (The matching Lambda-SG ingress rule should be deleted
+    # in AWS as part of the Rx-pipeline teardown.)
+    ports: !override []
     deploy:
       resources:
         limits:

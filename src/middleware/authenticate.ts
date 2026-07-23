@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt';
-import { User } from '../models/User';
+import { getUserCached } from '../services/userCache.service';
 import { AppError } from '../utils/AppError';
 import { ERROR_CODES } from '../utils/constants';
 
@@ -21,7 +21,7 @@ export const authenticate = async (req: Request, _res: Response, next: NextFunct
     }
 
     const decoded = verifyAccessToken(token);
-    const user = await User.findById(decoded.id);
+    const user = await getUserCached(decoded.id);
 
     if (!user) {
       throw new AppError('User not found.', 401, ERROR_CODES.USER_NOT_FOUND);

@@ -5,6 +5,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
 import { uploadToCloudinary } from '../services/upload.service';
 import { ERROR_CODES } from '../utils/constants';
+import { invalidateUserCache } from '../services/userCache.service';
 
 export const getProfile = asyncHandler(async (req: Request, res: Response) => {
   const user = req.user!;
@@ -38,6 +39,7 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
     new: true,
     runValidators: true,
   });
+  await invalidateUserCache(req.user!._id.toString());
 
   res.json({
     success: true,
@@ -62,6 +64,7 @@ export const updateLocation = asyncHandler(async (req: Request, res: Response) =
     },
     { new: true }
   );
+  await invalidateUserCache(req.user!._id.toString());
 
   // Also update pharmacy location if pharmacy role
   if (req.user!.role === 'pharmacy') {
@@ -94,6 +97,7 @@ export const updateSearchRadius = asyncHandler(async (req: Request, res: Respons
     { searchRadius: radius },
     { new: true }
   );
+  await invalidateUserCache(req.user!._id.toString());
 
   res.json({
     success: true,
@@ -109,6 +113,7 @@ export const updateFcmToken = asyncHandler(async (req: Request, res: Response) =
   }
 
   await User.findByIdAndUpdate(req.user!._id, { fcmToken });
+  await invalidateUserCache(req.user!._id.toString());
 
   res.json({
     success: true,

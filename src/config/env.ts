@@ -46,3 +46,24 @@ export const env = {
   AWS_REGION: process.env.AWS_REGION || 'eu-west-2',
   PRESCRIPTIONS_BUCKET: process.env.PRESCRIPTIONS_BUCKET || '',
 };
+
+// Fail fast in production: booting with the placeholder JWT secrets would let
+// anyone who reads this public repo forge tokens for any account. A crash at
+// startup is recoverable; silently running forgeable auth is not.
+if (env.NODE_ENV === 'production') {
+  const fatal: string[] = [];
+  if (!process.env.JWT_ACCESS_SECRET || env.JWT_ACCESS_SECRET === 'default_access_secret') {
+    fatal.push('JWT_ACCESS_SECRET is missing or still the insecure default');
+  }
+  if (!process.env.JWT_REFRESH_SECRET || env.JWT_REFRESH_SECRET === 'default_refresh_secret') {
+    fatal.push('JWT_REFRESH_SECRET is missing or still the insecure default');
+  }
+  if (!process.env.MONGODB_URI) {
+    fatal.push('MONGODB_URI is not set');
+  }
+  if (fatal.length > 0) {
+    // logger depends on env — plain console is deliberate here.
+    console.error(`FATAL: refusing to start in production:\n- ${fatal.join('\n- ')}`);
+    process.exit(1);
+  }
+}
