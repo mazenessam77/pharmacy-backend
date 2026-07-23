@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { User, UserDocument } from '../models/User';
 import { getRedisClient } from '../config/redis';
 import { logger } from '../utils/logger';
 
@@ -15,9 +15,7 @@ const USER_CACHE_TTL_SECONDS = 60;
 
 const cacheKey = (userId: string) => `user:${userId}`;
 
-type UserDoc = NonNullable<Awaited<ReturnType<typeof User.findById>>>;
-
-export const getUserCached = async (userId: string): Promise<UserDoc | null> => {
+export const getUserCached = async (userId: string): Promise<UserDocument | null> => {
   const redis = getRedisClient();
 
   if (redis && redis.status === 'ready') {
@@ -26,7 +24,7 @@ export const getUserCached = async (userId: string): Promise<UserDoc | null> => 
       if (cached) {
         // hydrate() re-applies schema casting (dates, ObjectIds) to the
         // plain JSON and returns a full mongoose document.
-        return User.hydrate(JSON.parse(cached));
+        return User.hydrate(JSON.parse(cached)) as UserDocument;
       }
     } catch (err) {
       logger.warn('User cache read failed (falling back to DB):', (err as Error).message);
